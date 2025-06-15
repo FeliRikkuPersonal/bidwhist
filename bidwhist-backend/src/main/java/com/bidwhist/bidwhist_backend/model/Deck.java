@@ -3,23 +3,22 @@ package com.bidwhist.bidwhist_backend.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public class Deck {
-    private final List<Card> cards;
-    private final List<Card> kitty = new ArrayList<>();
-    private final List<Card> player1Hand = new ArrayList<>();
-    private final List<Card> player2Hand = new ArrayList<>();
-    private final List<Card> player3Hand = new ArrayList<>();
-    private final List<Card> player4Hand = new ArrayList<>();
+    public enum PlayerPos {
+        P1, P2, P3, P4;
+    }
 
-    private List<Card> player1Winnings = new ArrayList<>();
-    private List<Card> player2Winnings = new ArrayList<>();
-    private List<Card> player3Winnings = new ArrayList<>();
-    private List<Card> player4Winnings = new ArrayList<>();
+    private final List<Card> cards;
+    private Kitty kitty;
+    private Map<PlayerPos, Hand> hands;
 
     public Deck() {
         this.cards = new ArrayList<>();
         buildStandardDeck();
+        this.kitty = new Kitty();       // create empty kitty
+        createHands();
     }
 
     private void buildStandardDeck() {
@@ -41,18 +40,40 @@ public class Deck {
         Collections.shuffle(cards);
     }
 
+    // Create empty hands
+    private void createHands() {
+        for (PlayerPos pos : PlayerPos.values()) {
+            hands.put(pos, new Hand(this));
+        }
+    }
+
     public void deal() {
         for (int i = 0; i < 48; i++) {
-            if (i % 4 == 0) player1Hand.add(cards.get(i));
-            else if (i % 4 == 1) player2Hand.add(cards.get(i));
-            else if (i % 4 == 2) player3Hand.add(cards.get(i));
-            else player4Hand.add(cards.get(i));
+            if (i % 4 == 0) {
+                hands.get(PlayerPos.P1).addCard(cards.get(i));
+            }
+            else if (i % 4 == 1) {
+                hands.get(PlayerPos.P2).addCard(cards.get(i));
+            }
+            else if (i % 4 == 2) {
+                hands.get(PlayerPos.P3).addCard(cards.get(i));
+            }
+            else {
+                hands.get(PlayerPos.P4).addCard(cards.get(i));
+            }
         }
 
         for (int i = 48; i < 54; i++) {
-            kitty.add(cards.get(i));
+            kitty.addCard(cards.get(i));
         }
     }
+
+    /* place holder for method to assigning hand to player.
+    *  private Hand assignHand(Hand hand) {
+    *       -some text here-
+    *       return hand;
+    *  }
+    */ 
 
     private boolean isJokerRank(Card.Rank rank) {
         return rank == Card.Rank.JOKER_S || rank == Card.Rank.JOKER_L;
@@ -64,6 +85,7 @@ public class Deck {
         }
     }
 
+    // Call to Card.assignSuit() for jokers only
     public void assignTrumpSuitToJokers(Card.Suit trump) {
         for (Card card : cards) {
             card.assignSuit(trump); // only affects jokers
@@ -72,6 +94,10 @@ public class Deck {
 
     public List<Card> getCards() {
         return cards;
+    }
+
+    public Kitty getKitty() {
+        return kitty;
     }
 }
 
