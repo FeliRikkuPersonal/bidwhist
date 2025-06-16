@@ -1,4 +1,4 @@
-package com.bidwhist.bidwhist_backend.model;
+package com.bidwhist.model;
 
 /* Books will be holders of 4 cards. These are the cards played during
  * a round. Once all cards are played, the book will be evaluated to 

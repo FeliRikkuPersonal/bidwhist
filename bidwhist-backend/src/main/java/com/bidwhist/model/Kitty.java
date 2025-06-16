@@ -1,13 +1,18 @@
-package com.bidwhist.bidwhist_backend.model;
+package com.bidwhist.model;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Kitty {
+    public enum State {
+        UNCLAIMED, CLAIMED, DISCARDED
+    }
     public List<Card> cards;
+    public State state;
 
     public Kitty() {
         this.cards = new ArrayList<>();
+        this.state = State.UNCLAIMED;
     }
 
     public void addCard(Card card) {
@@ -33,7 +38,25 @@ public class Kitty {
         hand.addCards(cards);
         List<Card> transferred = new ArrayList<>(cards);
         clear();
+        setState(State.CLAIMED);
+
+
+        // replace with animation signal
         return transferred;
+    }
+
+    public List<Card> receiveCardsFromHand(List<Card> newCards) {
+        if (newCards.size() != 6) {
+            throw new IllegalArgumentException("You must discard exactly 6 cards to the kitty.");
+        }
+        for (Card card : newCards) {
+            cards.add(card);
+        }
+
+        setState(State.DISCARDED);
+
+        // replace with animation signal
+        return cards;
     }
 
     public int size() {
@@ -42,5 +65,9 @@ public class Kitty {
 
     public boolean isFull() {
         return cards.size() == 6;
+    }
+
+    public void setState(State state) {
+        this.state = state;
     }
 }

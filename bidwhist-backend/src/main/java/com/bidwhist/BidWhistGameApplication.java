@@ -1,4 +1,4 @@
-package com.bidwhist.bidwhist_backend;
+package com.bidwhist;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

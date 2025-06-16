@@ -1,65 +1,54 @@
-package com.bidwhist.bidwhist_backend.model;
+package com.bidwhist.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+
+import com.bidwhist.utils.JokerUtils;
 
 public class Deck {
-    public enum PlayerPos {
-        P1, P2, P3, P4;
-    }
 
     private final List<Card> cards;
     private Kitty kitty;
-    private Map<PlayerPos, Hand> hands;
 
     public Deck() {
         this.cards = new ArrayList<>();
         buildStandardDeck();
         this.kitty = new Kitty();       // create empty kitty
-        createHands();
     }
 
     private void buildStandardDeck() {
-        // Add normal cards (non-jokers)
-        for (Card.Suit suit : Card.Suit.values()) {
-            for (Card.Rank rank : Card.Rank.values()) {
-                if (!isJokerRank(rank)) {
+        // Add 52 normal cards (non-jokers)
+        for (Suit suit : Suit.values()) {
+            for (Rank rank : Rank.values()) {
+                if (!JokerUtils.isJokerRank(rank)) {
                     cards.add(new Card(suit, rank));
                 }
             }
         }
 
         // Add Jokers
-        cards.add(new Card(null, Card.Rank.JOKER_S));
-        cards.add(new Card(null, Card.Rank.JOKER_L));
+        cards.add(new Card(null, Rank.SMALL_JOKER));
+        cards.add(new Card(null, Rank.BIG_JOKER));
     }
 
     public void shuffle() {
         Collections.shuffle(cards);
     }
 
-    // Create empty hands
-    private void createHands() {
-        for (PlayerPos pos : PlayerPos.values()) {
-            hands.put(pos, new Hand(this));
-        }
-    }
-
-    public void deal() {
+    public void deal(List<Player> players) {
         for (int i = 0; i < 48; i++) {
             if (i % 4 == 0) {
-                hands.get(PlayerPos.P1).addCard(cards.get(i));
+                players.get(0).addCard(cards.get(i));
             }
             else if (i % 4 == 1) {
-                hands.get(PlayerPos.P2).addCard(cards.get(i));
+                players.get(1).addCard(cards.get(i));
             }
             else if (i % 4 == 2) {
-                hands.get(PlayerPos.P3).addCard(cards.get(i));
+                players.get(2).addCard(cards.get(i));
             }
             else {
-                hands.get(PlayerPos.P4).addCard(cards.get(i));
+                players.get(3).addCard(cards.get(i));
             }
         }
 
@@ -75,10 +64,6 @@ public class Deck {
     *  }
     */ 
 
-    private boolean isJokerRank(Card.Rank rank) {
-        return rank == Card.Rank.JOKER_S || rank == Card.Rank.JOKER_L;
-    }
-
     public void resetJokerSuits() {
         for (Card card : cards) {
             card.clearSuit(); // only affects jokers
@@ -86,7 +71,7 @@ public class Deck {
     }
 
     // Call to Card.assignSuit() for jokers only
-    public void assignTrumpSuitToJokers(Card.Suit trump) {
+    public void assignTrumpSuitToJokers(Suit trump) {
         for (Card card : cards) {
             card.assignSuit(trump); // only affects jokers
         }

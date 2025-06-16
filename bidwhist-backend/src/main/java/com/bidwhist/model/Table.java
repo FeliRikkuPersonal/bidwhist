@@ -1,17 +1,17 @@
-package com.bidwhist.bidwhist_backend.model;
+ /* package com.bidwhist.model;
 
 import java.util.List;
 
-import com.bidwhist.bidwhist_backend.Game;
+import com.bidwhist.service.GameService;
 
 public class Table {
-    private Game game;
+    private GameService game;
     private Deck deck;
     private List<Player> turnOrder;
     public Book currentPlay;
 
     
-    public Table(Game game, Deck deck) {
+    public Table(GameService game, Deck deck) {
         this.game = game;
         this.deck = deck;
         this.turnOrder = game.getPlayers();
@@ -24,4 +24,4 @@ public class Table {
     }
 }
     
-}
+} */

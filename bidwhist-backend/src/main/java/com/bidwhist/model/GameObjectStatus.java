@@ -1,4 +1,4 @@
-package com.bidwhist.bidwhist_backend.model;
+package com.bidwhist.model;
 
 // Enum to track the status/state of objects like game, kitty, book, etc.
 public enum GameObjectStatus {
