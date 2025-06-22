@@ -1,0 +1,93 @@
+.mode-slider-toggle {
+    margin-top: 25px;
+    margin-bottom: 50px;
+    position: relative;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 80px;
+    height: 34px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    background-color: #8ca62d;
+    border-radius: 34px;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    border-radius: 50%;
+    background-color: #0a341f;
+    left: 4px;
+    bottom: 4px;
+    transition: .4s;
+}
+
+.switch input:checked + .slider:before {
+    transform: translateX(46px);
+}
+
+.labels {
+    display: flex;
+    justify-content: space-between;
+    position: absolute;
+    top: 40px;
+    width: 80px;
+    font-size: 0.8rem;
+    color: floralwhite;
+}
+
+.mode-form-frame {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+.mode-form-container {
+    display: flex;
+    width: 200%;
+    transition: transform 0.5s ease-in-out;
+    position: relative;
+}
+
+.mode-form {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: opacity 0.5s ease;
+}
+
+/* Slide content based on mode */
+.mode-form-container.single {
+    transform: translateX(0%);
+}
+.mode-form-container.multi {
+    transform: translateX(-50%);
+}
+
+.multiplayer-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+    width: 50%;
+}
