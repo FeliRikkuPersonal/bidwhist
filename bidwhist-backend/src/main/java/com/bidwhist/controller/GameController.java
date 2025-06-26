@@ -17,6 +17,7 @@ import com.bidwhist.dto.GameStateResponse;
 import com.bidwhist.dto.KittyRequest;
 import com.bidwhist.dto.PlayRequest;
 import com.bidwhist.dto.StartGameRequest;
+import com.bidwhist.model.GamePhase;
 import com.bidwhist.model.PlayedCard;
 import com.bidwhist.model.Suit;
 import com.bidwhist.model.Team;
@@ -92,6 +93,14 @@ public class GameController {
         }
 
         return ResponseEntity.ok("No cards have been played yet in any trick.");
+    }
+
+    @GetMapping("/result")
+    public GameStateResponse getGameResult(@RequestParam String player) {
+        if (gameService.getCurrentGame().getPhase() != GamePhase.END) {
+            throw new IllegalStateException("Game is not over yet.");
+        }
+        return gameService.getGameResultForPlayer(player);
     }
 
 }

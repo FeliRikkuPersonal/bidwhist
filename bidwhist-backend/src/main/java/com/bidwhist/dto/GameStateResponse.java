@@ -20,6 +20,8 @@ public class GameStateResponse {
     private Bid highestBid;
     private Map<Team, Integer> teamTrickCounts;
     private Map<Team, Integer> teamScores;
+    private Team winningTeam;
+    private Boolean bidSuccessful;
 
     public GameStateResponse(
             List<PlayerView> players,
@@ -107,4 +109,21 @@ public class GameStateResponse {
     public void setTeamScores(Map<Team, Integer> teamScores) {
         this.teamScores = teamScores;
     }
+
+    public Team getWinningTeam() {
+        return winningTeam;
+    }
+
+    public void setWinningTeam(Team winningTeam) {
+        this.winningTeam = winningTeam;
+    }
+
+    public Boolean getBidSuccessful() {
+        return bidSuccessful;
+    }
+
+    public void setBidSuccessful(Boolean bidSuccessful) {
+        this.bidSuccessful = bidSuccessful;
+    }
+
 }

@@ -105,6 +105,40 @@ public class GameService {
         response.setHighestBid(currentGame.getHighestBid());
         response.setTeamTrickCounts(currentGame.getTeamTrickCounts());
         response.setTeamScores(currentGame.getTeamScores());
+        if (currentGame.getPhase() == GamePhase.END) {
+            Bid winningBid = currentGame.getHighestBid();
+            Team winningTeam = currentGame.getPlayers().stream()
+                    .filter(p -> p.getName().equals(winningBid.getPlayerName()))
+                    .findFirst()
+                    .map(Player::getTeam)
+                    .orElse(null);
+
+            int tricksWon = currentGame.getTeamTrickCounts().getOrDefault(winningTeam, 0);
+            boolean bidSuccessful = tricksWon >= winningBid.getValue();
+
+            response.setWinningTeam(winningTeam);
+            response.setBidSuccessful(bidSuccessful);
+        }
+
+        return response;
+    }
+
+    public GameStateResponse getGameResultForPlayer(String playerName) {
+        GameStateResponse response = getGameStateForPlayer(playerName);
+
+        Bid highestBid = currentGame.getHighestBid();
+        Team biddingTeam = currentGame.getPlayers().stream()
+                .filter(p -> p.getName().equals(highestBid.getPlayerName()))
+                .findFirst()
+                .map(Player::getTeam)
+                .orElse(null);
+
+        int tricksWon = currentGame.getTeamTrickCounts().getOrDefault(biddingTeam, 0);
+        boolean success = tricksWon >= highestBid.getValue();
+
+        response.setBidSuccessful(success);
+        response.setWinningTeam(success ? biddingTeam : (biddingTeam == Team.A ? Team.B : Team.A));
+
         return response;
     }
 
@@ -284,6 +318,10 @@ public class GameService {
         Bid winningBid = currentGame.getHighestBid();
         currentGame.setTrumpType(winningBid.getType());
         currentGame.setPhase(GamePhase.PLAY);
+        int winnerIndex = findPlayerIndexByName(winner.getName());
+        currentGame.setCurrentPlayerIndex(winnerIndex);
+        System.out.println("DEBUG: First trick will be led by " + winner.getName());
+        autoPlayAITurns();
     }
 
     public void applyKittyAndDiscards(KittyRequest request) {
@@ -300,6 +338,8 @@ public class GameService {
 
         currentGame.setKitty(new ArrayList<>());
         currentGame.setPhase(GamePhase.PLAY);
+        int winnerIndex = findPlayerIndexByName(winner.getName());
+        currentGame.setCurrentPlayerIndex(winnerIndex);
     }
 
     public void playCard(PlayRequest request) {

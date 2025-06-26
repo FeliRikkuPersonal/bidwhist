@@ -9,7 +9,6 @@ C:\Projects\bidwhist-backend\src\main\java\com\bidwhist\dto\StartGameRequest.jav
 C:\Projects\bidwhist-backend\src\main\java\com\bidwhist\model\Bid.java
 C:\Projects\bidwhist-backend\src\main\java\com\bidwhist\model\BidType.java
 C:\Projects\bidwhist-backend\src\main\java\com\bidwhist\model\Card.java
-C:\Projects\bidwhist-backend\src\main\java\com\bidwhist\model\DeckService.java
 C:\Projects\bidwhist-backend\src\main\java\com\bidwhist\model\GamePhase.java
 C:\Projects\bidwhist-backend\src\main\java\com\bidwhist\model\GameState.java
 C:\Projects\bidwhist-backend\src\main\java\com\bidwhist\model\PlayedCard.java
@@ -17,4 +16,5 @@ C:\Projects\bidwhist-backend\src\main\java\com\bidwhist\model\Player.java
 C:\Projects\bidwhist-backend\src\main\java\com\bidwhist\model\Rank.java
 C:\Projects\bidwhist-backend\src\main\java\com\bidwhist\model\Suit.java
 C:\Projects\bidwhist-backend\src\main\java\com\bidwhist\model\Team.java
+C:\Projects\bidwhist-backend\src\main\java\com\bidwhist\service\DeckService.java
 C:\Projects\bidwhist-backend\src\main\java\com\bidwhist\service\GameService.java
