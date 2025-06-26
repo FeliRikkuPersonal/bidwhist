@@ -1,6 +1,10 @@
 package com.bidwhist.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -8,27 +12,29 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bidwhist.bidding.FinalBid;
 import com.bidwhist.dto.BidRequest;
-import com.bidwhist.dto.FinalBidRequest;
 import com.bidwhist.dto.GameStateResponse;
 import com.bidwhist.dto.KittyRequest;
-import com.bidwhist.model.GameState;
-import com.bidwhist.model.Player;
-import com.bidwhist.model.PlayerPos;
+import com.bidwhist.dto.PlayRequest;
+import com.bidwhist.dto.StartGameRequest;
+import com.bidwhist.model.PlayedCard;
+import com.bidwhist.model.Suit;
+import com.bidwhist.model.Team;
 import com.bidwhist.service.GameService;
 
 @RestController
 @RequestMapping("/api/game")
 public class GameController {
 
-    @Autowired
-    private GameService gameService;
+    private final GameService gameService;
+
+    public GameController(GameService gameService) {
+        this.gameService = gameService;
+    }
 
     @PostMapping("/start")
-    public GameStateResponse startGame(@RequestBody(required = false) String playerName) {
-        gameService.startNewGame();
-        return gameService.getGameStateForPlayer(PlayerPos.P1);
+    public void startGame(@RequestBody StartGameRequest request) {
+        gameService.startGame(request.getPlayerNames());
     }
 
     @PostMapping("/bid")
@@ -36,44 +42,56 @@ public class GameController {
         return gameService.submitBid(request);
     }
 
-    @PostMapping("/finalizeBid")
-    public GameStateResponse finalizeBid(@RequestBody FinalBidRequest request) {
-        GameState game = gameService.getCurrentGame();
-        PlayerPos winnerPos = request.getPlayer();
-
-        Player winner = game.getPlayers().stream()
-                .filter(p -> p.getPosition().equals(winnerPos))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Player not found: " + winnerPos));
-
-        if (winner.isAI()) {
-            throw new IllegalStateException("AI players do not need to finalize a bid.");
-        }
-
-        FinalBid finalBid = new FinalBid(
-                game.getHighestBid(),
-                request.getType(),
-                request.getSuit());
-
-        game.getFinalBidCache().put(winnerPos, finalBid);
-        game.setWinningBidStats(finalBid);
-
-        return gameService.getGameStateForPlayer(winnerPos);
-    }
-
     @PostMapping("/kitty")
     public GameStateResponse applyKitty(@RequestBody KittyRequest request) {
-        return gameService.applyKittyAndDiscards(request);
+        gameService.applyKittyAndDiscards(request);
+        return gameService.getGameStateForPlayer(request.getPlayer());
+    }
+
+    @PostMapping("/play")
+    public GameStateResponse playCard(@RequestBody PlayRequest request) {
+        gameService.playCard(request);
+        return gameService.getGameStateForPlayer(request.getPlayer());
     }
 
     @GetMapping("/state")
-    public GameStateResponse getGameStateForPlayer(@RequestParam String player) {
-        PlayerPos playerPos = gameService.getCurrentGame().getPlayers().stream()
-                .filter(p -> p.getName().equals(player))
-                .map(Player::getPosition)
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Player not found: " + player));
-
-        return gameService.getGameStateForPlayer(playerPos);
+    public GameStateResponse getGameState(@RequestParam String player) {
+        return gameService.getGameStateForPlayer(player);
     }
+
+    @GetMapping("/score")
+    public Map<String, Integer> getTeamScores() {
+        Map<Team, Integer> teamScores = gameService.getCurrentGame().getTeamScores();
+
+        // Convert enum keys to strings for JSON
+        return teamScores.entrySet().stream()
+                .collect(Collectors.toMap(e -> e.getKey().name(), Map.Entry::getValue));
+    }
+
+    @PostMapping("/startNewHand")
+    public ResponseEntity<String> startNewHand() {
+        gameService.startNewHand();
+        return ResponseEntity.ok("New hand started.");
+    }
+
+    @GetMapping("/lead-suit")
+    public ResponseEntity<String> getLeadSuit() {
+        List<PlayedCard> currentTrick = gameService.getCurrentGame().getCurrentTrick();
+
+        if (!currentTrick.isEmpty()) {
+            Suit leadSuit = currentTrick.get(0).getCard().getSuit();
+            return ResponseEntity.ok("Current lead suit: " + leadSuit.name());
+        }
+
+        // If current trick is empty, get last trick (if any)
+        List<List<PlayedCard>> completed = gameService.getCurrentGame().getCompletedTricks();
+        if (!completed.isEmpty()) {
+            List<PlayedCard> lastTrick = completed.get(completed.size() - 1);
+            Suit leadSuit = lastTrick.get(0).getCard().getSuit();
+            return ResponseEntity.ok("Previous trick's lead suit was: " + leadSuit.name());
+        }
+
+        return ResponseEntity.ok("No cards have been played yet in any trick.");
+    }
+
 }

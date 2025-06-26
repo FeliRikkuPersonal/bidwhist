@@ -5,63 +5,45 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.bidwhist.bidding.FinalBid;
-import com.bidwhist.bidding.InitialBid;
-import com.bidwhist.bidding.BidType;
-import com.bidwhist.utils.PlayerUtils;
-import com.bidwhist.service.DeckService;
-
 public class GameState {
 
-    private final List<Player> players;
-    private final Deck deck;
-    private final List<Card> kitty;
-    private int currentTurnIndex;
+    private List<Player> players = new ArrayList<>();
+    private List<Card> kitty = new ArrayList<>();
     private GamePhase phase;
-    private Suit trumpSuit;
-
-    private final List<InitialBid> bids;
     private int bidTurnIndex;
-    private InitialBid highestBid;
-    private Map<PlayerPos, FinalBid> finalBidCache = new HashMap<>();
-    private FinalBid winningBid;
-    private String winningPlayerName; // <-- NEW FIELD
+    private List<Bid> bids = new ArrayList<>();
+    private Bid highestBid;
+    private String winningPlayerName;
+    private BidType trumpType;
+    private int currentTurnIndex;
 
-    public GameState() {
-        this.players = new ArrayList<>();
-        this.deck = DeckService.createNewDeck();
-        this.kitty = new ArrayList<>();
-        this.currentTurnIndex = 0;
-        this.phase = GamePhase.DEAL;
-        this.trumpSuit = null;
-        this.bids = new ArrayList<>();
-        this.bidTurnIndex = 0;
-        this.highestBid = null;
-        this.winningPlayerName = null; // <-- Initialize
-    }
+    private List<PlayedCard> currentTrick = new ArrayList<>();
+    private List<List<PlayedCard>> completedTricks = new ArrayList<>();
+    private int currentPlayerIndex;
 
+    private int teamAScore = 0;
+    private int teamBScore = 0;
+    private int teamATricksWon = 0;
+    private int teamBTricksWon = 0;
+
+    private Map<Team, Integer> teamTrickCounts = new HashMap<>();
+    private Map<Team, Integer> teamScores = new HashMap<>();
+
+    // Getters and setters
     public List<Player> getPlayers() {
         return players;
     }
 
-    public void addPlayer(Player player) {
-        players.add(player);
-    }
-
-    public int getCurrentTurnIndex() {
-        return currentTurnIndex;
-    }
-
-    public void setCurrentTurnIndex(int index) {
-        this.currentTurnIndex = index;
-    }
-
-    public Deck getDeck() {
-        return deck;
+    public void setPlayers(List<Player> players) {
+        this.players = players;
     }
 
     public List<Card> getKitty() {
         return kitty;
+    }
+
+    public void setKitty(List<Card> kitty) {
+        this.kitty = kitty;
     }
 
     public GamePhase getPhase() {
@@ -72,22 +54,6 @@ public class GameState {
         this.phase = phase;
     }
 
-    public Suit getTrumpSuit() {
-        return trumpSuit;
-    }
-
-    public void setTrumpSuit(Suit trumpSuit) {
-        this.trumpSuit = trumpSuit;
-    }
-
-    public List<InitialBid> getBids() {
-        return bids;
-    }
-
-    public void addBid(InitialBid bid) {
-        bids.add(bid);
-    }
-
     public int getBidTurnIndex() {
         return bidTurnIndex;
     }
@@ -96,19 +62,24 @@ public class GameState {
         this.bidTurnIndex = bidTurnIndex;
     }
 
-    public InitialBid getHighestBid() {
+    public List<Bid> getBids() {
+        return bids;
+    }
+
+    public void setBids(List<Bid> bids) {
+        this.bids = bids;
+    }
+
+    public void addBid(Bid bid) {
+        this.bids.add(bid);
+    }
+
+    public Bid getHighestBid() {
         return highestBid;
     }
 
-    public void setHighestBid(InitialBid highestBid) {
+    public void setHighestBid(Bid highestBid) {
         this.highestBid = highestBid;
-    }
-
-    public void setWinningBidStats(FinalBid bid) {
-        this.winningBid = bid;
-        this.winningPlayerName = PlayerUtils.getNameByPosition(bid.getPlayer(), players);
-        this.trumpSuit = bid.getSuit();
-
     }
 
     public String getWinningPlayerName() {
@@ -119,19 +90,92 @@ public class GameState {
         this.winningPlayerName = winningPlayerName;
     }
 
-    public PlayerPos getWinningPlayerPos() {
-        return winningBid.getPlayer();
+    public BidType getTrumpType() {
+        return trumpType;
     }
 
-    public Map<PlayerPos, FinalBid> getFinalBidCache() {
-        return finalBidCache;
+    public void setTrumpType(BidType trumpType) {
+        this.trumpType = trumpType;
     }
 
-    public BidType getFinalBidType() {
-        if (winningBid != null) {
-            return winningBid.getType();
-        } else {
-            return null;
-        }
+    public List<PlayedCard> getCurrentTrick() {
+        return currentTrick;
     }
+
+    public void setCurrentTrick(List<PlayedCard> currentTrick) {
+        this.currentTrick = currentTrick;
+    }
+
+    public List<List<PlayedCard>> getCompletedTricks() {
+        return completedTricks;
+    }
+
+    public void setCompletedTricks(List<List<PlayedCard>> completedTricks) {
+        this.completedTricks = completedTricks;
+    }
+
+    public int getCurrentPlayerIndex() {
+        return currentPlayerIndex;
+    }
+
+    public void setCurrentPlayerIndex(int currentPlayerIndex) {
+        this.currentPlayerIndex = currentPlayerIndex;
+    }
+
+    public int getTeamAScore() {
+        return teamAScore;
+    }
+
+    public void setTeamAScore(int teamAScore) {
+        this.teamAScore = teamAScore;
+    }
+
+    public int getTeamBScore() {
+        return teamBScore;
+    }
+
+    public void setTeamBScore(int teamBScore) {
+        this.teamBScore = teamBScore;
+    }
+
+    public int getTeamATricksWon() {
+        return teamATricksWon;
+    }
+
+    public void setTeamATricksWon(int teamATricksWon) {
+        this.teamATricksWon = teamATricksWon;
+    }
+
+    public int getTeamBTricksWon() {
+        return teamBTricksWon;
+    }
+
+    public void setTeamBTricksWon(int teamBTricksWon) {
+        this.teamBTricksWon = teamBTricksWon;
+    }
+
+    public Map<Team, Integer> getTeamTrickCounts() {
+        return teamTrickCounts;
+    }
+
+    public void setTeamTrickCounts(Map<Team, Integer> teamTrickCounts) {
+        this.teamTrickCounts = teamTrickCounts;
+    }
+
+    public Map<Team, Integer> getTeamScores() {
+        return teamScores;
+    }
+
+    public void setTeamScores(Map<Team, Integer> teamScores) {
+        this.teamScores = teamScores;
+    }
+
+    public int getCurrentTurnIndex() {
+        return currentTurnIndex;
+    }
+
+    public void setCurrentTurnIndex(int currentTurnIndex) {
+        this.currentTurnIndex = currentTurnIndex;
+    }
+
 }

@@ -1,18 +1,18 @@
 package com.bidwhist.model;
 
 public enum Suit {
-    SPADES("♠"),
-    HEARTS("♥"),
-    DIAMONDS("♦"),
-    CLUBS("♣");
+    SPADES,
+    HEARTS,
+    CLUBS,
+    DIAMONDS,
+    RED_JOKER,
+    BLACK_JOKER;
 
-    private final String symbol;
-
-    Suit(String symbol) {
-        this.symbol = symbol;
+    public boolean isJokerSuit() {
+        return this == RED_JOKER || this == BLACK_JOKER;
     }
 
-    public String getSymbol() {
-        return symbol;
+    public boolean isStandardSuit() {
+        return this == SPADES || this == HEARTS || this == CLUBS || this == DIAMONDS;
     }
 }

@@ -1,59 +1,61 @@
 package com.bidwhist.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Player {
-    private String name;
-    private Hand hand;
-    private final boolean isAI;
-    private boolean isDealer;
-    private final PlayerPos position; // 0–3 for N, E, S, W
-    private final Team team;   // "A" or "B" (optional team-based scoring)
+    private final String name;
+    private List<Card> hand;
+    private Team team;
+    private int seatIndex;
+    private boolean isAI;
 
-    public Player(String name, boolean isAI, PlayerPos position, Team team) {
+    public Player(String name, List<Card> hand, Team team, int seatIndex, boolean isAI) {
         this.name = name;
-        this.isAI = isAI;
-        this.position = position;
+        this.hand = hand != null ? hand : new ArrayList<>();
         this.team = team;
-        this.hand = new Hand();
-    }
-
-    public void addCard(Card card) {
-        this.hand.addCard(card);
-    }
-
-    public void removeCard(Card card) {
-        this.hand.removeCard(card);
-    }
-
-    public boolean isAI() {
-        return isAI;
-    }
-
-    public boolean isDealer() {
-        return isDealer;
+        this.seatIndex = seatIndex;
+        this.isAI = isAI;
     }
 
     public String getName() {
         return name;
     }
 
-    public PlayerPos getPosition() {
-        return position;
+    public List<Card> getHand() {
+        return hand;
+    }
+
+    public void setHand(List<Card> hand) {
+        this.hand = hand;
     }
 
     public Team getTeam() {
         return team;
     }
 
-    public Hand getHand() {
-        return hand;
+    public void setTeam(Team team) {
+        this.team = team;
     }
 
-    public void setHand(Hand hand) {
-        this.hand = hand;
+    public int getSeatIndex() {
+        return seatIndex;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setSeatIndex(int seatIndex) {
+        this.seatIndex = seatIndex;
+    }
+
+    public boolean isAI() {
+        return isAI;
+    }
+
+    public void setAI(boolean isAI) {
+        this.isAI = isAI;
+    }
+
+    public void addCard(Card card) {
+        if (hand == null) hand = new ArrayList<>();
+        hand.add(card);
     }
 }
-

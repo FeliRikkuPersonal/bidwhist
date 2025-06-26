@@ -1,34 +1,22 @@
 package com.bidwhist.model;
 
-import com.bidwhist.utils.JokerUtils;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import java.util.Objects;
 
-@JsonPropertyOrder({ "rank", "suit" })
 public class Card {
+    private final Suit suit;
+    private final Rank rank;
 
-    /* Track card location across game */
-    public enum CardLocation {
-        DECK, HAND, KITTY, PLAY, BOOK, DISCARDED
-    }
-
-    private Rank rank;
-    private Suit suit;
-    
     public Card(Suit suit, Rank rank) {
-        this.rank = rank;
+        // ✅ Enforce Joker validation
+        if (rank == Rank.JOKER && !suit.isJokerSuit()) {
+            throw new IllegalArgumentException("JOKER rank must have RED_JOKER or BLACK_JOKER suit.");
+        }
+        if (suit.isJokerSuit() && rank != Rank.JOKER) {
+            throw new IllegalArgumentException("RED_JOKER and BLACK_JOKER suits must have JOKER rank.");
+        }
+
         this.suit = suit;
-    }
-
-    /* Suite will be assigned across the deck, but only effect the Jokers.
-     * This ensure that Jokers count towards the winning bid's suit.
-     */
-    public void assignSuit(Suit suit) {
-        if (JokerUtils.isJokerRank(rank)) {this.suit = suit;}
-    }
-
-    // Suit must be cleared after match and reset on winning bid.
-    public void clearSuit() {
-        if (JokerUtils.isJokerRank(rank)) this.suit = null;
+        this.rank = rank;
     }
 
     public Suit getSuit() {
@@ -41,6 +29,19 @@ public class Card {
 
     @Override
     public String toString() {
-        return rank + "of" + suit;
+        return rank + " of " + suit;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Card)) return false;
+        Card card = (Card) o;
+        return suit == card.suit && rank == card.rank;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(suit, rank);
     }
 }
