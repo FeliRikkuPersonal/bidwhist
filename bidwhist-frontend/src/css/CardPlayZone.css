@@ -1,10 +1,6 @@
 .card-play-zone {
-    position: absolute;
-    top: 50%;
-    left: 50%;
     width: 400px;
     height: 400px;
-    transform: translate(-50%, -50%);
     background-color: rgba(255, 255, 255, 0.1);
     border-radius: 16px;
     border: none;

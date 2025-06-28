@@ -1,8 +1,9 @@
 // src/App.jsx
 import { useState } from 'react';
-import './App.css';
+import './css/index.css';
 import ModeSelector from "./components/ModeSelector";
 import GameScreen from './components/GameScreen';
+import Scoreboard from './components/Scoreboard';
 
 function App() {
   const [playerName, setPlayerName] = useState('');
@@ -54,6 +55,9 @@ function App() {
 
   return (
     <div className="index-wrapper">
+      <div className="scoreboard-container">
+        <Scoreboard gameState={gameState} />
+      </div>
       <div className="index-container">
         {gameState ? (
           <GameScreen gameState={gameState} />

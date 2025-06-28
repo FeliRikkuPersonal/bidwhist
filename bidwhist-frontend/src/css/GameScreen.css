@@ -1,0 +1,28 @@
+.game-screen {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  padding: 10px;
+  overflow: hidden;
+  background-color: transparent;
+}
+
+.scoreboard-container {
+  width: 300px;
+  overflow: visible;
+}
+
+.center-area {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 0;
+}
+
+.bottom-bar {
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+}
