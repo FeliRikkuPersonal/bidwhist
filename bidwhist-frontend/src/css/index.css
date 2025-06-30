@@ -107,6 +107,7 @@
   pointer-events: none; /* Let clicks pass through */
   z-index: 100;
   background-color: transparent;
+  overflow: visible;
 }
 
 

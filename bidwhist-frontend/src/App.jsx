@@ -8,6 +8,7 @@ import GameScreen from './components/GameScreen';
 import Scoreboard from './components/Scoreboard';
 import AnimatedCard from './components/AnimatedCard';
 import ShuffleAnimation from './animations/ShuffleAnimation';
+import { dealCardsClockwise } from './animations/DealAnimation';
 import { getPositionMap } from './utils/PositionUtils';
 import { getCardImage } from './utils/CardUtils';
 
@@ -26,17 +27,11 @@ function App() {
   const onStartGame = (name) => {
     const trimmedName = name.trim();
     if (!trimmedName) {
-
-      //debug log
       console.warn("[App] Name is empty after trimming. Aborting start.");
-
       return;
     }
 
-
-    //debug log
     console.log("[App] Starting game for player:", trimmedName);
-
     setPlayerName(trimmedName);
 
     fetch('/api/game/start', {
@@ -44,45 +39,44 @@ function App() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ playerName: trimmedName })
     })
-      .then(res => {
-
-        //debug logg
-        console.log("[App] Received response status:", res.status);
-
-        return res.json();
-      })
-
+      .then(res => res.json())
       .then(data => {
-
-        //debug log
         console.log('[App] Game started successfully:', data);
 
-        // 🔥 Save shuffledDeck separately for persistent rendering
         if (data.shuffledDeck) {
           setShuffledDeck(data.shuffledDeck);
+          runIntroSequence(data.shuffledDeck, trimmedName);  // 👈 hand off to animation runner
         }
-
-        setTimeout(() => {
-          setShowShuffle(true);
-          setShowStackedDeck(false);
-        }, 1000);
-
-        setTimeout(() => {
-          fetch('/api/game/deal', {
-            method: 'POST'
-          })
-            .then(res => res.json())
-            .then(dealData => {
-              console.log('[App] Cards dealt:', dealData);
-              setGameState(dealData); // Updates hand visibility etc
-            });
-        }, 1000); // matches animation length
       })
-
       .catch(err => {
         console.error('[App] Error starting game:', err);
       });
   };
+
+  const runIntroSequence = async (deck, playerName) => {
+    setShowShuffle(true);
+
+    await delay(1000);
+    setShowShuffle(false);
+    setShowStackedDeck(true);
+
+    await delay(300);
+
+    const dealData = await fetch('/api/game/deal', { method: 'POST' }).then(r => r.json());
+    setGameState(dealData);
+
+    const players = dealData.players.map(p => p.position);
+    const cards = dealData.players.flatMap(p =>
+      p.hand.map(card => ({ ...card, owner: p.position }))
+    );
+    const positionMap = getPositionMap(players, playerName);
+
+    dealCardsClockwise(players, cards, deckPosition, positionMap, setAnimatedCards, () => {
+      setShowStackedDeck(false);
+      console.log("🎉 Deal animation complete");
+    });
+  };
+
 
   useEffect(() => {
     function updatePosition() {
@@ -107,6 +101,9 @@ function App() {
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
+  function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
 
   return (
     <div className="index-wrapper">
@@ -134,6 +131,7 @@ function App() {
             onComplete={() => {
               setShowShuffle(false);
               setShowStackedDeck(true);
+
             }}
           />
         )}
