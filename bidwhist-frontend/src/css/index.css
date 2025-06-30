@@ -98,6 +98,18 @@
     color: floralwhite;
 }
 
+.floating-card-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none; /* Let clicks pass through */
+  z-index: 100;
+  background-color: transparent;
+}
+
+
 body {
   margin: 0;
   background-image: url('/static/img/table.png');

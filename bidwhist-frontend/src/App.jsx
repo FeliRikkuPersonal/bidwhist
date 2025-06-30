@@ -1,13 +1,27 @@
 // src/App.jsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './css/index.css';
+import './css/Card.css';
+import './css/Animations.css';
 import ModeSelector from "./components/ModeSelector";
 import GameScreen from './components/GameScreen';
 import Scoreboard from './components/Scoreboard';
+import AnimatedCard from './components/AnimatedCard';
+import ShuffleAnimation from './animations/ShuffleAnimation';
+import { getPositionMap } from './utils/PositionUtils';
+import { getCardImage } from './utils/CardUtils';
 
 function App() {
   const [playerName, setPlayerName] = useState('');
   const [gameState, setGameState] = useState(null);
+  const [animatedCards, setAnimatedCards] = useState([]);
+  const [showShuffle, setShowShuffle] = useState(false);
+  const [shuffledDeck, setShuffledDeck] = useState([]);
+  const [showStackedDeck, setShowStackedDeck] = useState(true);
+  const [deckPosition, setDeckPosition] = useState({ x: 0, y: 0 });
+
+  const positionMap = gameState?.players ? getPositionMap(gameState.players, playerName) : {};
+  const myPosition = positionMap[playerName] || 'south';
 
   const onStartGame = (name) => {
     const trimmedName = name.trim();
@@ -43,7 +57,26 @@ function App() {
         //debug log
         console.log('[App] Game started successfully:', data);
 
-        setGameState(data);
+        // 🔥 Save shuffledDeck separately for persistent rendering
+        if (data.shuffledDeck) {
+          setShuffledDeck(data.shuffledDeck);
+        }
+
+        setTimeout(() => {
+          setShowShuffle(true);
+          setShowStackedDeck(false);
+        }, 1000);
+
+        setTimeout(() => {
+          fetch('/api/game/deal', {
+            method: 'POST'
+          })
+            .then(res => res.json())
+            .then(dealData => {
+              console.log('[App] Cards dealt:', dealData);
+              setGameState(dealData); // Updates hand visibility etc
+            });
+        }, 1000); // matches animation length
       })
 
       .catch(err => {
@@ -51,6 +84,28 @@ function App() {
       });
   };
 
+  useEffect(() => {
+    function updatePosition() {
+      const x = window.innerWidth / 2;
+      const y = window.innerHeight / 2;
+      setDeckPosition({ x, y });
+    }
+
+    updatePosition(); // Initial call
+    window.addEventListener('resize', updatePosition);
+    return () => window.removeEventListener('resize', updatePosition);
+  }, []);
+
+  useEffect(() => {
+    const onResize = () => {
+      const dropZone = getRef('CardPlayZone-south')?.current;
+      const bounds = dropZone?.getBoundingClientRect();
+      console.log('Resize → new bounds:', bounds);
+    };
+
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
 
   return (
@@ -69,7 +124,51 @@ function App() {
           />
         )}
       </div>
+      <div className="floating-card-layer">
+
+        {showShuffle && (
+          <ShuffleAnimation
+            cards={shuffledDeck}
+            viewerName={playerName}
+            deckPosition={deckPosition}
+            onComplete={() => {
+              setShowShuffle(false);
+              setShowStackedDeck(true);
+            }}
+          />
+        )}
+        {showStackedDeck && shuffledDeck.map((card, i) => (
+          <img
+            key={i}
+            src={getCardImage(card, playerName, 'SHUFFLING')}
+            alt="Card back"
+            className="card-img stacked-card"
+            style={{
+              position: 'absolute',
+              top: deckPosition.y,
+              left: deckPosition.x,
+              transform: `translate(-50%, -50%)`,
+              zIndex: i,
+            }}
+          />
+        ))}
+
+        {/* Future: add animated transitions here */}
+        {animatedCards.map(card => (
+          <AnimatedCard
+            key={card.id}
+            card={card}
+            from={card.from}
+            to={card.to}
+            viewerName={playerName}
+            contextPhase={gamePhase} // e.g., 'SHUFFLING', 'KITTY_ASSIGNMENT', 'PLAYING'
+          />
+        ))}
+
+
+      </div>
     </div>
+
   );
 }
 

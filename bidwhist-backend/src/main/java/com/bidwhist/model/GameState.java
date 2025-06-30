@@ -15,7 +15,7 @@ public class GameState {
 
     private final List<Player> players;
     private final Deck deck;
-    private final List<Card> kitty;
+    private List<Card> kitty;
     private int currentTurnIndex;
     private GamePhase phase;
     private Suit trumpSuit;
@@ -26,6 +26,7 @@ public class GameState {
     private Map<PlayerPos, FinalBid> finalBidCache = new HashMap<>();
     private FinalBid winningBid;
     private String winningPlayerName; // <-- NEW FIELD
+    private List<Card> shuffledDeck;
 
     public GameState() {
         this.players = new ArrayList<>();
@@ -38,6 +39,7 @@ public class GameState {
         this.bidTurnIndex = 0;
         this.highestBid = null;
         this.winningPlayerName = null; // <-- Initialize
+        this.shuffledDeck = deck.getCards();
     }
 
     public List<Player> getPlayers() {
@@ -60,9 +62,21 @@ public class GameState {
         return deck;
     }
 
+    public List<Card> getShuffledDeck() {
+        return shuffledDeck;
+    }
+
+    public void setShuffledDeck(List<Card> shuffledDeck) {
+        this.shuffledDeck = shuffledDeck;
+    }
+
     public List<Card> getKitty() {
         return kitty;
     }
+
+    public void setKitty(List<Card> kitty) {
+        this.kitty = kitty;
+    } 
 
     public GamePhase getPhase() {
         return phase;

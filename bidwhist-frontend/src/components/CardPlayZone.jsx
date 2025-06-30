@@ -1,11 +1,19 @@
 // src/components/CardPlayZone.js
 import React from 'react';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { useZoneRefs } from '../utils/RefContext';
 import '../css/CardPlayZone.css';
 
 export default function CardPlayZone({ playerPosition, onCardPlayed }) {
     const [isOver, setIsOver] = useState(false);
     const [playedCard, setPlayedCard] = useState(null);
+
+    const localRef = useRef();
+    const { register } = useZoneRefs();
+
+    useEffect(() => {
+        register(`CardPlayZone-${playerPosition}`, localRef);
+    }, [playerPosition, register]);
 
     const handleDrop = (e) => {
         e.preventDefault();
@@ -24,7 +32,7 @@ export default function CardPlayZone({ playerPosition, onCardPlayed }) {
     if (playerPosition !== 'south') return null;
 
     return (
-        <div className={`card-play-zone ${playerPosition}`}>
+        <div ref={localRef} className="card-play-zone">
             <div
                 className={`drop-zone ${playerPosition} ${isOver ? 'highlight' : ''}`}
                 onDragOver={(e) => e.preventDefault()}

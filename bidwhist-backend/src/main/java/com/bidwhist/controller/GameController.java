@@ -13,6 +13,7 @@ import com.bidwhist.dto.BidRequest;
 import com.bidwhist.dto.FinalBidRequest;
 import com.bidwhist.dto.GameStateResponse;
 import com.bidwhist.dto.KittyRequest;
+import com.bidwhist.model.GamePhase;
 import com.bidwhist.model.GameState;
 import com.bidwhist.model.Player;
 import com.bidwhist.model.PlayerPos;
@@ -29,6 +30,25 @@ public class GameController {
     public GameStateResponse startGame(@RequestBody(required = false) String playerName) {
         gameService.startNewGame(playerName);
         return gameService.getGameStateForPlayer(playerName);
+    }
+
+    @PostMapping("/deal")
+    public GameStateResponse dealCards() {
+        GameState game = gameService.getCurrentGame();
+
+        if (game == null) {
+            throw new IllegalStateException("Game not started.");
+        }
+
+        if (game.getPhase() != GamePhase.SHUFFLE) {
+            throw new IllegalStateException("Can only deal after shuffle.");
+        }
+
+        game.getDeck().deal(game.getPlayers()); // Perform actual dealing
+        game.setKitty(game.getDeck().getKitty().getCards()); // Move kitty over
+        game.setPhase(GamePhase.BID); // Advance phase
+
+        return gameService.getGameStateForPlayer(game.getPlayers().get(0).getPosition()); // or current human player
     }
 
     @PostMapping("/bid")

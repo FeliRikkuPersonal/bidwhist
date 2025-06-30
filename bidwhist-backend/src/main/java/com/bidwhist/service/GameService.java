@@ -33,7 +33,7 @@ public class GameService {
     }
 
     public GameState startNewGame(String playerName) {
-        //debug log
+        // debug log
         System.out.println("Staring new game for player: " + playerName);
 
         GameState gameState = new GameState();
@@ -44,16 +44,14 @@ public class GameService {
         players.add(new Player("AI 2", true, PlayerPos.P3, Team.A));
         players.add(new Player("AI 3", true, PlayerPos.P4, Team.B));
 
-        gameState.getDeck().deal(players);
-
-        List<Card> kitty = gameState.getDeck().getKitty().getCards();
+        gameState.getDeck().shuffle();
+        gameState.setShuffledDeck(gameState.getDeck().getCards());
 
         gameState.getPlayers().addAll(players);
-        gameState.getKitty().addAll(kitty);
-        gameState.setPhase(GamePhase.BID);
+        gameState.setPhase(GamePhase.SHUFFLE);
         this.currentGame = gameState;
 
-        //debug log
+        // debug log
         System.out.println("Initial phase: " + gameState.getPhase());
 
         return currentGame;
@@ -91,7 +89,12 @@ public class GameService {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Player not found: " + playerName));
 
-        return getGameStateForPlayer(pos);
+        GameStateResponse response = getGameStateForPlayer(pos);
+
+            response.setShuffledDeck(currentGame.getDeck().getCards());
+
+        return response;
+
     }
 
     public GameState getCurrentGame() {
@@ -236,4 +239,5 @@ public class GameService {
         return getGameStateForPlayer(request.getPlayer());
 
     }
+
 }

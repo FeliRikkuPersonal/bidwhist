@@ -1,5 +1,7 @@
 package com.bidwhist.model;
 
+import com.bidwhist.dto.CardOwner;
+import com.bidwhist.dto.CardVisibility;
 import com.bidwhist.utils.JokerUtils;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
@@ -13,10 +15,20 @@ public class Card {
 
     private Rank rank;
     private Suit suit;
+    private String cardImage;
+    private CardOwner owner;
+    private CardVisibility visibility;
     
     public Card(Suit suit, Rank rank) {
         this.rank = rank;
         this.suit = suit;
+        this.cardImage = this.getCardImage();
+        
+        // debug log
+        System.out.println(cardImage);
+
+        this.owner = CardOwner.TABLE;
+        this.visibility = CardVisibility.HIDDEN;
     }
 
     /* Suite will be assigned across the deck, but only effect the Jokers.
@@ -28,7 +40,7 @@ public class Card {
 
     // Suit must be cleared after match and reset on winning bid.
     public void clearSuit() {
-        if (JokerUtils.isJokerRank(rank)) this.suit = null;
+        if (JokerUtils.isJokerRank(rank)) {this.suit = null;}
     }
 
     public Suit getSuit() {
@@ -37,6 +49,40 @@ public class Card {
 
     public Rank getRank() {
         return rank;
+    }
+
+    public CardOwner getOwner() {
+        return owner;
+    }
+
+    public CardVisibility getVisibility() {
+        return visibility;
+    }
+
+    public String getCardImage() {
+        if (this.rank == Rank.JOKER_B) {
+            return rank.toString().toLowerCase() + ".png";
+        } else if (this.rank == Rank.JOKER_S) {
+            return rank.toString().toLowerCase() + ".png";
+        } else if (this.rank.getValue() == 11 ) {
+            return suit.toString().toLowerCase() + "_jack.png";
+        } else if (this.rank.getValue() == 12) {
+            return suit.toString().toLowerCase() + "_queen.png";
+        } else if (this.rank.getValue() == 13) {
+            return suit.toString().toLowerCase() + "_king.png";
+        } else if (this.rank.getValue() == 14) {
+            return suit.toString().toLowerCase() + "_ace.png";
+        } else {
+            return suit.toString().toLowerCase() + "_" + rank.getValue() +".png";
+        }
+    }
+
+    public void setCardOwner(CardOwner newOwner) {
+        this.owner = newOwner;
+    }
+
+    public void setVisibility(CardVisibility newVisibility) {
+        this.visibility = newVisibility;
     }
 
     @Override

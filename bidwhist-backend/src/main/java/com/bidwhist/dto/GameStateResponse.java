@@ -17,6 +17,7 @@ public class GameStateResponse {
     private BidType bidType;
     private String winningPlayerName; // NEW FIELD
     private InitialBid highestBid; // NEW FIELD
+    private List<Card> shuffledDeck;
 
     public GameStateResponse(List<PlayerView> players, List<Card> kitty, int currentTurnIndex,
                               GamePhase phase, Suit trumpSuit, BidType bidType) {
@@ -29,12 +30,20 @@ public class GameStateResponse {
 
     }
 
+    public void setShuffledDeck(List<Card> shuffledDeck) {
+        this.shuffledDeck = shuffledDeck;
+    }
+
     public List<PlayerView> getPlayers() {
         return players;
     }
 
     public List<Card> getKitty() {
         return kitty;
+    }
+
+    public List<Card> getShuffledDeck() {
+        return shuffledDeck;
     }
 
     public int getCurrentTurnIndex() {
