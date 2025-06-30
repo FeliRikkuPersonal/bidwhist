@@ -28,8 +28,12 @@ public class Deck {
         }
 
         // Add Jokers
-        cards.add(new Card(null, Rank.SMALL_JOKER));
-        cards.add(new Card(null, Rank.BIG_JOKER));
+        cards.add(new Card(null, Rank.JOKER_S));
+        cards.add(new Card(null, Rank.JOKER_B));
+
+        for (Card card : cards) {
+            System.out.println(card.getCardImage());
+        }
     }
 
     public void shuffle() {

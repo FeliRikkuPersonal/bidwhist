@@ -6,7 +6,7 @@ import com.bidwhist.model.Card;
 
 public class JokerUtils {
     public static boolean isJokerRank(Rank rank) {
-        return rank == Rank.SMALL_JOKER || rank == Rank.BIG_JOKER;
+        return rank == Rank.JOKER_S || rank == Rank.JOKER_B;
     }
 
     public static int countJokers(Hand hand) {

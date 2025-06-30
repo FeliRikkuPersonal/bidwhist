@@ -1,0 +1,103 @@
+/* General layout for all player zones */
+.player-zone {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Card image styles */
+.card-img {
+    width: 60px;
+    height: 90px;
+    object-fit: contain;
+}
+
+/* Default player hand layout */
+.player-hand {
+    display: flex;
+    gap: 2px;
+}
+
+/* NORTH and SOUTH layout (horizontal hands) */
+.north {
+    top: 10px;
+    left: 26%;
+}
+
+.south {
+    bottom: 10px;
+    left: 26%;
+}
+
+/* EAST and WEST layout (vertical hands) */
+.east,
+.west {
+    top: 16%;
+    flex-direction: column;
+}
+
+.east {
+    right: 20px;
+}
+
+.west {
+    left: 20px;
+}
+
+/* Stack cards vertically for EAST/WEST and reduce gap */
+.east .player-hand,
+.west .player-hand {
+    flex-direction: column;
+    gap: 0;
+    align-items: center;
+}
+
+/* Rotate cards for EAST/WEST players */
+.east .card-img,
+.west .card-img {
+    transform: rotate(90deg);
+    transform-origin: center;
+    margin: -13px 0; /* tightens the vertical stack */
+}
+
+/* Player name styles */
+.player-name {
+    color: white;
+    font-size: 0.85rem;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+/* NORTH/SOUTH name positioning */
+.north .player-name {
+    position: absolute;
+    top: 105px;
+    right: 90%;
+}
+
+.south .player-name {
+    position: absolute;
+    bottom: 105px;
+    right: 95%;
+}
+
+/* EAST/WEST name positioning and rotation */
+.east .player-name,
+.west .player-name {
+    writing-mode: vertical-lr;
+    white-space: nowrap;
+}
+
+.east .player-name {
+    position: absolute;
+    right: 105px;
+    top: 90%;
+    transform: rotate(180deg);
+}
+
+.west .player-name {
+    position: absolute;
+    left: 105px;
+    top: 3%;
+}

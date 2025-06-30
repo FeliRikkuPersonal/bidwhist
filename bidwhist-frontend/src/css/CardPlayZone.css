@@ -1,0 +1,102 @@
+.card-play-zone {
+    width: 400px;
+    height: 400px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.played-card {
+    position: absolute;
+    font-size: 2rem;
+    background: white;
+    border-radius: 8px;
+    padding: 6px 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.played-card.north {
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.played-card.south {
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.played-card.east {
+    right: -30px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.played-card.west {
+    left: -30px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.drop-zone {
+    position: absolute;
+    bottom: 0;
+    width: 80px;
+    height: 120px;
+    border: 2px dashed transparent;
+    margin: auto;
+    left: 50%;
+    transform: translateX(-50%) translateY(50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: border-color 0.3s ease;
+    z-index: 10;
+}
+
+.drop-zone.highlight {
+    border-color: gold;
+    background-color: rgba(255, 215, 0, 0.1);
+    border-radius: 8px;
+}
+
+.card-img {
+    width: 60px;
+    height: 90px;
+    object-fit: contain;
+}
+
+.card-img:active {
+    opacity: 0.75;
+    transform: scale(1.1);
+    transition: transform 0.15s ease;
+    z-index: 999;
+    cursor: pointer;
+}
+
+.card-play-zone.north .drop-zone {
+    top: 0;
+    bottom: unset;
+}
+
+.card-play-zone.south .drop-zone {
+    bottom: 0;
+}
+
+.card-play-zone.east .drop-zone {
+    top: 50%;
+    right: 0;
+    left: unset;
+    transform: translateY(-50%);
+}
+
+.card-play-zone.west .drop-zone {
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+}

@@ -1,0 +1,51 @@
+.card-back {
+  position: absolute;
+  width: 80px;
+  height: 120px;
+  background-image: url('/static/img/deck/Deck_Back.png');
+  background-size: cover;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.center-deck {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 60px; /* or whatever size matches your card assets */
+  height: 90px;
+  transform: translate(-50%, -50%);
+  z-index: 5; /* below animated cards, above background */
+  pointer-events: none;
+}
+
+.card-img {
+  width: 80px;
+  height: 120px;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  user-select: none;
+  pointer-events: none; /* Prevent interference unless you make it interactive */
+}
+
+.card-img.draggable {
+  cursor: grab;
+  pointer-events: auto;
+}
+
+.card-img.draggable:active {
+  cursor: grabbing;
+  transform: scale(1.05);
+}
+
+.card-test-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 20px;
+  background-color: #eee;
+  border: 2px dashed #333;
+}
+

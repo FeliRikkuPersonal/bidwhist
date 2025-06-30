@@ -1,81 +1,61 @@
 package com.bidwhist.dto;
 
 import java.util.List;
-import java.util.Map;
 
-import com.bidwhist.model.Bid;
-import com.bidwhist.model.BidType;
+import com.bidwhist.bidding.InitialBid;
 import com.bidwhist.model.Card;
 import com.bidwhist.model.GamePhase;
-import com.bidwhist.model.Team;
+import com.bidwhist.model.Suit;
+import com.bidwhist.bidding.BidType;
 
 public class GameStateResponse {
-
     private List<PlayerView> players;
     private List<Card> kitty;
     private int currentTurnIndex;
     private GamePhase phase;
-    private BidType trumpType;
-    private String winningPlayerName;
-    private Bid highestBid;
-    private Map<Team, Integer> teamTrickCounts;
-    private Map<Team, Integer> teamScores;
-    private Team winningTeam;
-    private Boolean bidSuccessful;
+    private Suit trumpSuit;
+    private BidType bidType;
+    private String winningPlayerName; // NEW FIELD
+    private InitialBid highestBid; // NEW FIELD
+    private List<Card> shuffledDeck;
 
-    public GameStateResponse(
-            List<PlayerView> players,
-            List<Card> kitty,
-            int currentTurnIndex,
-            GamePhase phase,
-            BidType trumpType
-    ) {
+    public GameStateResponse(List<PlayerView> players, List<Card> kitty, int currentTurnIndex,
+                              GamePhase phase, Suit trumpSuit, BidType bidType) {
         this.players = players;
         this.kitty = kitty;
         this.currentTurnIndex = currentTurnIndex;
         this.phase = phase;
-        this.trumpType = trumpType;
+        this.trumpSuit = trumpSuit;
+        this.bidType = bidType;
+
     }
 
-    // Getters and Setters
+    public void setShuffledDeck(List<Card> shuffledDeck) {
+        this.shuffledDeck = shuffledDeck;
+    }
+
     public List<PlayerView> getPlayers() {
         return players;
-    }
-
-    public void setPlayers(List<PlayerView> players) {
-        this.players = players;
     }
 
     public List<Card> getKitty() {
         return kitty;
     }
 
-    public void setKitty(List<Card> kitty) {
-        this.kitty = kitty;
+    public List<Card> getShuffledDeck() {
+        return shuffledDeck;
     }
 
     public int getCurrentTurnIndex() {
         return currentTurnIndex;
     }
 
-    public void setCurrentTurnIndex(int currentTurnIndex) {
-        this.currentTurnIndex = currentTurnIndex;
-    }
-
     public GamePhase getPhase() {
         return phase;
     }
 
-    public void setPhase(GamePhase phase) {
-        this.phase = phase;
-    }
-
-    public BidType getTrumpType() {
-        return trumpType;
-    }
-
-    public void setTrumpType(BidType trumpType) {
-        this.trumpType = trumpType;
+    public Suit getTrumpSuit() {
+        return trumpSuit;
     }
 
     public String getWinningPlayerName() {
@@ -86,44 +66,39 @@ public class GameStateResponse {
         this.winningPlayerName = winningPlayerName;
     }
 
-    public Bid getHighestBid() {
+    public InitialBid getHighestBid() {
         return highestBid;
     }
 
-    public void setHighestBid(Bid highestBid) {
+    public BidType getBidType() {
+        return bidType;
+    }
+
+    public void setHighestBid(InitialBid highestBid) {
         this.highestBid = highestBid;
     }
 
-    public Map<Team, Integer> getTeamTrickCounts() {
-        return teamTrickCounts;
+    public void setPlayers(List<PlayerView> players) {
+        this.players = players;
     }
 
-    public void setTeamTrickCounts(Map<Team, Integer> teamTrickCounts) {
-        this.teamTrickCounts = teamTrickCounts;
+    public void setKitty(List<Card> kitty) {
+        this.kitty = kitty;
     }
 
-    public Map<Team, Integer> getTeamScores() {
-        return teamScores;
+    public void setCurrentTurnIndex(int currentTurnIndex) {
+        this.currentTurnIndex = currentTurnIndex;
     }
 
-    public void setTeamScores(Map<Team, Integer> teamScores) {
-        this.teamScores = teamScores;
+    public void setPhase(GamePhase phase) {
+        this.phase = phase;
     }
 
-    public Team getWinningTeam() {
-        return winningTeam;
+    public void setTrumpSuit(Suit trumpSuit) {
+        this.trumpSuit = trumpSuit;
     }
 
-    public void setWinningTeam(Team winningTeam) {
-        this.winningTeam = winningTeam;
+    public void setBidType(BidType newBidType) {
+        bidType = newBidType;
     }
-
-    public Boolean getBidSuccessful() {
-        return bidSuccessful;
-    }
-
-    public void setBidSuccessful(Boolean bidSuccessful) {
-        this.bidSuccessful = bidSuccessful;
-    }
-
 }
