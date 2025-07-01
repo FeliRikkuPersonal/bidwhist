@@ -66,12 +66,40 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
+.rules-button {
+    width: 11vw !important;
+    margin-top: 20px;
+}
+
 .multi-button {
     width: 12.5vw !important;
 }
 
 .settings-button {
     width: 5vw !important;
+}
+
+.radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 10px 0 20px;
+}
+
+.radio-group label {
+    font-size: 1rem;
+    color: white;
+    cursor: pointer;
+}
+
+.radio-group input[type="radio"] {
+    margin-right: 8px;
+}
+
+.settings-actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
 }
 
 .index-button:hover {

@@ -5,6 +5,7 @@ import PlayerZone from './components/PlayerZone';
 import CardPlayZone from './components/CardPlayZone';
 import SettingsPanel from './components/SettingsPanel';
 import Scoreboard from './components/Scoreboard';
+import BiddingPanel from './components/BiddingPanel';
 
 function App() {
     const [playerName, setPlayerName] = useState('');
@@ -13,6 +14,7 @@ function App() {
     const [showSettings, setShowSettings] = useState(false);
     const [hands, setHands] = useState([[], [], [], []]);
     const [playCard, setPlayCard] = useState(false);
+    const [showBidding, setShowBidding] = useState(false);
 
     const handleStartGame = () => {
         if (playerName.trim() !== "") {
@@ -20,6 +22,7 @@ function App() {
             const dealtHands = dealHands(fullDeck);
             setHands(dealtHands);
             setShowWelcome(false);
+            setShowBidding(true);
         }
     };
 
@@ -57,6 +60,16 @@ function App() {
         return hands;
     }
 
+    const handleBidSubmit = (bid) => {
+        console.log('Bid submitted:', bid);
+        setShowBidding(false); // Hide bidding panel after bid
+    };
+
+    const handleSkipBid = () => {
+        console.log('Bid skipped.');
+        setShowBidding(false); // Hide if skipped
+    };
+
     return (
         <div className="index-wrapper">
             {showWelcome ? (
@@ -88,6 +101,10 @@ function App() {
                         <PlayerZone position="east" name="AI Player" showHand={false} cards={hands[2]} />
                         <PlayerZone position="west" name="AI Player" showHand={false} cards={hands[3]} />
                     </div>
+
+                    {showBidding && (
+                        <BiddingPanel closeBidding={() => setShowBidding(false)} />
+                    )}
                     <div className="settings-icon" onClick={toggleSettings}>⚙</div>
                     {showSettings && (
                         <div className="index-container settings-panel">
