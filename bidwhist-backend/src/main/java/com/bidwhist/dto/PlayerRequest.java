@@ -1,21 +1,21 @@
 package com.bidwhist.dto;
 
 public class PlayerRequest {
-    private String name;
+    private String playerName;
 
     public PlayerRequest() {
         // Default constructor for JSON
     }
 
-    public PlayerRequest(String name) {
-        this.name = name;
+    public PlayerRequest(String playerName) {
+        this.playerName = playerName;
     }
 
-    public String getName() {
-        return name;
+    public String getPlayerName() {
+        return playerName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setplayerName(String playerName) {
+        this.playerName = playerName;
     }
 }

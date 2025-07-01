@@ -24,7 +24,7 @@
   height: 120px;
   object-fit: contain;
   border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.3);
   transition: transform 0.2s ease, opacity 0.2s ease;
   user-select: none;
   pointer-events: none; /* Prevent interference unless you make it interactive */

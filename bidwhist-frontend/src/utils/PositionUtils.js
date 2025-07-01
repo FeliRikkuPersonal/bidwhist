@@ -1,20 +1,24 @@
 // src/utils/PositionUtils.js
 
 /**
- * Maps player IDs to UI-relative positions (south, west, north, east)
- * based on the viewer's perspective.
- *
- * @param {string[]} players - Ordered list of player IDs (e.g., ["P1", "P2", "P3", "P4"])
- * @param {string} viewerId - The ID of the player viewing the UI
- * @returns {Object} playerId => position (e.g., { P1: "west", P2: "south", ... })
+ * Given an ordered list of players and the current viewer's position,
+ * assign directions: south (you), then clockwise.
  */
-export function getPositionMap(players, viewerId) {
-  const viewerIndex = players.indexOf(viewerId);
-  const positions = ["south", "west", "north", "east"];
+export function getPositionMap(backendPositions, viewerPosition) {
+  const directions = ['south', 'west', 'north', 'east'];
+  const viewerIndex = backendPositions.indexOf(viewerPosition);
 
-  return players.reduce((map, playerId, i) => {
-    const position = positions[(i - viewerIndex + 4) % 4];
-    map[playerId] = position;
-    return map;
-  }, {});
+  if (viewerIndex === -1) {
+    console.warn(`Viewer position ${viewerPosition} not found in backend positions`);
+    return {};
+  }
+
+  const rotated = [...backendPositions.slice(viewerIndex), ...backendPositions.slice(0, viewerIndex)];
+
+  const map = {};
+  for (let i = 0; i < rotated.length; i++) {
+    map[rotated[i]] = directions[i];
+  }
+
+  return map;
 }

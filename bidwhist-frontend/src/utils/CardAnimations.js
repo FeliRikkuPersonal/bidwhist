@@ -1,12 +1,6 @@
 import { useZoneRefs } from '../context/RefContext';
 
-/**
- * Calculates an animation path between two registered refs.
- * 
- * @param {string} fromKey - e.g., 'Deck', 'PlayerZone-P1'
- * @param {string} toKey - e.g., 'CardPlayZone', 'PlayerZone-P2'
- * @returns {Object} from and to {x, y} points
- */
+
 export function getAnimationPath(fromKey, toKey) {
   const { get } = useZoneRefs();
 

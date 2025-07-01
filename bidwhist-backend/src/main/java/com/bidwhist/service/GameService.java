@@ -7,9 +7,11 @@ import java.util.Comparator;
 import org.springframework.stereotype.Service;
 
 import com.bidwhist.dto.BidRequest;
+import com.bidwhist.dto.CardVisibility;
 import com.bidwhist.dto.GameStateResponse;
 import com.bidwhist.dto.KittyRequest;
 import com.bidwhist.dto.PlayerView;
+import com.bidwhist.dto.CardOwner;
 import com.bidwhist.bidding.InitialBid;
 import com.bidwhist.bidding.FinalBid;
 import com.bidwhist.bidding.HandEvaluator;
@@ -32,6 +34,7 @@ public class GameService {
         this.deckService = deckService;
     }
 
+    // Start New Game, add players and shuffled deck
     public GameState startNewGame(String playerName) {
         // debug log
         System.out.println("Staring new game for player: " + playerName);
@@ -57,11 +60,26 @@ public class GameService {
         return currentGame;
     }
 
+    // Return GameState for specific player with dummy cards for other players
     public GameStateResponse getGameStateForPlayer(PlayerPos playerPos) {
         List<PlayerView> playerViews = new ArrayList<>();
 
         for (Player p : currentGame.getPlayers()) {
-            List<Card> visibleHand = p.getPosition().equals(playerPos) ? p.getHand().getCards() : null;
+            List<Card> visibleHand;
+
+            if (p.getPosition().equals(playerPos)) {
+                visibleHand = p.getHand().getCards();
+            } else {
+                int hiddenCount = p.getHand().getCards().size();
+                visibleHand = new ArrayList<>();
+                for (int i = 0; i < hiddenCount; i++) {
+                    Card hiddenCard = new Card(null, null);
+                    hiddenCard.setCardOwner(CardUtils.fromPlayerPos(p.getPosition()));
+                    hiddenCard.setVisibility(CardVisibility.HIDDEN); // optional enum
+                    visibleHand.add(hiddenCard);
+                }
+            }
+
             playerViews.add(new PlayerView(
                     p.getName(),
                     p.getPosition(),
@@ -79,9 +97,11 @@ public class GameService {
                 currentGame.getFinalBidType());
         response.setWinningPlayerName(currentGame.getWinningPlayerName());
         response.setHighestBid(currentGame.getHighestBid());
+        response.setPlayerPostion(playerPos);
         return response;
     }
 
+    // Helper function for getting GameState for specific player using name string
     public GameStateResponse getGameStateForPlayer(String playerName) {
         PlayerPos pos = currentGame.getPlayers().stream()
                 .filter(p -> p.getName().equals(playerName))
@@ -91,16 +111,13 @@ public class GameService {
 
         GameStateResponse response = getGameStateForPlayer(pos);
 
-            response.setShuffledDeck(currentGame.getDeck().getCards());
+        response.setShuffledDeck(currentGame.getDeck().getCards());
 
         return response;
 
     }
 
-    public GameState getCurrentGame() {
-        return currentGame;
-    }
-
+    // Collects bid from players and generates AI Bids
     public GameStateResponse submitBid(BidRequest request) {
         if (currentGame == null) {
             throw new IllegalStateException("Game has not been started. Call /start first.");
@@ -166,6 +183,7 @@ public class GameService {
         return getGameStateForPlayer(request.getPlayer());
     }
 
+    // Evaluates AI player's hand to provide an appropriate bid
     private InitialBid generateAIBid(Player ai) {
         HandEvaluator evaluator = new HandEvaluator(ai);
         evaluator.evaluateHand();
@@ -193,6 +211,7 @@ public class GameService {
         return bestBid.getInitialBid();
     }
 
+    // Provides Kitty to winner and discards cards - May need to divide function into 2
     public GameStateResponse applyKittyAndDiscards(KittyRequest request) {
         if (currentGame == null || currentGame.getPhase() != GamePhase.KITTY) {
             throw new IllegalStateException("Game is not in KITTY phase.");
@@ -238,6 +257,11 @@ public class GameService {
 
         return getGameStateForPlayer(request.getPlayer());
 
+    }
+
+    // getters
+    public GameState getCurrentGame() {
+        return currentGame;
     }
 
 }

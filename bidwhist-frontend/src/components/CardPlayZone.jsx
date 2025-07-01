@@ -1,7 +1,7 @@
 // src/components/CardPlayZone.js
 import React from 'react';
 import { useState, useRef, useEffect } from 'react';
-import { useZoneRefs } from '../utils/RefContext';
+import { useZoneRefs } from '../context/RefContext';
 import '../css/CardPlayZone.css';
 
 export default function CardPlayZone({ playerPosition, onCardPlayed }) {

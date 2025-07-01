@@ -18,12 +18,12 @@ public class Card {
     private String cardImage;
     private CardOwner owner;
     private CardVisibility visibility;
-    
+
     public Card(Suit suit, Rank rank) {
         this.rank = rank;
         this.suit = suit;
         this.cardImage = this.getCardImage();
-        
+
         // debug log
         System.out.println(cardImage);
 
@@ -31,16 +31,21 @@ public class Card {
         this.visibility = CardVisibility.HIDDEN;
     }
 
-    /* Suite will be assigned across the deck, but only effect the Jokers.
+    /*
+     * Suite will be assigned across the deck, but only effect the Jokers.
      * This ensure that Jokers count towards the winning bid's suit.
      */
     public void assignSuit(Suit suit) {
-        if (JokerUtils.isJokerRank(rank)) {this.suit = suit;}
+        if (JokerUtils.isJokerRank(rank)) {
+            this.suit = suit;
+        }
     }
 
     // Suit must be cleared after match and reset on winning bid.
     public void clearSuit() {
-        if (JokerUtils.isJokerRank(rank)) {this.suit = null;}
+        if (JokerUtils.isJokerRank(rank)) {
+            this.suit = null;
+        }
     }
 
     public Suit getSuit() {
@@ -60,11 +65,13 @@ public class Card {
     }
 
     public String getCardImage() {
-        if (this.rank == Rank.JOKER_B) {
+        if (this.rank == null) {
+            return "Deck_Back.png";
+        } else if (this.rank == Rank.JOKER_B) {
             return rank.toString().toLowerCase() + ".png";
         } else if (this.rank == Rank.JOKER_S) {
             return rank.toString().toLowerCase() + ".png";
-        } else if (this.rank.getValue() == 11 ) {
+        } else if (this.rank.getValue() == 11) {
             return suit.toString().toLowerCase() + "_jack.png";
         } else if (this.rank.getValue() == 12) {
             return suit.toString().toLowerCase() + "_queen.png";
@@ -73,7 +80,7 @@ public class Card {
         } else if (this.rank.getValue() == 14) {
             return suit.toString().toLowerCase() + "_ace.png";
         } else {
-            return suit.toString().toLowerCase() + "_" + rank.getValue() +".png";
+            return suit.toString().toLowerCase() + "_" + rank.getValue() + ".png";
         }
     }
 

@@ -5,6 +5,7 @@ import java.util.List;
 import com.bidwhist.bidding.InitialBid;
 import com.bidwhist.model.Card;
 import com.bidwhist.model.GamePhase;
+import com.bidwhist.model.PlayerPos;
 import com.bidwhist.model.Suit;
 import com.bidwhist.bidding.BidType;
 
@@ -18,9 +19,10 @@ public class GameStateResponse {
     private String winningPlayerName; // NEW FIELD
     private InitialBid highestBid; // NEW FIELD
     private List<Card> shuffledDeck;
+    private PlayerPos playerPosition;
 
     public GameStateResponse(List<PlayerView> players, List<Card> kitty, int currentTurnIndex,
-                              GamePhase phase, Suit trumpSuit, BidType bidType) {
+            GamePhase phase, Suit trumpSuit, BidType bidType) {
         this.players = players;
         this.kitty = kitty;
         this.currentTurnIndex = currentTurnIndex;
@@ -36,6 +38,10 @@ public class GameStateResponse {
 
     public List<PlayerView> getPlayers() {
         return players;
+    }
+
+    public PlayerPos getPlayerPosition() {
+        return playerPosition;
     }
 
     public List<Card> getKitty() {
@@ -80,6 +86,10 @@ public class GameStateResponse {
 
     public void setPlayers(List<PlayerView> players) {
         this.players = players;
+    }
+
+    public void setPlayerPostion(PlayerPos playerPosition) {
+        this.playerPosition = playerPosition;
     }
 
     public void setKitty(List<Card> kitty) {

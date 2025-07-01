@@ -13,6 +13,7 @@ import com.bidwhist.dto.BidRequest;
 import com.bidwhist.dto.FinalBidRequest;
 import com.bidwhist.dto.GameStateResponse;
 import com.bidwhist.dto.KittyRequest;
+import com.bidwhist.dto.PlayerRequest;
 import com.bidwhist.model.GamePhase;
 import com.bidwhist.model.GameState;
 import com.bidwhist.model.Player;
@@ -27,7 +28,8 @@ public class GameController {
     private GameService gameService;
 
     @PostMapping("/start")
-    public GameStateResponse startGame(@RequestBody(required = false) String playerName) {
+    public GameStateResponse startGame(@RequestBody PlayerRequest request) {
+        String playerName = request.getPlayerName();
         gameService.startNewGame(playerName);
         return gameService.getGameStateForPlayer(playerName);
     }
@@ -47,7 +49,7 @@ public class GameController {
         game.getDeck().deal(game.getPlayers()); // Perform actual dealing
         game.setKitty(game.getDeck().getKitty().getCards()); // Move kitty over
         game.setPhase(GamePhase.BID); // Advance phase
-
+  
         return gameService.getGameStateForPlayer(game.getPlayers().get(0).getPosition()); // or current human player
     }
 

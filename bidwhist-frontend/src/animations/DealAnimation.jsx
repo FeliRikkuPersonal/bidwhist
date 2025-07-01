@@ -1,4 +1,3 @@
-import { getRef } from '../utils/RefRegistry';
 import { getCardImage } from '../utils/CardUtils';
 
 /**
@@ -11,36 +10,59 @@ import { getCardImage } from '../utils/CardUtils';
  * @param {Function} setAnimatedCards - updater to push card animation state
  * @param {Function} [onComplete] - optional callback when done
  */
-export function dealCardsClockwise(playerPositions, cards, deckPosition, positionMap, setAnimatedCards, onComplete) {
+export function dealCardsClockwise(
+  playerPositions,
+  cards,
+  deckPosition,
+  positionMap,
+  setAnimatedCards,
+  onComplete,
+  get
+) {
   const totalCards = cards.length;
   const delayPerCard = 120; // ms
+  console.log("Cards being dealt:", cards.length, cards);
 
-  cards.forEach((card, i) => {
-    const owner = card.owner; // e.g., "P2"
-    const visualPosition = positionMap[owner]; // e.g., "west"
-    const targetRef = getRef(`PlayerZone-${visualPosition}`)?.current;
-    const toRect = targetRef?.getBoundingClientRect();
-
-    if (!toRect) {
-      console.warn(`Missing ref for player ${owner} → ${visualPosition}`);
-      return;
-    }
-
-    const toX = toRect.left + toRect.width / 2;
-    const toY = toRect.top + toRect.height / 2;
-
-    setTimeout(() => {
-      setAnimatedCards(prev => [
-        ...prev,
-        {
-          id: `${card.cardImage}-${i}`,
-          card,
-          from: deckPosition,
-          to: { x: toX, y: toY }
-        }
-      ]);
-    }, i * delayPerCard);
+  const grouped = {};
+  playerPositions.forEach(pos => {
+    grouped[pos] = cards.filter(c => c.owner === pos);
   });
+
+  // Interleave by round
+  for (let round = 0; round < grouped[playerPositions[0]].length; round++) {
+    for (let p = 0; p < playerPositions.length; p++) {
+      const player = playerPositions[p];
+      const card = grouped[player][round];
+      if (!card) continue;
+
+      const visualPosition = positionMap[player];
+      const targetRef = get(visualPosition)?.current;
+      const toRect = targetRef?.getBoundingClientRect();
+
+      if (!toRect) {
+        console.warn(`Missing ref for player ${player} → ${visualPosition}`);
+        continue;
+      }
+
+      const toX = toRect.left + toRect.width / 2;
+      const toY = toRect.top + toRect.height / 2;
+
+      const index = round * playerPositions.length + p;
+
+      setTimeout(() => {
+        setAnimatedCards(prev => [
+          ...prev,
+          {
+            id: `${card.cardImage}-${index}`,
+            card,
+            from: deckPosition,
+            to: { x: toX, y: toY }
+          }
+        ]);
+      }, index * delayPerCard);
+    }
+  }
+
 
   if (onComplete) {
     setTimeout(() => {

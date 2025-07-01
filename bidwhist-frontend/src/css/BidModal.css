@@ -1,0 +1,42 @@
+/* src/css/BidModal.css */
+.bid-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.bid-modal {
+  background: #222;
+  padding: 20px;
+  border-radius: 12px;
+  color: white;
+  text-align: center;
+  min-width: 300px;
+}
+
+.bid-options button {
+  margin: 8px;
+  padding: 10px 20px;
+  font-size: 18px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: #555;
+  color: white;
+}
+
+.bid-options button.selected {
+  background: #28a745;
+}
+
+.no-toggle {
+  margin-top: 12px;
+  font-size: 16px;
+}
