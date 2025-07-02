@@ -5,6 +5,7 @@
   width: 100vw;
   height: 100vh;
   padding: 10px;
+  z-index: 9999;
   overflow: hidden;
 }
 
@@ -100,15 +101,3 @@
   grid-area: bottom-right;
 }
 
-.floating-card-layer {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  pointer-events: none;
-  /* Let clicks pass through */
-  z-index: 100;
-  background-color: transparent;
-  overflow: visible;
-}

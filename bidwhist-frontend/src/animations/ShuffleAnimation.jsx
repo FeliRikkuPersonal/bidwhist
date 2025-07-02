@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { getCardImage } from '../utils/CardUtils';
 import '../css/Animations.css';
 
-function ShuffleAnimation({ cards, viewerName, deckPosition, onComplete }) {
+function ShuffleAnimation({ cards, deckPosition, viewerName, onComplete }) {
 
   useEffect(() => {
     const timeout = setTimeout(() => {

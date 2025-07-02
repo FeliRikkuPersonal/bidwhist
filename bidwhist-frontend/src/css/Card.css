@@ -8,16 +8,7 @@
   box-shadow: 0 4px 8px rgba(0,0,0,0.3);
 }
 
-.center-deck {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 60px; /* or whatever size matches your card assets */
-  height: 90px;
-  transform: translate(-50%, -50%);
-  z-index: 5; /* below animated cards, above background */
-  pointer-events: none;
-}
+
 
 .card-img {
   width: 80px;

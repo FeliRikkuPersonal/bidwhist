@@ -1,3 +1,5 @@
+// src/animations/DealAnimation.jsx
+import { useZoneRefs } from '../context/RefContext';
 import { getCardImage } from '../utils/CardUtils';
 
 /**
@@ -44,8 +46,9 @@ export function dealCardsClockwise(
         continue;
       }
 
-      const toX = toRect.left + toRect.width / 2;
-      const toY = toRect.top + toRect.height / 2;
+      const parentBounds = document.querySelector('.floating-card-layer')?.getBoundingClientRect();
+      const toX = toRect.left + toRect.width / 2 - parentBounds.left;
+      const toY = toRect.top + toRect.height / 2 - parentBounds.top;
 
       const index = round * playerPositions.length + p;
 
@@ -54,7 +57,7 @@ export function dealCardsClockwise(
           ...prev,
           {
             id: `${card.cardImage}-${index}`,
-            card,
+            ...card,
             from: deckPosition,
             to: { x: toX, y: toY }
           }

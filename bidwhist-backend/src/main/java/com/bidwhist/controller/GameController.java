@@ -34,6 +34,15 @@ public class GameController {
         return gameService.getGameStateForPlayer(playerName);
     }
 
+    @PostMapping("/shuffle")
+    public GameStateResponse getShuffledDeck(@RequestBody PlayerRequest request) {
+        String playerName = request.getPlayerName();
+        gameService.shuffleDeck();
+
+        return gameService.getGameStateForPlayer(playerName);
+    }
+    
+
     @PostMapping("/deal")
     public GameStateResponse dealCards() {
         GameState game = gameService.getCurrentGame();
@@ -48,7 +57,7 @@ public class GameController {
 
         game.getDeck().deal(game.getPlayers()); // Perform actual dealing
         game.setKitty(game.getDeck().getKitty().getCards()); // Move kitty over
-        game.setPhase(GamePhase.BID); // Advance phase
+        game.setPhase(GamePhase.DEAL); // Advance phase
   
         return gameService.getGameStateForPlayer(game.getPlayers().get(0).getPosition()); // or current human player
     }

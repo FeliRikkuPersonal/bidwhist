@@ -11,13 +11,12 @@ import { getPositionMap } from './utils/PositionUtils';
 function App() {
   const [playerName, setPlayerName] = useState('');
   const [gameState, setGameState] = useState(null);
-  const [shuffledDeck, setShuffledDeck] = useState([]);
   const [showStackedDeck, setShowStackedDeck] = useState(false);
-  const [showShuffle, setShowShuffle] = useState(false);
   const [animatedCards, setAnimatedCards] = useState([]);
   const [deckPosition, setDeckPosition] = useState({ x: 0, y: 0 })
+
   const positionMap = gameState?.players
-    ? getPositionMap(gameState.players.map(p => p.position), gameState.playerPosition) 
+    ? getPositionMap(gameState.players.map(p => p.position), gameState.playerPosition)
     : {};
   const myPosition = gameState?.playerPosition || 'south';
 
@@ -40,7 +39,6 @@ function App() {
       .then(data => {
         console.log('[App] Game started successfully:', data);
         setGameState(data);
-        setShuffledDeck(data.shuffledDeck);
       })
       .catch(err => {
         console.error('[App] Error starting game:', err);
@@ -57,13 +55,10 @@ function App() {
           <GameScreen
             gameState={gameState}
             playerName={playerName}
-            shuffledDeck={shuffledDeck}
             setGameState={setGameState}
             showStackedDeck={showStackedDeck}
             setShowStackedDeck={setShowStackedDeck}
             setAnimatedCards={setAnimatedCards}
-            showShuffle={showShuffle}
-            setShowShuffle={setShowShuffle}
             animatedCards={animatedCards}
             deckPosition={deckPosition}
             setDeckPosition={setDeckPosition}

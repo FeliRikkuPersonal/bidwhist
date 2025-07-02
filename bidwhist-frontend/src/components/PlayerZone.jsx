@@ -2,9 +2,11 @@ import React, { useState, useEffect, useRef, useImperativeHandle, forwardRef } f
 import { useZoneRefs } from '../context/RefContext';
 import '../css/PlayerZone.css';
 
-const PlayerZone = forwardRef(({ position, direction, name, showHand, cards = [] }, ref) => {
+const PlayerZone = forwardRef(({ position, direction, name, showHand, cards = [], gameState }, ref) => {
   const zoneRef = useRef();
   const [draggingCardIndex, setDraggingCardIndex] = useState(null);
+  const visiblePhases = ['BID', 'KITTY', 'PLAY', 'SCORE'];
+  const shouldRenderCards = visiblePhases.includes(gameState?.phase);
   const { register } = useZoneRefs();
 
   useImperativeHandle(ref, () => ({
@@ -24,31 +26,34 @@ const PlayerZone = forwardRef(({ position, direction, name, showHand, cards = []
     <div ref={zoneRef} className={`player-zone ${direction}`}>
       {["west", "east"].includes(direction) && <div className="player-name">{name}</div>}
       <div className={`player-hand ${direction}`}>
-        {showHand
-          ? cards.map((card, i) => (
-            <img
-              key={i}
-              src={`/static/img/deck/${card.cardImage}`}
-              alt="card"
-              className="card-img"
-              draggable={direction === 'south'}
-              onDragStart={(e) => {
-                e.dataTransfer.setData('application/json', JSON.stringify(card));
-                setDraggingCardIndex(i);
-              }}
-              onDragEnd={() => setDraggingCardIndex(null)}
-            />
-          ))
-          : cards.map((_, i) => (
-            <img
-              key={i}
-              src="/static/img/deck/Deck_Back.png"
-              alt="Card Back"
-              className="card-img"
-              style={{ visibility: draggingCardIndex === i ? 'hidden' : 'visible' }}
-            />
-          ))}
+        {shouldRenderCards ? (
+          showHand
+            ? cards.map((card, i) => (
+              <img
+                key={i}
+                src={`/static/img/deck/${card.cardImage}`}
+                alt="card"
+                className="card-img"
+                draggable={direction === 'south'}
+                onDragStart={(e) => {
+                  e.dataTransfer.setData('application/json', JSON.stringify(card));
+                  setDraggingCardIndex(i);
+                }}
+                onDragEnd={() => setDraggingCardIndex(null)}
+              />
+            ))
+            : cards.map((_, i) => (
+              <img
+                key={i}
+                src="/static/img/deck/Deck_Back.png"
+                alt="Card Back"
+                className="card-img"
+                style={{ visibility: draggingCardIndex === i ? 'hidden' : 'visible' }}
+              />
+            ))
+        ) : null}
       </div>
+
       {["north", "south"].includes(direction) && <div className="player-name">{name}</div>}
     </div>
   );

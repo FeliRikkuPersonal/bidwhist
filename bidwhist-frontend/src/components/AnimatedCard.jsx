@@ -1,3 +1,4 @@
+// src/components/AnimatedCard.jsx
 import { useEffect, useState } from "react";
 
 import '../css/Card.css';
@@ -20,10 +21,12 @@ export default function AnimatedCard({ card, from, to, viewerName, contextPhase,
 
     console.log(`🃏 Card: ${card.cardImage}, owner: ${card.owner}, to: (${to.x}, ${to.y})`);
 
-    setStyle(prev => ({
-      ...prev,
-      transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`
-    }));
+    requestAnimationFrame(() => {
+      setStyle(prev => ({
+        ...prev,
+        transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`
+      }));
+    });
   }, [from, to]);
 
   const image = getCardImage(card, viewerName);

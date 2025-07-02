@@ -51,13 +51,23 @@ public class GameService {
         gameState.setShuffledDeck(gameState.getDeck().getCards());
 
         gameState.getPlayers().addAll(players);
-        gameState.setPhase(GamePhase.SHUFFLE);
+        gameState.setPhase(GamePhase.START);
         this.currentGame = gameState;
 
         // debug log
         System.out.println("Initial phase: " + gameState.getPhase());
 
         return currentGame;
+    }
+
+    public GameState shuffleDeck() {
+        GameState gameState = currentGame;
+
+        gameState.getDeck().shuffle();
+        gameState.setShuffledDeck(gameState.getDeck().getCards());
+        gameState.setPhase(GamePhase.SHUFFLE);
+
+        return gameState;
     }
 
     // Return GameState for specific player with dummy cards for other players
@@ -211,7 +221,8 @@ public class GameService {
         return bestBid.getInitialBid();
     }
 
-    // Provides Kitty to winner and discards cards - May need to divide function into 2
+    // Provides Kitty to winner and discards cards - May need to divide function
+    // into 2
     public GameStateResponse applyKittyAndDiscards(KittyRequest request) {
         if (currentGame == null || currentGame.getPhase() != GamePhase.KITTY) {
             throw new IllegalStateException("Game is not in KITTY phase.");
