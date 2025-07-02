@@ -104,7 +104,15 @@ public class GameService {
                 currentGame.getCurrentTurnIndex(),
                 currentGame.getPhase(),
                 currentGame.getTrumpSuit(),
-                currentGame.getFinalBidType());
+                currentGame.getFinalBidType(),
+                currentGame.getWinningPlayerName(),
+                currentGame.getHighestBid(),
+                currentGame.getShuffledDeck(),
+                playerPos,
+                currentGame.getFirstBidder(),
+                currentGame.getBidTurnIndex(),
+                currentGame.getBids()
+                );
         response.setWinningPlayerName(currentGame.getWinningPlayerName());
         response.setHighestBid(currentGame.getHighestBid());
         response.setPlayerPostion(playerPos);
@@ -185,6 +193,19 @@ public class GameService {
                 }
                 currentGame.setWinningBidStats(finalBid);
             }
+
+            // Rotate first bidder for next round
+            PlayerPos[] order = PlayerPos.values();
+            PlayerPos currentFirst = currentGame.getFirstBidder();
+            int nextOrdinal = (currentFirst.ordinal() + 1) % order.length;
+
+            currentGame.setFirstBidder(order[nextOrdinal]);
+            currentGame.setBidTurnIndex(nextOrdinal);
+
+            // clear information
+            currentGame.getBids().clear();
+            currentGame.setHighestBid(null);
+            currentGame.getFinalBidCache().clear();
 
             // Human will finalize later via /finalizeBid
             currentGame.setPhase(GamePhase.KITTY);

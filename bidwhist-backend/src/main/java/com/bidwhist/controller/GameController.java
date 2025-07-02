@@ -31,6 +31,7 @@ public class GameController {
     public GameStateResponse startGame(@RequestBody PlayerRequest request) {
         String playerName = request.getPlayerName();
         gameService.startNewGame(playerName);
+        gameService.getCurrentGame().setFirstBidder(PlayerPos.P1);
         return gameService.getGameStateForPlayer(playerName);
     }
 

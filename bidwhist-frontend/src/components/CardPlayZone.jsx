@@ -27,6 +27,9 @@ export default function CardPlayZone({
     const [shuffledDeck, setShuffledDeck] = useState([]);
     const [showShuffle, setShowShuffle] = useState(false);
     const [hasRunIntro, setHasRunIntro] = useState(false);
+    const [newRound, setNewRound] = useState(false);
+    const [bidPhase, setBidPhase] = useState(false);
+    const [showBidding, setShowBidding] = useState(false);
 
     const { playerProps, positionToDirection, viewerPosition } = usePlayerContext();
 
@@ -37,6 +40,7 @@ export default function CardPlayZone({
         get(dir)?.current
     );
 
+    // 1. Shuffle and intro sequence
     useEffect(() => {
         if (!playerName || !allRefsReady || hasRunIntro) return;
         if (gameState?.phase !== 'START') return;
@@ -63,15 +67,27 @@ export default function CardPlayZone({
                 setGameState(shuffleData);
                 setShuffledDeck(shuffleData.shuffledDeck);
 
-                console.log(`Current center: ${deckPosition.x}, ${deckPosition.y}`)
+                console.log(`Current center: ${deckPosition.x}, ${deckPosition.y}`);
 
-                // ⬇️ Animate shuffle → stacked deck
                 setShowShuffle(true);
-                await delay(1000);
+                await delay(1500);
+                setNewRound(true); // ⬅️ Triggers next useEffect
 
-                await delay(1000);
+            } catch (err) {
+                console.error("🔥 Error during intro sequence:", err);
+            }
+        };
 
-                // ⬇️ Deal
+        runIntroSequence();
+    }, [playerName, allRefsReady, hasRunIntro, gameState, deckPosition]);
+
+
+    // 2. Deal logic (triggered when newRound becomes true)
+    useEffect(() => {
+        if (!newRound) return;
+
+        const deal = async () => {
+            try {
                 const dealRes = await fetch('/api/game/deal', { method: 'POST' });
                 const dealData = await dealRes.json();
 
@@ -89,7 +105,6 @@ export default function CardPlayZone({
 
                 setGameState(dealData); // ✅ So PlayerZone has correct hands
 
-                // ⬇️ Give React a tick to rerender
                 setTimeout(() => {
                     dealCardsClockwise(
                         players,
@@ -98,19 +113,39 @@ export default function CardPlayZone({
                         positionMap,
                         setAnimatedCards,
                         () => {
-                            setShowStackedDeck(false);
                             console.log("🎉 Deal animation complete");
                         },
                         get
                     );
                 }, 50);
+
             } catch (err) {
-                console.error("🔥 Error during intro sequence:", err);
+                console.error("🔥 Error during deal:", err);
             }
         };
 
-        runIntroSequence();
-    }, [playerName, allRefsReady, hasRunIntro, gameState, backendPositions, viewerPosition, deckPosition]);
+        deal();
+        delay(8000);
+        setBidPhase(true);
+    }, [newRound, backendPositions, viewerPosition, deckPosition]);
+
+    useEffect(() => {
+        if (!bidPhase) return;
+
+        const runBid = async () => {
+            const callbid = await fetch(`/api/game/bid`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ playerName })
+            });
+
+            const bidData = await runBid.json();
+
+            setShowBidding(true);
+
+        }
+    });
+
 
     const updatePositions = () => {
         const bounds = localRef.current?.getBoundingClientRect();
@@ -184,7 +219,8 @@ export default function CardPlayZone({
                         cards={shuffledDeck}
                         viewerName={playerName}
                         deckPosition={deckPosition}
-                        onComplete={() => setShowShuffle(false)}
+                        onComplete={() =>
+                            setShowShuffle(false)}
                     />
                 )}
 
@@ -194,6 +230,10 @@ export default function CardPlayZone({
                         viewerName={playerName}
                         deckPosition={deckPosition}
                     />
+                )}
+
+                {showBidding && (
+                    <BiddingPanel closeBidding={() => setShowBidding(false)} />
                 )}
 
                 {playedCard && (

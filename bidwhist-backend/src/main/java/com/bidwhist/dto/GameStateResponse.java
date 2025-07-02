@@ -7,8 +7,10 @@ import com.bidwhist.model.Card;
 import com.bidwhist.model.GamePhase;
 import com.bidwhist.model.PlayerPos;
 import com.bidwhist.model.Suit;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.bidwhist.bidding.BidType;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class GameStateResponse {
     private List<PlayerView> players;
     private List<Card> kitty;
@@ -20,17 +22,40 @@ public class GameStateResponse {
     private InitialBid highestBid; // NEW FIELD
     private List<Card> shuffledDeck;
     private PlayerPos playerPosition;
+    private PlayerPos firstBidder;
+    private int bidTurnIndex;
+    private List<InitialBid> bids;
 
-    public GameStateResponse(List<PlayerView> players, List<Card> kitty, int currentTurnIndex,
-            GamePhase phase, Suit trumpSuit, BidType bidType) {
-        this.players = players;
-        this.kitty = kitty;
-        this.currentTurnIndex = currentTurnIndex;
-        this.phase = phase;
-        this.trumpSuit = trumpSuit;
-        this.bidType = bidType;
+public GameStateResponse(
+        List<PlayerView> players,
+        List<Card> kitty,
+        int currentTurnIndex,
+        GamePhase phase,
+        Suit trumpSuit,
+        BidType bidType,
+        String winningPlayerName,
+        InitialBid highestBid,
+        List<Card> shuffledDeck,
+        PlayerPos playerPosition,
+        PlayerPos firstBidder,
+        int bidTurnIndex,
+        List<InitialBid> bids
+) {
+    this.players = players;
+    this.kitty = kitty;
+    this.currentTurnIndex = currentTurnIndex;
+    this.phase = phase;
+    this.trumpSuit = trumpSuit;
+    this.bidType = bidType;
+    this.winningPlayerName = winningPlayerName;
+    this.highestBid = highestBid;
+    this.shuffledDeck = shuffledDeck;
+    this.playerPosition = playerPosition;
+    this.firstBidder = firstBidder;
+    this.bidTurnIndex = bidTurnIndex;
+    this.bids = bids;
+}
 
-    }
 
     public void setShuffledDeck(List<Card> shuffledDeck) {
         this.shuffledDeck = shuffledDeck;
@@ -62,6 +87,18 @@ public class GameStateResponse {
 
     public Suit getTrumpSuit() {
         return trumpSuit;
+    }
+
+    public PlayerPos getFirstBidder() {
+        return firstBidder;
+    }
+
+    public int getBidTurnIndex() {
+        return bidTurnIndex;
+    }
+
+    public List<InitialBid> getBids() {
+        return bids;
     }
 
     public String getWinningPlayerName() {
