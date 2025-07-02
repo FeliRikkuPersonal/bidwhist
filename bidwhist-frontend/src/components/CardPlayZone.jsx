@@ -132,18 +132,13 @@ export default function CardPlayZone({
     useEffect(() => {
         if (!bidPhase) return;
 
-        const runBid = async () => {
-            const callbid = await fetch(`/api/game/bid`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ playerName })
-            });
+        const turnPlayerPos = ['P1', 'P2', 'P3', 'P4'][currentTurnIndex];
 
-            const bidData = await runBid.json();
-
+        if (playerPosition === turnPlayerPos) {
             setShowBidding(true);
-
         }
+
+
     });
 
 
