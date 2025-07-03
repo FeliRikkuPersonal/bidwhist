@@ -6,19 +6,15 @@ import './css/Animations.css';
 import ModeSelector from "./components/ModeSelector";
 import GameScreen from './components/GameScreen';
 import Scoreboard from './components/Scoreboard';
-import { getPositionMap } from './utils/PositionUtils';
 
 function App() {
   const [playerName, setPlayerName] = useState('');
   const [gameState, setGameState] = useState(null);
   const [showStackedDeck, setShowStackedDeck] = useState(false);
   const [animatedCards, setAnimatedCards] = useState([]);
+  const [showAnimatedCards, setShowAnimatedCards] = useState(false);
   const [deckPosition, setDeckPosition] = useState({ x: 0, y: 0 })
-
-  const positionMap = gameState?.players
-    ? getPositionMap(gameState.players.map(p => p.position), gameState.playerPosition)
-    : {};
-  const myPosition = gameState?.playerPosition || 'south';
+  const [viewerPosition, setViewerPosition] = useState(null);
 
   const onStartGame = (name) => {
     const trimmedName = name.trim();
@@ -39,6 +35,8 @@ function App() {
       .then(data => {
         console.log('[App] Game started successfully:', data);
         setGameState(data);
+        setViewerPosition(data.playerPosition);
+        setShowAnimatedCards(true);
       })
       .catch(err => {
         console.error('[App] Error starting game:', err);
@@ -55,6 +53,7 @@ function App() {
           <GameScreen
             gameState={gameState}
             playerName={playerName}
+            viewerPosition={viewerPosition}
             setGameState={setGameState}
             showStackedDeck={showStackedDeck}
             setShowStackedDeck={setShowStackedDeck}
@@ -62,6 +61,8 @@ function App() {
             animatedCards={animatedCards}
             deckPosition={deckPosition}
             setDeckPosition={setDeckPosition}
+            showAnimatedCards={showAnimatedCards}
+            setShowAnimatedCards={setShowAnimatedCards}
           />
         ) : (
           <ModeSelector

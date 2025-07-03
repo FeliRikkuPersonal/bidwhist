@@ -4,6 +4,7 @@ public enum GamePhase {
     START,
     SHUFFLE,
     DEAL,
+    PRE_BID,
     BID,
     KITTY,
     PLAY,

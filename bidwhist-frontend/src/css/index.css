@@ -1,5 +1,6 @@
 .index-wrapper {
-    height: 100vh;
+    height: 100%;
+    width: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -119,8 +120,8 @@ body {
   background-color: darkgreen;
   /* Background Color in lieu of Image loading */
   position: relative;
-  height: 100vh;
-  width: 100vh;
+  height: 100%;
+  width: 100%;
   overflow: hidden;
   /* No Scrolling */
   margin: 0;

@@ -7,7 +7,7 @@ function ShuffleAnimation({ cards, deckPosition, viewerName, onComplete }) {
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (onComplete) onComplete();
-    }, 2000); // Match your CSS animation duration
+    }, 1500); // Match your CSS animation duration
     return () => clearTimeout(timeout);
   }, [onComplete]);
 

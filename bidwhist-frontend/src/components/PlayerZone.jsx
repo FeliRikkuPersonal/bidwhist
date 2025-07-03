@@ -5,7 +5,7 @@ import '../css/PlayerZone.css';
 const PlayerZone = forwardRef(({ position, direction, name, showHand, cards = [], gameState }, ref) => {
   const zoneRef = useRef();
   const [draggingCardIndex, setDraggingCardIndex] = useState(null);
-  const visiblePhases = ['BID', 'KITTY', 'PLAY', 'SCORE'];
+  const visiblePhases = ['PRE_BID', 'BID', 'KITTY', 'PLAY', 'SCORE'];
   const shouldRenderCards = visiblePhases.includes(gameState?.phase);
   const { register } = useZoneRefs();
 
@@ -20,7 +20,9 @@ const PlayerZone = forwardRef(({ position, direction, name, showHand, cards = []
     }
   }, [direction]);
 
-  console.log(`▶️ ${direction} hand:`, cards);
+  useEffect(() => {
+    console.log("phase changed:", gameState?.phase);
+  }, [gameState?.phase]);
 
   return (
     <div ref={zoneRef} className={`player-zone ${direction}`}>

@@ -125,7 +125,7 @@ public GameStateResponse(
         this.players = players;
     }
 
-    public void setPlayerPostion(PlayerPos playerPosition) {
+    public void setPlayerPosition(PlayerPos playerPosition) {
         this.playerPosition = playerPosition;
     }
 

@@ -32,20 +32,30 @@ public class GameController {
         String playerName = request.getPlayerName();
         gameService.startNewGame(playerName);
         gameService.getCurrentGame().setFirstBidder(PlayerPos.P1);
-        return gameService.getGameStateForPlayer(playerName);
+
+        GameStateResponse response = gameService.getGameStateForPlayer(playerName);
+
+        // Temp until solution for multiplayer
+        response.setPlayerPosition(PlayerPos.P1);
+        return response;
     }
 
-    @PostMapping("/shuffle")
-    public GameStateResponse getShuffledDeck(@RequestBody PlayerRequest request) {
-        String playerName = request.getPlayerName();
-        gameService.shuffleDeck();
+@PostMapping("/shuffle")
+public GameStateResponse getShuffledDeck(@RequestBody PlayerRequest request) {
+    PlayerPos playerPosition = request.getPlayerPosition();
 
-        return gameService.getGameStateForPlayer(playerName);
-    }
-    
+    System.out.println("Requested playerPosition for shuffle: " + playerPosition);
+
+    gameService.shuffleDeck(); // actual shuffle logic, if separate
+
+    GameStateResponse response = gameService.getGameStateForPlayer(playerPosition);
+
+    return response;
+}
+
 
     @PostMapping("/deal")
-    public GameStateResponse dealCards() {
+    public GameStateResponse dealCards(@RequestBody PlayerRequest request) {
         GameState game = gameService.getCurrentGame();
 
         if (game == null) {
@@ -59,8 +69,22 @@ public class GameController {
         game.getDeck().deal(game.getPlayers()); // Perform actual dealing
         game.setKitty(game.getDeck().getKitty().getCards()); // Move kitty over
         game.setPhase(GamePhase.DEAL); // Advance phase
-  
-        return gameService.getGameStateForPlayer(game.getPlayers().get(0).getPosition()); // or current human player
+
+        PlayerPos viewer = request.getPlayerPosition();
+
+        GameStateResponse response = gameService.getGameStateForPlayer(viewer);
+        response.setPlayerPosition(viewer);
+        
+        return response;
+    }
+
+    @PostMapping("/pre-bid")
+    public GameStateResponse showHands(@RequestBody PlayerRequest request) {
+        GameState game = gameService.getCurrentGame();
+        game.setPhase(GamePhase.PRE_BID);
+
+        PlayerPos viewer = request.getPlayerPosition();
+        return gameService.getGameStateForPlayer(viewer);
     }
 
     @PostMapping("/bid")

@@ -18,6 +18,8 @@ export function dealCardsClockwise(
   deckPosition,
   positionMap,
   setAnimatedCards,
+  showAnimatedCards,
+  setShowAnimatedCards,
   onComplete,
   get
 ) {
@@ -70,6 +72,7 @@ export function dealCardsClockwise(
   if (onComplete) {
     setTimeout(() => {
       onComplete();
+      setShowAnimatedCards(false);
     }, totalCards * delayPerCard + 500);
   }
 }

@@ -17,6 +17,7 @@ import PlayerZone from './PlayerZone';
 export default function GameScreen({
     gameState,
     playerName,
+    viewerPosition,
     shuffledDeck,
     setGameState,
     showStackedDeck,
@@ -26,14 +27,19 @@ export default function GameScreen({
     setShowShuffle,
     animatedCards,
     deckPosition,
-    setDeckPosition
+    setDeckPosition,
+    showAnimatedCards,
+    setShowAnimatedCards,
 }) {
 
 
 
     const { get } = useZoneRefs();
     const backendPositions = gameState?.players.map(p => p.position);
-    const viewerPosition = gameState?.playerPosition;
+
+    console.log("gameState.playerPosition:", gameState?.playerPosition);
+    console.log("backendPositions:", backendPositions);
+
 
     const positionToDirection = backendPositions && viewerPosition
         ? getPositionMap(backendPositions, viewerPosition)
@@ -66,21 +72,10 @@ export default function GameScreen({
         };
     };
 
-    const playerProps = {
-        north: getPlayerProps("north"),
-        west: getPlayerProps("west"),
-        east: getPlayerProps("east"),
-        south: getPlayerProps("south"),
-    }
 
-    console.log("🧩 ZONE PROPS");
-    console.log("NORTH:", playerProps.north.props);
-    console.log("WEST:", playerProps.west.props);
-    console.log("EAST:", playerProps.east.props);
-    console.log("SOUTH:", playerProps.south.props);
 
     return (
-        <PlayerContext.Provider value={{ positionToDirection, playerProps, viewerPosition }}>
+
             <div className="game-screen-container">
                 <div className="game-grid">
                     {/* Top row */}
@@ -109,6 +104,8 @@ export default function GameScreen({
                             gameState={gameState}
                             backendPositions={backendPositions}
                             onCardPlayed={(card) => console.log("Played:", card)}
+                            showAnimatedCards={showAnimatedCards}
+                            setShowAnimatedCards={setShowAnimatedCards}
                         />
                     </div>
 
@@ -130,7 +127,7 @@ export default function GameScreen({
                     </div>
                 </div>
             </div>
-        </PlayerContext.Provider>
+
     );
 };
 

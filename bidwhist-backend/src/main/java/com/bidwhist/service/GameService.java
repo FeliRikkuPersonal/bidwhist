@@ -39,13 +39,24 @@ public class GameService {
         // debug log
         System.out.println("Staring new game for player: " + playerName);
 
+        // Define all positions
         GameState gameState = new GameState();
 
+        PlayerPos[] positions = PlayerPos.values();
         List<Player> players = new ArrayList<>();
-        players.add(new Player(playerName, false, PlayerPos.P1, Team.A));
-        players.add(new Player("AI 1", true, PlayerPos.P2, Team.B));
-        players.add(new Player("AI 2", true, PlayerPos.P3, Team.A));
-        players.add(new Player("AI 3", true, PlayerPos.P4, Team.B));
+
+        // TEMPORARY: one human, three AIs
+        Player humanPlayer = new Player(playerName, false, positions[0], Team.A);
+        players.add(humanPlayer);
+
+        // Fill the rest with AI
+        players.add(new Player("AI 1", true, positions[1], Team.B));
+        players.add(new Player("AI 2", true, positions[2], Team.A));
+        players.add(new Player("AI 3", true, positions[3], Team.B));
+
+        for (Player p : players) {
+            System.out.println("Created player: " + p.getName() + " (" + p.getPosition() + ")");
+        }
 
         gameState.getDeck().shuffle();
         gameState.setShuffledDeck(gameState.getDeck().getCards());
@@ -66,18 +77,19 @@ public class GameService {
         gameState.getDeck().shuffle();
         gameState.setShuffledDeck(gameState.getDeck().getCards());
         gameState.setPhase(GamePhase.SHUFFLE);
+        System.out.println(gameState.getPhase().toString());
 
         return gameState;
     }
 
     // Return GameState for specific player with dummy cards for other players
-    public GameStateResponse getGameStateForPlayer(PlayerPos playerPos) {
+    public GameStateResponse getGameStateForPlayer(PlayerPos playerPosition) {
         List<PlayerView> playerViews = new ArrayList<>();
 
         for (Player p : currentGame.getPlayers()) {
             List<Card> visibleHand;
 
-            if (p.getPosition().equals(playerPos)) {
+            if (p.getPosition().equals(playerPosition)) {
                 visibleHand = p.getHand().getCards();
             } else {
                 int hiddenCount = p.getHand().getCards().size();
@@ -108,14 +120,13 @@ public class GameService {
                 currentGame.getWinningPlayerName(),
                 currentGame.getHighestBid(),
                 currentGame.getShuffledDeck(),
-                playerPos,
+                playerPosition,
                 currentGame.getFirstBidder(),
                 currentGame.getBidTurnIndex(),
-                currentGame.getBids()
-                );
+                currentGame.getBids());
         response.setWinningPlayerName(currentGame.getWinningPlayerName());
         response.setHighestBid(currentGame.getHighestBid());
-        response.setPlayerPostion(playerPos);
+        response.setPlayerPosition(playerPosition);
         return response;
     }
 
@@ -132,7 +143,6 @@ public class GameService {
         response.setShuffledDeck(currentGame.getDeck().getCards());
 
         return response;
-
     }
 
     // Collects bid from players and generates AI Bids
