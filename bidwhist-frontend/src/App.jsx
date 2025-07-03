@@ -1,20 +1,26 @@
 // src/App.jsx
-import { useState } from 'react';
 import './css/index.css';
 import './css/Card.css';
 import './css/Animations.css';
 import ModeSelector from "./components/ModeSelector";
 import GameScreen from './components/GameScreen';
 import Scoreboard from './components/Scoreboard';
+import { useUIDisplay } from './context/UIDisplayContext';
+import { useGameState } from './context/GameStateContext';
+import { usePositionContext } from './context/PositionContext';
 
 function App() {
-  const [playerName, setPlayerName] = useState('');
-  const [gameState, setGameState] = useState(null);
-  const [showStackedDeck, setShowStackedDeck] = useState(false);
-  const [animatedCards, setAnimatedCards] = useState([]);
-  const [showAnimatedCards, setShowAnimatedCards] = useState(false);
-  const [deckPosition, setDeckPosition] = useState({ x: 0, y: 0 })
-  const [viewerPosition, setViewerPosition] = useState(null);
+  const { 
+    gameState,
+    setGameState,
+  } = useGameState();
+  const { 
+    playerName,
+    setPlayerName,
+    setViewerPosition,
+    setBackendPositions 
+  } = usePositionContext();
+  const { setShowAnimatedCards } = useUIDisplay();
 
   const onStartGame = (name) => {
     const trimmedName = name.trim();
@@ -36,6 +42,7 @@ function App() {
         console.log('[App] Game started successfully:', data);
         setGameState(data);
         setViewerPosition(data.playerPosition);
+        setBackendPositions(data.players.map(p => p.position));
         setShowAnimatedCards(true);
       })
       .catch(err => {
@@ -46,24 +53,11 @@ function App() {
   return (
     <div className="index-wrapper">
       <div className="scoreboard-container">
-        <Scoreboard gameState={gameState} />
+        <Scoreboard/>
       </div>
       <div className="index-container">
         {gameState ? (
-          <GameScreen
-            gameState={gameState}
-            playerName={playerName}
-            viewerPosition={viewerPosition}
-            setGameState={setGameState}
-            showStackedDeck={showStackedDeck}
-            setShowStackedDeck={setShowStackedDeck}
-            setAnimatedCards={setAnimatedCards}
-            animatedCards={animatedCards}
-            deckPosition={deckPosition}
-            setDeckPosition={setDeckPosition}
-            showAnimatedCards={showAnimatedCards}
-            setShowAnimatedCards={setShowAnimatedCards}
-          />
+          <GameScreen/>
         ) : (
           <ModeSelector
             playerName={playerName}

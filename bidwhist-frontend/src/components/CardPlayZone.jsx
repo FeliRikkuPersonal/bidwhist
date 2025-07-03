@@ -5,36 +5,43 @@ import { useZoneRefs } from '../context/RefContext';
 import ShuffleAnimation from '../animations/ShuffleAnimation';
 import AnimatedCard from './AnimatedCard';
 import { getPositionMap } from '../utils/PositionUtils';
-import { StackedDeck } from './StackedDeck';
 import BiddingPanel from './BiddingPanel';
 import { delay } from '../utils/TimeUtils';
 import { dealCardsClockwise } from '../animations/DealAnimation';
-import { usePlayerContext } from '../context/PlayerContext';
 import '../css/CardPlayZone.css';
+import { useUIDisplay } from '../context/UIDisplayContext';
+import { useGameState } from '../context/GameStateContext';
+import { usePositionContext } from '../context/PositionContext';
 
-export default function CardPlayZone({
-    playerName,
-    showStackedDeck,
-    setShowStackedDeck,
-    setGameState,
-    gameState,
-    backendPositions,
-    onCardPlayed,
-    showAnimatedCards,
-    setShowAnimatedCards,
-}) {
+export default function CardPlayZone(onCardPlayed) {
+    const {
+        setShowHands,
+        showBidding,
+        setShowBidding,
+        deckPosition,
+        setDeckPosition,
+        animatedCards,
+        showAnimatedCards,
+        setShowAnimatedCards,
+        setAnimatedCards,
+    } = useUIDisplay();
+    const {
+        playerName,
+        viewerPosition,
+        positionToDirection,
+    } = usePositionContext;
+    const {
+        gameState,
+        shuffledDeck,
+        setShuffledDeck,
+        setPhase,
+    } = useGameState();
+
     const [isOver, setIsOver] = useState(false);
     const [playedCard, setPlayedCard] = useState(null);
-    const [deckPosition, setDeckPosition] = useState({ x: 0, y: 0 });
-    const [animatedCards, setAnimatedCards] = useState([]);
-    const [shuffledDeck, setShuffledDeck] = useState([]);
-    const [showShuffle, setShowShuffle] = useState(false);
     const [hasRunIntro, setHasRunIntro] = useState(false);
     const [newRound, setNewRound] = useState(false);
     const [bidPhase, setBidPhase] = useState(false);
-    const [showBidding, setShowBidding] = useState(false);
-
-    const { playerProps, positionToDirection, viewerPosition } = usePlayerContext();
 
     console.log(`[CardPlayZone] Viewer position: ${viewerPosition}`);
 
@@ -48,7 +55,7 @@ export default function CardPlayZone({
     // 1. Shuffle and intro sequence
     useEffect(() => {
         if (!playerName || !allRefsReady || hasRunIntro) return;
-        if (gameState?.phase !== 'START') return;
+        if (gameState?.phase !== 'START' && gameState?.phase !== 'NEXT_ROUND') return;
 
         const runIntroSequence = async () => {
             setHasRunIntro(true); // ✅ prevent reruns
@@ -69,11 +76,8 @@ export default function CardPlayZone({
                 }
 
                 console.log('[CardPlayZone] Shuffle started successfully:', shuffleData);
-                const { shuffledDeck, phase } = shuffleData;
-                setGameState(prev => ({
-                    ...prev,
-                    phase
-                }));
+                setShuffledDeck(shuffleData.shuffledDeck);
+                setBidPhase(shuffleData.phase);
                 console.log('Gamestate Updated - Shuffle');
 
                 setShuffledDeck(shuffleData.shuffledDeck);
@@ -140,6 +144,7 @@ export default function CardPlayZone({
 
                 // Wait 8 seconds before pre-bid phase (or use animation duration)
                 await delay(8000);
+                setShowHands(true);
 
                 // 👇 Now initiate pre-bid
                 const preBidRes = await fetch('/api/game/pre-bid', {
@@ -155,16 +160,7 @@ export default function CardPlayZone({
                 }
 
                 // ✅ Only update phase without touching playerPosition
-                setGameState(prev => {
-                    if (!prev) {
-                        console.error("❌ Cannot update phase: gameState is undefined");
-                        return prev;
-                    }
-
-                    return { ...prev, phase };
-                });
-
-
+                setPhase(preBidData.phase);
                 setBidPhase(true);
 
             } catch (err) {
@@ -223,15 +219,15 @@ export default function CardPlayZone({
         }
     }, [showShuffle]);
 
-useEffect(() => {
-    if (!viewerPosition || !positionToDirection) return;
+    useEffect(() => {
+        if (!viewerPosition || !positionToDirection) return;
 
-    const direction = positionToDirection[viewerPosition];
-    if (!direction) return;
+        const direction = positionToDirection[viewerPosition];
+        if (!direction) return;
 
-    console.log(`Checking CardPlayZone: ${direction}`);
-    register(`CardPlayZone-${direction}`, localRef);
-}, [viewerPosition, positionToDirection, register]);
+        console.log(`Checking CardPlayZone: ${direction}`);
+        register(`CardPlayZone-${direction}`, localRef);
+    }, [viewerPosition, positionToDirection, register]);
 
 
     const handleDrop = (e) => {

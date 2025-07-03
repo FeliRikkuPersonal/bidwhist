@@ -11,7 +11,9 @@ createRoot(document.getElementById('root')).render(
     <RefProvider>
       <GameStateProvider>
         <PositionProvider>
-          <App />
+          <UIDisplayProvider>
+            <App />
+          </UIDisplayProvider>
         </PositionProvider>
       </GameStateProvider>
     </RefProvider>

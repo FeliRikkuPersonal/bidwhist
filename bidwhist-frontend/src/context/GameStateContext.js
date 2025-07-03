@@ -15,7 +15,6 @@ export const GameStateProvider = ({ children }) => {
   const [winningPlayerName, setWinningPlayerName] = useState(null); // string
   const [highestBid, setHighestBid] = useState(null); // InitialBid
   const [shuffledDeck, setShuffledDeck] = useState([]); // List<Card>
-  const [playerPosition, setPlayerPosition] = useState(null); // PlayerPos
   const [firstBidder, setFirstBidder] = useState(null); // PlayerPos
   const [bidTurnIndex, setBidTurnIndex] = useState(0);
   const [bids, setBids] = useState([]); // List<InitialBid>
@@ -30,7 +29,6 @@ export const GameStateProvider = ({ children }) => {
     setWinningPlayerName(response.winningPlayerName || null);
     setHighestBid(response.highestBid || null);
     setShuffledDeck(response.shuffledDeck || []);
-    setPlayerPosition(response.playerPosition || null);
     setFirstBidder(response.firstBidder || null);
     setBidTurnIndex(response.bidTurnIndex ?? 0);
     setBids(response.bids || []);

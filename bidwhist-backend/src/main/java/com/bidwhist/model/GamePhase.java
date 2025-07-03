@@ -8,5 +8,7 @@ public enum GamePhase {
     BID,
     KITTY,
     PLAY,
-    SCORE
+    SCORE,
+    NEXT_ROUND,
+
 }

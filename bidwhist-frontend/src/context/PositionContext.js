@@ -3,6 +3,7 @@ import { createContext, useContext, useState } from 'react';
 export const PositionContext = createContext(null);
 
 export function PositionProvider({ children }) {
+  const [playerName, setPlayerName] = useState(null);
   const [viewerPosition, setViewerPosition] = useState(null);
   const [backendPositions, setBackendPositions] = useState([]);
   
@@ -16,6 +17,8 @@ export function PositionProvider({ children }) {
 
   return (
     <PositionContext.Provider value={{
+      playerName,
+      setPlayerName,
       viewerPosition,
       setViewerPosition,
       backendPositions,

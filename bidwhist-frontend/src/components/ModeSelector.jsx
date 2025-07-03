@@ -1,11 +1,13 @@
 // src/compnents/ModeSelector.jsx
-import React, { useState } from 'react';
 import '../css/ModeSelector.css';
 
 // No multiplayer for now. Removed isMultiplayer, setIsMultiplayer, 
 function ModeSelector({ playerName, setPlayerName, onStartGame }) {
     const [mode, setMode] = useState('single');
+
+    {/* Reserved for Multiplayer 
     const [lobbyCode, setLobbyCode] = useState('');
+    */}
 
     const handleStart = () => {
         const trimmedName = playerName.trim();
@@ -18,6 +20,7 @@ function ModeSelector({ playerName, setPlayerName, onStartGame }) {
         }
     };
 
+    {/* Reserved for Multiplayer 
     const handleJoin = () => {
         if (playerName.trim() && lobbyCode.trim()) {
             alert(`Joining lobby ${lobbyCode} as ${playerName}`);
@@ -31,6 +34,7 @@ function ModeSelector({ playerName, setPlayerName, onStartGame }) {
             alert(`Created lobby ${code} as ${playerName}`);
         }
     };
+    */}
 
     return (
         <>
