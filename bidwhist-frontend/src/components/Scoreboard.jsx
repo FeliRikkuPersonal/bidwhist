@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
+import { useGameState } from "../context/GameStateContext.jsx";
+import { useUIDisplay } from "../context/UIDisplayContext.jsx";
 
-export default function Scoreboard({ gameState }) {
-    const [bidPhase, setBidPhase] = useState(false);
+export default function Scoreboard() {
+    const { gameState } = useGameState();
+    const { bidPhase, setBidPhase } = useUIDisplay();
 
     function formatBid(bid) {
         if (bid.isPassed) return `${bid.player} passes`;

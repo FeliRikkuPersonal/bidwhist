@@ -1,24 +1,35 @@
 // src/components/GameScreen.jsx
+import React from 'react';
 import '../css/GameScreen.css';
 import '../css/Card.css';
 import '../css/PlayerZone.css';
 import CardPlayZone from './CardPlayZone';
 import PlayerZone from './PlayerZone';
-import { useGameState } from '../context/GameStateContext';
-import { usePositionContext } from '../context/PositionContext';
+import { useGameState } from '../context/GameStateContext.jsx';
+import { usePositionContext } from '../context/PositionContext.jsx';
+import { useUIDisplay } from '../context/UIDisplayContext.jsx';
 
 export default function GameScreen() {
+    const { debugLog: logGameState } = useGameState();
+    const { debugLog: logPosition } = usePositionContext();
+    const { debugLog: logUI } = useUIDisplay();
+
+
     const {
-        gameState,
+        players,
         showHands,
     } = useGameState();
     const {
+        playerName,
         positionToDirection,
         viewerPosition,
+        viewerDirection,
     } = usePositionContext();
 
     const getPlayerProps = (direction) => {
-        if (!gameState || !positionToDirection) {
+
+        if (!positionToDirection) {
+            console.warn("Missing positionToDirection");
             return { direction, name: "", cards: [], showHand: false };
         }
 
@@ -27,13 +38,14 @@ export default function GameScreen() {
         );
 
         if (!entry) {
+            console.warn(`No position found for direction: ${direction}`, positionToDirection);
             return { direction, name: "", cards: [], showHand: false };
         }
 
         const [position] = entry;
-        const player = gameState.players.find(p => p.position === position);
+        const player = players.find(p => p.position === position);
+    
 
-        const isViewer = position === viewerPosition;
 
         return {
             key: position,
@@ -42,10 +54,11 @@ export default function GameScreen() {
                 position,
                 name: player?.name || direction.toUpperCase(),
                 cards: player?.hand || [],
-                showHand: isViewer && showHands,
+                revealHand: direction === 'south',
             }
         };
     };
+
 
     const playerProps = {
         north: getPlayerProps("north"),

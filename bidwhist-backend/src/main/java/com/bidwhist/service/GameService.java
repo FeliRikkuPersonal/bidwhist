@@ -35,7 +35,7 @@ public class GameService {
     }
 
     // Start New Game, add players and shuffled deck
-    public GameState startNewGame(String playerName) {
+    public GameStateResponse startNewGame(String playerName) {
         // debug log
         System.out.println("Staring new game for player: " + playerName);
 
@@ -65,10 +65,14 @@ public class GameService {
         gameState.setPhase(GamePhase.START);
         this.currentGame = gameState;
 
+        GameStateResponse response = getGameStateForPlayer(playerName);
+        response.setPlayerPosition(PlayerUtils.getPositionByName(playerName, players));
+        response.setViewerName(playerName);
+
         // debug log
         System.out.println("Initial phase: " + gameState.getPhase());
 
-        return currentGame;
+        return response;
     }
 
     public GameState shuffleDeck() {
@@ -85,6 +89,7 @@ public class GameService {
     // Return GameState for specific player with dummy cards for other players
     public GameStateResponse getGameStateForPlayer(PlayerPos playerPosition) {
         List<PlayerView> playerViews = new ArrayList<>();
+        String viewerName = PlayerUtils.getNameByPosition(playerPosition, currentGame.getPlayers());
 
         for (Player p : currentGame.getPlayers()) {
             List<Card> visibleHand;
@@ -121,6 +126,7 @@ public class GameService {
                 currentGame.getHighestBid(),
                 currentGame.getShuffledDeck(),
                 playerPosition,
+                viewerName,
                 currentGame.getFirstBidder(),
                 currentGame.getBidTurnIndex(),
                 currentGame.getBids());

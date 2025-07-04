@@ -22,6 +22,7 @@ public class GameStateResponse {
     private InitialBid highestBid; // NEW FIELD
     private List<Card> shuffledDeck;
     private PlayerPos playerPosition;
+    private String viewerName;
     private PlayerPos firstBidder;
     private int bidTurnIndex;
     private List<InitialBid> bids;
@@ -37,6 +38,7 @@ public GameStateResponse(
         InitialBid highestBid,
         List<Card> shuffledDeck,
         PlayerPos playerPosition,
+        String viewerName,
         PlayerPos firstBidder,
         int bidTurnIndex,
         List<InitialBid> bids
@@ -51,6 +53,7 @@ public GameStateResponse(
     this.highestBid = highestBid;
     this.shuffledDeck = shuffledDeck;
     this.playerPosition = playerPosition;
+    this.viewerName  = viewerName;
     this.firstBidder = firstBidder;
     this.bidTurnIndex = bidTurnIndex;
     this.bids = bids;
@@ -67,6 +70,10 @@ public GameStateResponse(
 
     public PlayerPos getPlayerPosition() {
         return playerPosition;
+    }
+
+    public String getViewerName() {
+        return viewerName;
     }
 
     public List<Card> getKitty() {
@@ -127,6 +134,10 @@ public GameStateResponse(
 
     public void setPlayerPosition(PlayerPos playerPosition) {
         this.playerPosition = playerPosition;
+    }
+
+    public void setViewerName(String viewerName) {
+        this.viewerName = viewerName;
     }
 
     public void setKitty(List<Card> kitty) {

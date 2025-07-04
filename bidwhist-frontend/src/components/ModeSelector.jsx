@@ -1,16 +1,18 @@
 // src/compnents/ModeSelector.jsx
 import '../css/ModeSelector.css';
+import { useState } from 'react';
 
 // No multiplayer for now. Removed isMultiplayer, setIsMultiplayer, 
-function ModeSelector({ playerName, setPlayerName, onStartGame }) {
+function ModeSelector({ onStartGame }) {
     const [mode, setMode] = useState('single');
+    const [newPlayerName, setNewPlayerName] = useState('');
 
     {/* Reserved for Multiplayer 
     const [lobbyCode, setLobbyCode] = useState('');
     */}
 
     const handleStart = () => {
-        const trimmedName = playerName.trim();
+        const trimmedName = newPlayerName.trim();
 
         // debug log
         console.log("[ModeSelector] Start button clicked. Name:", trimmedName);
@@ -61,8 +63,8 @@ function ModeSelector({ playerName, setPlayerName, onStartGame }) {
                             className="index-input-box"
                             type="text"
                             placeholder="Enter your name"
-                            value={playerName}
-                            onChange={(e) => setPlayerName(e.target.value)}
+                            value={newPlayerName}
+                            onChange={(e) => setNewPlayerName(e.target.value)}
                         />
                         <button className="index-button" onClick={handleStart}>Start Game</button>
                     </div>

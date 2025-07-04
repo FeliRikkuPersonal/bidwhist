@@ -1,13 +1,21 @@
 import React, { useState, useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
-import { useZoneRefs } from '../context/RefContext';
+import { useZoneRefs } from '../context/RefContext.jsx';
 import '../css/PlayerZone.css';
+import { useGameState } from '../context/GameStateContext.jsx';
+import { usePositionContext } from '../context/PositionContext.jsx';
+import { useUIDisplay } from '../context/UIDisplayContext.jsx';
 
-const PlayerZone = forwardRef(({ position, direction, name, showHand, cards = [], gameState }, ref) => {
-  const zoneRef = useRef();
+const PlayerZone = forwardRef(({ position, direction, name, revealHand, cards = [] }, ref) => {
+  const { debugLog: logGameState, phase } = useGameState();
+  const { debugLog: logPosition } = usePositionContext();
+  const { debugLog: logUI, showHands } = useUIDisplay();
+
+  {/* comment out until debuglog is deleted }
+  const { phase } = useGameState();
+  */}
   const [draggingCardIndex, setDraggingCardIndex] = useState(null);
-  const visiblePhases = ['PRE_BID', 'BID', 'KITTY', 'PLAY', 'SCORE'];
-  const shouldRenderCards = visiblePhases.includes(gameState?.phase);
-  const { register } = useZoneRefs();
+  const zoneRef = useRef();
+  const { register, debug: logZoneRef } = useZoneRefs();
 
   useImperativeHandle(ref, () => ({
     getPosition: () => zoneRef.current?.getBoundingClientRect()
@@ -18,18 +26,15 @@ const PlayerZone = forwardRef(({ position, direction, name, showHand, cards = []
       console.log(`[PlayerZone] Registering ref for direction: ${direction}`);
       register(direction, zoneRef);
     }
-  }, [direction]);
-
-  useEffect(() => {
-    console.log("phase changed:", gameState?.phase);
-  }, [gameState?.phase]);
+  }, [direction, register]);
 
   return (
     <div ref={zoneRef} className={`player-zone ${direction}`}>
       {["west", "east"].includes(direction) && <div className="player-name">{name}</div>}
-      <div className={`player-hand ${direction}`}>
-        {shouldRenderCards ? (
-          showHand
+
+      {showHands && (
+        <div className={`player-hand ${direction}`}>
+          {revealHand
             ? cards.map((card, i) => (
               <img
                 key={i}
@@ -52,13 +57,14 @@ const PlayerZone = forwardRef(({ position, direction, name, showHand, cards = []
                 className="card-img"
                 style={{ visibility: draggingCardIndex === i ? 'hidden' : 'visible' }}
               />
-            ))
-        ) : null}
-      </div>
+            ))}
+        </div>
+      )}
 
       {["north", "south"].includes(direction) && <div className="player-name">{name}</div>}
     </div>
   );
-});
+})
+
 
 export default PlayerZone;

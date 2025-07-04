@@ -1,8 +1,12 @@
 import React, { useEffect } from 'react';
 import { getCardImage } from '../utils/CardUtils';
 import '../css/Animations.css';
+import { usePositionContext } from '../context/PositionContext.jsx';
+import { useUIDisplay } from '../context/UIDisplayContext.jsx';
 
-function ShuffleAnimation({ cards, deckPosition, viewerName, onComplete }) {
+function ShuffleAnimation({ cards, onComplete }) {
+  const { viewerName } = usePositionContext();
+  const { deckPosition } = useUIDisplay();
 
   useEffect(() => {
     const timeout = setTimeout(() => {

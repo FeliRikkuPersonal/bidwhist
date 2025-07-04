@@ -8,11 +8,11 @@
 }
 
 .scoreboard-container {
-  position: absolute;
-  top: 0;
-  right: 0;
-  padding: 12px;
-  z-index: 10;
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 12px;
+    z-index: 10;
 }
 
 .index-container {
@@ -27,8 +27,8 @@
     border: 1px solid darkgreen;
     border-radius: 25px;
     box-shadow: 30px 30px 42px rgba(0, 0, 0, 0.12),
-    -30px -30px 42px rgba(0, 0, 0, 0.12);
-    background: rgba(255,255,255,0.01);
+        -30px -30px 42px rgba(0, 0, 0, 0.12);
+    background: rgba(255, 255, 255, 0.01);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
 }
@@ -80,7 +80,15 @@
     width: 12.5vw !important;
 }
 
+.settings-actions {
+    gap: 12px;
+    display: flex;
+    flex-direction: row;
+    padding-top: 10px;
+}
+
 .settings-button {
+
     width: 5vw !important;
 }
 
@@ -100,35 +108,35 @@
 }
 
 body {
-  margin: 0;
-  background-image: url('/static/img/table.png');
-  background-size: auto;
-  background-repeat: repeat;
-  background-position: top left;
-  background-attachment: fixed;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    margin: 0;
+    background-image: url('/static/img/table.png');
+    background-size: auto;
+    background-repeat: repeat;
+    background-position: top left;
+    background-attachment: fixed;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+        sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 html,
 body {
-  /* Main HTML and BODY styling */
-  color: floralwhite;
-  background-color: darkgreen;
-  /* Background Color in lieu of Image loading */
-  position: relative;
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
-  /* No Scrolling */
-  margin: 0;
-  padding: 0;
+    /* Main HTML and BODY styling */
+    color: floralwhite;
+    background-color: darkgreen;
+    /* Background Color in lieu of Image loading */
+    position: relative;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    /* No Scrolling */
+    margin: 0;
+    padding: 0;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+        monospace;
 }

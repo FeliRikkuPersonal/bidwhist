@@ -3,9 +3,18 @@ import { useEffect, useState } from "react";
 
 import '../css/Card.css';
 import { getCardImage } from "../utils/CardUtils";
-import { useZoneRefs } from "../context/RefContext";
+import { useGameState } from "../context/GameStateContext.jsx";
+import { usePositionContext } from "../context/PositionContext.jsx";
+import { useUIDisplay } from "../context/UIDisplayContext.jsx";
 
-export default function AnimatedCard({ card, from, to, viewerName, contextPhase, zIndex }) {
+export default function AnimatedCard({ card, from, to, zIndex }) {
+  const { debugLog: logGameState } = useGameState();
+const { debugLog: logPosition } = usePositionContext();
+const { debugLog: logUI } = useUIDisplay();
+
+
+  const { viewerName } = usePositionContext();
+  
   const [style, setStyle] = useState({
     position: 'absolute',
     top: from.y,
@@ -18,8 +27,6 @@ export default function AnimatedCard({ card, from, to, viewerName, contextPhase,
   useEffect(() => {
     const dx = to.x - from.x;
     const dy = to.y - from.y;
-
-    console.log(`🃏 Card: ${card.cardImage}, owner: ${card.owner}, to: (${to.x}, ${to.y})`);
 
     requestAnimationFrame(() => {
       setStyle(prev => ({

@@ -1,11 +1,32 @@
-import React, { useState, useContext } from 'react';
 import '../css/BiddingPanel.css';
-import { PlayerContext } from '../context/PlayerContext';
+import '../css/index.css';
+import '../css/GameScreen.css';
+import { useState, useEffect } from 'react';
+import { usePositionContext } from '../context/PositionContext.jsx';
+import { useGameState } from '../context/GameStateContext.jsx';
+import { useUIDisplay } from '../context/UIDisplayContext.jsx';
 
 export default function BiddingPanel({ closeBidding, onBidPlaced }) {
-    const { viewerPosition } = useContext(PlayerContext);
+    const { viewerPosition, positionToDirection } = usePositionContext();
+    const { currentTurnIndex } = useGameState();
+    const { bidPhase, showBidding, setShowBidding } = useUIDisplay();
+
+    // ✅ HOOKS MUST BE DECLARED FIRST
     const [bidValue, setBidValue] = useState('');
     const [isNo, setIsNo] = useState(false);
+
+    useEffect(() => {
+        if (!bidPhase || !viewerPosition || currentTurnIndex == null) return;
+
+        const turnPlayerPos = ['P1', 'P2', 'P3', 'P4'][currentTurnIndex];
+        const biddingTime = bidPhase;
+        const isMyTurn = viewerPosition === turnPlayerPos;
+
+        setShowBidding(biddingTime && isMyTurn);
+    }, [bidPhase, currentTurnIndex, viewerPosition]);
+
+    // ✅ Only conditionally render JSX, not the hooks
+    if (!showBidding) return null;
 
     const placeBid = async () => {
         const res = await fetch('/api/game/bid', {
@@ -14,22 +35,22 @@ export default function BiddingPanel({ closeBidding, onBidPlaced }) {
             body: JSON.stringify({
                 player: viewerPosition,
                 value: parseInt(bidValue),
-                isNo: isNo
+                isNo
             })
         });
 
         const bidData = await res.json();
 
         if (res.ok) {
-            onBidPlaced(bidData); // optional: trigger game state update
-            closeBidding();
+            onBidPlaced?.(bidData);
+            closeBidding?.();
         } else {
             console.error("Bid failed:", bidData);
         }
     };
 
     return (
-        <div className="bidding-overlay">
+        <div className="bidding-overlay card-play-zone grid-item center">
             <div className="bidding-panel">
                 <h2>Place Your Bid</h2>
 

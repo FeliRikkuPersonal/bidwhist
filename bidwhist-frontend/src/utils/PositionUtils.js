@@ -6,14 +6,16 @@
  */
 export function getPositionMap(backendPositions, viewerPosition) {
   const directions = ['south', 'west', 'north', 'east'];
-  const viewerIndex = backendPositions.indexOf(viewerPosition);
+
+  const positions = Object.keys(backendPositions); // ['P1', 'P2', 'P3', 'P4']
+  const viewerIndex = positions.indexOf(viewerPosition);
 
   if (viewerIndex === -1) {
     console.warn(`Viewer position ${viewerPosition} not found in backend positions`);
     return {};
   }
 
-  const rotated = [...backendPositions.slice(viewerIndex), ...backendPositions.slice(0, viewerIndex)];
+  const rotated = [...positions.slice(viewerIndex), ...positions.slice(0, viewerIndex)];
 
   const map = {};
   for (let i = 0; i < rotated.length; i++) {

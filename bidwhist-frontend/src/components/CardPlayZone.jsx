@@ -9,44 +9,54 @@ import BiddingPanel from './BiddingPanel';
 import { delay } from '../utils/TimeUtils';
 import { dealCardsClockwise } from '../animations/DealAnimation';
 import '../css/CardPlayZone.css';
-import { useUIDisplay } from '../context/UIDisplayContext';
-import { useGameState } from '../context/GameStateContext';
-import { usePositionContext } from '../context/PositionContext';
+import { useUIDisplay } from '../context/UIDisplayContext.jsx';
+import { useGameState } from '../context/GameStateContext.jsx';
+import { usePositionContext } from '../context/PositionContext.jsx';
 
-export default function CardPlayZone(onCardPlayed) {
+export default function CardPlayZone({ onCardPlayed }) {
+    const { debugLog: logGameState } = useGameState();
+    const { debugLog: logPosition } = usePositionContext();
+    const { debugLog: logUI } = useUIDisplay();
+
+
     const {
         setShowHands,
+        showGameScreen,
         showBidding,
         setShowBidding,
         deckPosition,
         setDeckPosition,
         animatedCards,
+        setAnimatedCards,
+        showShuffle,
+        setShowShuffle,
         showAnimatedCards,
         setShowAnimatedCards,
-        setAnimatedCards,
+        bidPhase,
+        setBidPhase,
     } = useUIDisplay();
     const {
         playerName,
         viewerPosition,
+        backendPositions,
         positionToDirection,
-    } = usePositionContext;
+    } = usePositionContext();
     const {
-        gameState,
+        updateFromResponse,
         shuffledDeck,
         setShuffledDeck,
         setPhase,
+        seetBidPhase,
+        currentTurnIndex,
     } = useGameState();
 
     const [isOver, setIsOver] = useState(false);
     const [playedCard, setPlayedCard] = useState(null);
     const [hasRunIntro, setHasRunIntro] = useState(false);
     const [newRound, setNewRound] = useState(false);
-    const [bidPhase, setBidPhase] = useState(false);
-
-    console.log(`[CardPlayZone] Viewer position: ${viewerPosition}`);
 
     const localRef = useRef();
-    const { register, get } = useZoneRefs();
+    const { register, get, debugLog: zoneRefLog } = useZoneRefs();
 
     const allRefsReady = ['south', 'west', 'north', 'east'].every(dir =>
         get(dir)?.current
@@ -54,8 +64,12 @@ export default function CardPlayZone(onCardPlayed) {
 
     // 1. Shuffle and intro sequence
     useEffect(() => {
-        if (!playerName || !allRefsReady || hasRunIntro) return;
-        if (gameState?.phase !== 'START' && gameState?.phase !== 'NEXT_ROUND') return;
+        if (!playerName || hasRunIntro || !viewerPosition || !showGameScreen) return;
+
+        if (!allRefsReady) {
+            console.log("⏳ Waiting for refs to be ready...");
+            return;
+        }
 
         const runIntroSequence = async () => {
             setHasRunIntro(true); // ✅ prevent reruns
@@ -77,12 +91,10 @@ export default function CardPlayZone(onCardPlayed) {
 
                 console.log('[CardPlayZone] Shuffle started successfully:', shuffleData);
                 setShuffledDeck(shuffleData.shuffledDeck);
-                setBidPhase(shuffleData.phase);
+                setPhase(shuffleData.phase);
                 console.log('Gamestate Updated - Shuffle');
 
                 setShuffledDeck(shuffleData.shuffledDeck);
-
-                console.log(`Current center: ${deckPosition.x}, ${deckPosition.y}`);
 
                 setShowShuffle(true);
                 await delay(1500);
@@ -94,7 +106,7 @@ export default function CardPlayZone(onCardPlayed) {
         };
 
         runIntroSequence();
-    }, [playerName, allRefsReady, hasRunIntro, gameState, deckPosition]);
+    }, [playerName, allRefsReady, hasRunIntro, deckPosition]);
 
 
     useEffect(() => {
@@ -105,7 +117,7 @@ export default function CardPlayZone(onCardPlayed) {
                 const dealRes = await fetch('/api/game/deal', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ player: viewerPosition })
+                    body: JSON.stringify({ playerPosition: viewerPosition })
                 });
                 const dealData = await dealRes.json();
 
@@ -123,45 +135,30 @@ export default function CardPlayZone(onCardPlayed) {
                 const players = dealData.players.map(p => p.position);
                 const positionMap = getPositionMap(backendPositions, viewerPosition);
 
-                setGameState(dealData); // ✅ PlayerZone updated
+                updateFromResponse(dealData); // ✅ PlayerZone updated
 
                 // Start card animations
                 setTimeout(() => {
                     dealCardsClockwise(
                         players,
                         cards,
-                        deckPosition,
                         positionMap,
-                        setAnimatedCards,
-                        showAnimatedCards,
-                        setShowAnimatedCards,
                         () => {
                             console.log("🎉 Deal animation complete");
                         },
-                        get
+                        get,
+                        deckPosition,
+                        setAnimatedCards,
+                        setShowAnimatedCards,
+                        setBidPhase
                     );
                 }, 50);
 
                 // Wait 8 seconds before pre-bid phase (or use animation duration)
-                await delay(8000);
+                await delay(7000);
                 setShowHands(true);
-
-                // 👇 Now initiate pre-bid
-                const preBidRes = await fetch('/api/game/pre-bid', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ player: viewerPosition }) // viewerPosition = "P1", "P2", etc.
-                });
-                const preBidData = await preBidRes.json();
-
-                if (!preBidRes.ok) {
-                    console.error("❌ Pre-bid failed:", preBidData);
-                    return;
-                }
-
-                // ✅ Only update phase without touching playerPosition
-                setPhase(preBidData.phase);
-                setBidPhase(true);
+                await delay(10000);
+                logUI();
 
             } catch (err) {
                 console.error("🔥 Error during deal or pre-bid:", err);
@@ -173,17 +170,6 @@ export default function CardPlayZone(onCardPlayed) {
     }, [newRound, backendPositions, viewerPosition, deckPosition]);
 
 
-    useEffect(() => {
-        if (!bidPhase) return;
-
-        const turnPlayerPos = ['P1', 'P2', 'P3', 'P4'][gameState?.currentTurnIndex];
-
-        if (viewerPosition === turnPlayerPos) {
-            setShowBidding(true);
-        }
-
-
-    });
 
 
     const updatePositions = () => {
@@ -194,7 +180,6 @@ export default function CardPlayZone(onCardPlayed) {
             const centerX = bounds.left + bounds.width / 2 - parentBounds.left;
             const centerY = bounds.top + bounds.height / 2 - parentBounds.top;
             setDeckPosition({ x: centerX, y: centerY });
-            console.log('🃏 deckPosition relative to .floating-card-layer:', { x: centerX, y: centerY });
 
             // Optional quadrant debug
             const quadrantPositions = {
@@ -244,17 +229,16 @@ export default function CardPlayZone(onCardPlayed) {
         setIsOver(false);
     };
 
-
     if (positionToDirection[viewerPosition] !== 'south') return null;
 
     return (
         <div ref={localRef} className="card-play-zone">
             <div
-                className={`drop-zone ${positionToDirection[viewerPosition]} ${isOver ? 'highlight' : ''}`}
+                className={`drop-zone south ${isOver ? 'highlight' : ''}`}
                 onDragOver={(e) => e.preventDefault()}
-                onDragEnter={() => positionToDirection[viewerPosition] === 'south' && setIsOver(true)}
-                onDragLeave={() => positionToDirection[viewerPosition] === 'south' && setIsOver(false)}
-                onDrop={positionToDirection[viewerPosition] === 'south' ? handleDrop : undefined}
+                onDragEnter={() => setIsOver(true)}
+                onDragLeave={() => setIsOver(false)}
+                onDrop={handleDrop}
             >
             </div>
 
@@ -263,16 +247,14 @@ export default function CardPlayZone(onCardPlayed) {
                 {showShuffle && (
                     <ShuffleAnimation
                         cards={shuffledDeck}
-                        viewerName={playerName}
-                        deckPosition={deckPosition}
                         onComplete={() =>
                             setShowShuffle(false)}
                     />
                 )}
 
-                {showBidding && (
                     <BiddingPanel closeBidding={() => setShowBidding(false)} />
-                )}
+
+
 
                 {playedCard && (
                     <img
@@ -289,8 +271,6 @@ export default function CardPlayZone(onCardPlayed) {
                                 card={card}
                                 from={card.from}
                                 to={card.to}
-                                viewerName={playerName}
-                                contextPhase={gameState?.phase}
                                 zIndex={i}
                             />
                         ))}
