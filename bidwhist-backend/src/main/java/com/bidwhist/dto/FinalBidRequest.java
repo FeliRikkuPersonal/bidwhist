@@ -5,6 +5,7 @@ import com.bidwhist.model.PlayerPos;
 import com.bidwhist.model.Suit;
 
 public class FinalBidRequest {
+    private String gameId;
     private PlayerPos player;
     private BidType type;
     private Suit suit;
@@ -33,5 +34,9 @@ public class FinalBidRequest {
 
     public void setSuit(Suit suit) {
         this.suit = suit;
+    }
+
+    public String getGameId() {
+        return gameId;
     }
 }

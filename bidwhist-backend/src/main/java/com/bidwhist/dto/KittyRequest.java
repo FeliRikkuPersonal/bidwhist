@@ -6,6 +6,7 @@ import com.bidwhist.model.Card;
 import com.bidwhist.model.PlayerPos;
 
 public class KittyRequest {
+    private String gameId;
     private PlayerPos player;
     private List<Card> discards;
 
@@ -30,5 +31,9 @@ public class KittyRequest {
 
     public void setDiscards(List<Card> discards) {
         this.discards = discards;
+    }
+
+    public String getGameId() {
+        return gameId;  
     }
 }

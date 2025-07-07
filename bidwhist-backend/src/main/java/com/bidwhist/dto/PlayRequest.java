@@ -1,16 +1,18 @@
 package com.bidwhist.dto;
 
 import com.bidwhist.model.Card;
+import com.bidwhist.model.PlayerPos;
 
 public class PlayRequest {
-    private String player;
+    private String gameId;
+    private PlayerPos player;
     private Card card;
 
-    public String getPlayer() {
+    public PlayerPos getPlayer() {
         return player;
     }
 
-    public void setPlayer(String player) {
+    public void setPlayer(PlayerPos player) {
         this.player = player;
     }
 
@@ -20,5 +22,9 @@ public class PlayRequest {
 
     public void setCard(Card card) {
         this.card = card;
+    }
+
+    public String getGameId() {
+        return gameId;
     }
 }

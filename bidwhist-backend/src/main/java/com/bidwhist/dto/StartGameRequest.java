@@ -1,15 +1,49 @@
 package com.bidwhist.dto;
 
-import java.util.List;
+import com.bidwhist.model.Difficulty;
 
 public class StartGameRequest {
-    private List<String> playerNames;
 
-    public List<String> getPlayerNames() {
-        return playerNames;
+    private String gameId;
+    private String playerName;
+    private Difficulty difficulty;
+
+    // Required for JSON deserialization
+    public StartGameRequest() {
+
     }
 
-    public void setPlayerNames(List<String> playerNames) {
-        this.playerNames = playerNames;
+    // Multiplayer
+    public StartGameRequest(String gameId, String playerName) {
+        this.gameId = gameId;
+        this.playerName = playerName;
     }
+
+    // Single Player
+    public StartGameRequest(String playerName, Difficulty difficulty, String gameId) {
+        this.playerName = playerName;
+        this.difficulty = difficulty;
+        this.gameId = gameId;
+    }
+
+    public String getPlayerName() {
+        return playerName;
+    }
+
+    public String getGameId() {
+        return gameId;
+    }
+
+    public void setPlayerName(String playerName) {
+        this.playerName = playerName;
+    }
+
+    public Difficulty getDifficulty() {
+        return difficulty;
+    }
+
+    public void setDifficulty(Difficulty difficulty) {
+        this.difficulty = difficulty;
+    }
+
 }

@@ -18,6 +18,11 @@ export const GameStateProvider = ({ children }) => {
   const [firstBidder, setFirstBidder] = useState(null); // PlayerPos
   const [bidTurnIndex, setBidTurnIndex] = useState(0);
   const [bids, setBids] = useState([]); // List<InitialBid>
+  const [winningBid, setWinningBid] = useState(null);
+  const [lobbySize, setLobbySize] = useState(0);
+  const [mode, setMode] = useState('single');
+  const [difficulty, setDifficulty] = useState('EASY'); // NEW: default to EASY
+  const [gameId, setGameId] = useState(null);
 
   const updateFromResponse = (response) => {
     if ('players' in response) setPlayers(response.players);
@@ -32,6 +37,9 @@ export const GameStateProvider = ({ children }) => {
     if ('firstBidder' in response) setFirstBidder(response.firstBidder);
     if ('bidTurnIndex' in response) setBidTurnIndex(response.bidTurnIndex);
     if ('bids' in response) setBids(response.bids);
+    if ('winningBid' in response) setWinningBid(response.winningBid);
+    if ('lobbySize' in response) setLobbySize(response.lobbySize);
+    if (!gameId && 'gameId' in response && response.gameId) setGameId(response.gameId);
   };
 
   const debugLog = () => {
@@ -48,6 +56,11 @@ export const GameStateProvider = ({ children }) => {
       firstBidder,
       bidTurnIndex,
       bids,
+      winningBid,
+      lobbySize,
+      mode,
+      difficulty,
+      gameId
     });
   }
 
@@ -79,6 +92,16 @@ export const GameStateProvider = ({ children }) => {
       setBidTurnIndex,
       bids,
       setBids,
+      winningBid,
+      setWinningBid,
+      lobbySize,
+      setLobbySize,
+      mode,
+      setMode,
+      difficulty,
+      setDifficulty,
+      gameId,
+      setGameId,
       updateFromResponse,
       debugLog,
     }}

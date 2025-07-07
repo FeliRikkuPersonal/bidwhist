@@ -1,5 +1,5 @@
 flowchart TD
-    A[Start Game] --> B[startNewGame]
+    A[Start Game] --> B[startSoloGame]
     B --> C[Play Matches]
 
     subgraph Game Loop

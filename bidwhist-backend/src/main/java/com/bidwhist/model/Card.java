@@ -6,7 +6,7 @@ import com.bidwhist.utils.JokerUtils;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonPropertyOrder({ "rank", "suit" })
-public class Card {
+public class Card implements Comparable<Card> {
 
     /* Track card location across game */
     public enum CardLocation {
@@ -23,9 +23,6 @@ public class Card {
         this.rank = rank;
         this.suit = suit;
         this.cardImage = this.getCardImage();
-
-        // debug log
-        System.out.println(cardImage);
 
         this.owner = CardOwner.TABLE;
         this.visibility = CardVisibility.HIDDEN;
@@ -46,6 +43,34 @@ public class Card {
         if (JokerUtils.isJokerRank(rank)) {
             this.suit = null;
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        Card card = (Card) o;
+        return rank == card.rank && suit == card.suit;
+    }
+
+    @Override
+    public int compareTo(Card other) {
+        // Handle suit nulls (Jokers)
+        if (this.suit == null && other.suit != null)
+            return 1; // Jokers go after normal cards
+        if (this.suit != null && other.suit == null)
+            return -1;
+        if (this.suit == null && other.suit == null) {
+            // Compare by rank only (optional: treat JokerLow < JokerHigh)
+            return this.rank.compareTo(other.rank);
+        }
+
+        int suitCompare = this.suit.compareTo(other.suit);
+        return (suitCompare != 0)
+                ? suitCompare
+                : this.rank.compareTo(other.rank);
     }
 
     public Suit getSuit() {
@@ -96,4 +121,30 @@ public class Card {
     public String toString() {
         return rank + "of" + suit;
     }
+
+    public void setOwnerByPlayer(Player player) {
+        if (player == null || player.getPosition() == null) {
+            throw new IllegalArgumentException("Player or player position cannot be null");
+        }
+
+        PlayerPos position = player.getPosition();
+
+        switch (position) {
+            case P1:
+                this.owner = CardOwner.P1;
+                break;
+            case P2:
+                this.owner = CardOwner.P2;
+                break;
+            case P3:
+                this.owner = CardOwner.P3;
+                break;
+            case P4:
+                this.owner = CardOwner.P4;
+                break;
+            default:
+                throw new IllegalArgumentException("Unhandled position: " + position);
+        }
+    }
+
 }

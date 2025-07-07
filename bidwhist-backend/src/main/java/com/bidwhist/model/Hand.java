@@ -1,6 +1,7 @@
 package com.bidwhist.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Hand {
@@ -9,6 +10,7 @@ public class Hand {
     // Not currently used
     public Card addCard(Card card) {
         cards.add(card);
+        Collections.sort(cards);
 
         //replace with animation signal
         return card;
@@ -17,6 +19,7 @@ public class Hand {
     // Used for initial population of hand and adding kitty
     public List<Card> addCards(List<Card> newCards) {
         cards.addAll(newCards);
+        Collections.sort(newCards);
 
         //replace with animation signal
         return newCards;
@@ -45,6 +48,7 @@ public class Hand {
     }
 
     public List<Card> getCards() {
+
         return cards;
     }
 }

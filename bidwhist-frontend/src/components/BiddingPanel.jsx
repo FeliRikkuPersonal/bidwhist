@@ -7,11 +7,11 @@ import { useGameState } from '../context/GameStateContext.jsx';
 import { useUIDisplay } from '../context/UIDisplayContext.jsx';
 
 export default function BiddingPanel({ closeBidding, onBidPlaced }) {
-    const { viewerPosition, positionToDirection } = usePositionContext();
-    const { currentTurnIndex } = useGameState();
-    const { bidPhase, showBidding, setShowBidding } = useUIDisplay();
 
-    // ✅ HOOKS MUST BE DECLARED FIRST
+    const { debugLog: logPosition, viewerPosition } = usePositionContext();
+    const { debugLog: logGameState, gameId, bids, setBids, currentTurnIndex, setCurrentTurnIndex, setFirstBidder, setPhase } = useGameState();
+    const { debugLog: logUI, bidPhase, setBidPhase, showBidding, setShowBidding, setShowFinalizeBid } = useUIDisplay();
+
     const [bidValue, setBidValue] = useState('');
     const [isNo, setIsNo] = useState(false);
 
@@ -19,34 +19,58 @@ export default function BiddingPanel({ closeBidding, onBidPlaced }) {
         if (!bidPhase || !viewerPosition || currentTurnIndex == null) return;
 
         const turnPlayerPos = ['P1', 'P2', 'P3', 'P4'][currentTurnIndex];
-        const biddingTime = bidPhase;
         const isMyTurn = viewerPosition === turnPlayerPos;
 
-        setShowBidding(biddingTime && isMyTurn);
-    }, [bidPhase, currentTurnIndex, viewerPosition]);
+        setShowBidding(bidPhase && isMyTurn);
 
-    // ✅ Only conditionally render JSX, not the hooks
+        console.log('[BiddingPanel Log]');
+        logGameState();
+        logUI();
+
+    }, [bids, bidPhase, currentTurnIndex, viewerPosition]);
+
     if (!showBidding) return null;
 
-    const placeBid = async () => {
+    const sendBidRequest = async (bidBody) => {
         const res = await fetch('/api/game/bid', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                player: viewerPosition,
-                value: parseInt(bidValue),
-                isNo
-            })
+            body: JSON.stringify(bidBody)
         });
 
         const bidData = await res.json();
 
         if (res.ok) {
             onBidPlaced?.(bidData);
+            setBidPhase(false);
+            setBids(bidData.bids);
+            setPhase(bidData.phase);
+            setFirstBidder(bidData.firstBidder);
+            setCurrentTurnIndex(bidData.currentTurnIndex);
             closeBidding?.();
         } else {
             console.error("Bid failed:", bidData);
         }
+    };
+
+    const placeBid = () => {
+        sendBidRequest({
+            gameId,
+            player: viewerPosition,
+            value: parseInt(bidValue),
+            isNo,
+            isPassed: false
+        });
+    };
+
+    const passBid = () => {
+        sendBidRequest({
+            gameId,
+            player: viewerPosition,
+            value: 0,
+            no: false,
+            isPassed: true
+        });
     };
 
     return (
@@ -76,6 +100,9 @@ export default function BiddingPanel({ closeBidding, onBidPlaced }) {
                 <div className="settings-actions">
                     <button className="index-button settings-button" onClick={placeBid}>
                         Set Bid
+                    </button>
+                    <button className="index-button settings-button" onClick={passBid}>
+                        Pass
                     </button>
                     <button className="index-button settings-button" onClick={closeBidding}>
                         Close

@@ -48,4 +48,10 @@ public class SuitEvaluation {
     public BidType getBestMode() {
         return (uptownStrength >= downtownStrength) ? BidType.UPTOWN : BidType.DOWNTOWN;
     }
+
+    @Override
+    public String toString() {
+        return suit.toString() +  " Uptown: " + uptownStrength + ", Downtown: "
+        + downtownStrength + " count..." + count;
+    }
 }

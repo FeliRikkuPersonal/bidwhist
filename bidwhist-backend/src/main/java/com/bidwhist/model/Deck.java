@@ -30,10 +30,6 @@ public class Deck {
         // Add Jokers
         cards.add(new Card(null, Rank.JOKER_S));
         cards.add(new Card(null, Rank.JOKER_B));
-
-        for (Card card : cards) {
-            System.out.println(card.getCardImage());
-        }
     }
 
     public void shuffle() {
@@ -44,15 +40,19 @@ public class Deck {
         for (int i = 0; i < 48; i++) {
             if (i % 4 == 0) {
                 players.get(0).addCard(cards.get(i));
+                cards.get(i).setOwnerByPlayer(players.get(0));
             }
             else if (i % 4 == 1) {
                 players.get(1).addCard(cards.get(i));
+                cards.get(i).setOwnerByPlayer(players.get(1));
             }
             else if (i % 4 == 2) {
                 players.get(2).addCard(cards.get(i));
+                cards.get(i).setOwnerByPlayer(players.get(2));
             }
             else {
                 players.get(3).addCard(cards.get(i));
+                cards.get(i).setOwnerByPlayer(players.get(3));
             }
         }
 

@@ -5,6 +5,7 @@ import com.bidwhist.model.PlayerPos;
 public class PlayerRequest {
     private String playerName;
     private PlayerPos playerPosition;
+    private String gameId;
 
     public PlayerRequest() {
         // Default constructor for JSON
@@ -20,6 +21,10 @@ public class PlayerRequest {
 
     public PlayerPos getPlayerPosition() {
         return playerPosition;
+    }
+
+    public String getGameId() {
+        return gameId;
     }
 
     public void setPlayerName(String playerName) {

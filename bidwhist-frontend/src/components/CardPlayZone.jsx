@@ -12,48 +12,54 @@ import '../css/CardPlayZone.css';
 import { useUIDisplay } from '../context/UIDisplayContext.jsx';
 import { useGameState } from '../context/GameStateContext.jsx';
 import { usePositionContext } from '../context/PositionContext.jsx';
+import BidTypePanel from './BidTypePanel.jsx';
 
-export default function CardPlayZone({ onCardPlayed }) {
-    const { debugLog: logGameState } = useGameState();
-    const { debugLog: logPosition } = usePositionContext();
-    const { debugLog: logUI } = useUIDisplay();
-
-
+export default function CardPlayZone({ dropZoneRef, onCardPlayed }) {
     const {
+        debugLog: logUI,
         setShowHands,
         showGameScreen,
-        showBidding,
         setShowBidding,
         deckPosition,
         setDeckPosition,
+        playedCard,
+        setPlayedCard,
+        playedCardPosition,
+        setPlayedCardPosition,
         animatedCards,
         setAnimatedCards,
         showShuffle,
         setShowShuffle,
         showAnimatedCards,
         setShowAnimatedCards,
-        bidPhase,
         setBidPhase,
+        setShowFinalizeBid,
     } = useUIDisplay();
     const {
+        debugLog: logPosition,
         playerName,
         viewerPosition,
         backendPositions,
         positionToDirection,
     } = usePositionContext();
     const {
+        gameId,
+        debugLog: logGameState,
+        players,
+        bids,
         updateFromResponse,
+        highestBid,
         shuffledDeck,
         setShuffledDeck,
         setPhase,
-        seetBidPhase,
         currentTurnIndex,
+        winningPlayerName,
     } = useGameState();
 
     const [isOver, setIsOver] = useState(false);
-    const [playedCard, setPlayedCard] = useState(null);
     const [hasRunIntro, setHasRunIntro] = useState(false);
     const [newRound, setNewRound] = useState(false);
+    const [dropPos, setDropPos] = useState(null);
 
     const localRef = useRef();
     const { register, get, debugLog: zoneRefLog } = useZoneRefs();
@@ -65,112 +71,67 @@ export default function CardPlayZone({ onCardPlayed }) {
     // 1. Shuffle and intro sequence
     useEffect(() => {
         if (!playerName || hasRunIntro || !viewerPosition || !showGameScreen) return;
+        if (!allRefsReady) return;
 
-        if (!allRefsReady) {
-            console.log("⏳ Waiting for refs to be ready...");
-            return;
-        }
+        // If we already have a shuffled deck, and we haven't animated it yet
+        if (shuffledDeck && shuffledDeck.length > 0) {
+            setHasRunIntro(true); // prevent rerun
 
-        const runIntroSequence = async () => {
-            setHasRunIntro(true); // ✅ prevent reruns
-
-            try {
-                // ⬇️ Shuffle
-                const shuffleRes = await fetch('/api/game/shuffle', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ playerPosition: viewerPosition })
-                });
-
-                const shuffleData = await shuffleRes.json();
-
-                if (!shuffleRes.ok || shuffleData.phase !== 'SHUFFLE') {
-                    console.error("❌ Shuffle failed or did not update phase:", shuffleData);
-                    return;
-                }
-
-                console.log('[CardPlayZone] Shuffle started successfully:', shuffleData);
-                setShuffledDeck(shuffleData.shuffledDeck);
-                setPhase(shuffleData.phase);
-                console.log('Gamestate Updated - Shuffle');
-
-                setShuffledDeck(shuffleData.shuffledDeck);
-
+            const runIntroAnimation = async () => {
                 setShowShuffle(true);
                 await delay(1500);
-                setNewRound(true); // ⬅️ Triggers next useEffect
+                setNewRound(true); // trigger next phase logic
+            };
 
-            } catch (err) {
-                console.error("🔥 Error during intro sequence:", err);
-            }
-        };
-
-        runIntroSequence();
-    }, [playerName, allRefsReady, hasRunIntro, deckPosition]);
+            runIntroAnimation();
+        }
+    }, [shuffledDeck, playerName, viewerPosition, showGameScreen, allRefsReady, hasRunIntro]);
 
 
     useEffect(() => {
-        if (!newRound) return;
+        if (!newRound || !players || players.length === 0) return;
 
-        const runDealSequence = async () => {
-            try {
-                const dealRes = await fetch('/api/game/deal', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ playerPosition: viewerPosition })
-                });
-                const dealData = await dealRes.json();
+        // Check if all players have hands dealt (from polled backend state)
+        const hasHands = players.every(p => p.hand && p.hand.length > 0);
+        if (!hasHands) return;
 
-                setNewRound(false);
+        const runDealAnimation = async () => {
+            setNewRound(false);
 
-                if (!dealRes.ok || !dealData.players) {
-                    console.error("❌ Invalid dealData:", dealData);
-                    return;
-                }
+            // Flatten all cards with owners
+            const cards = players.flatMap(p =>
+                (p.hand || []).map(card => ({ ...card, owner: p.position }))
+            );
+            console.log("🃏 Dealing cards:", cards);
 
-                const cards = dealData.players.flatMap(p =>
-                    (p.hand || []).map(card => ({ ...card, owner: p.position }))
+            const playerPositions = players.map(p => p.position);
+            const positionMap = getPositionMap(backendPositions, viewerPosition);
+
+            // Animate clockwise deal
+            setTimeout(() => {
+                dealCardsClockwise(
+                    playerPositions,
+                    cards,
+                    positionMap,
+                    () => console.log("🎉 Deal animation complete"),
+                    get,
+                    deckPosition,
+                    setAnimatedCards,
+                    setShowAnimatedCards,
+                    setBidPhase
                 );
-                console.log("Dealt cards to animate:", cards);
-                const players = dealData.players.map(p => p.position);
-                const positionMap = getPositionMap(backendPositions, viewerPosition);
+            }, 50);
 
-                updateFromResponse(dealData); // ✅ PlayerZone updated
-
-                // Start card animations
-                setTimeout(() => {
-                    dealCardsClockwise(
-                        players,
-                        cards,
-                        positionMap,
-                        () => {
-                            console.log("🎉 Deal animation complete");
-                        },
-                        get,
-                        deckPosition,
-                        setAnimatedCards,
-                        setShowAnimatedCards,
-                        setBidPhase
-                    );
-                }, 50);
-
-                // Wait 8 seconds before pre-bid phase (or use animation duration)
-                await delay(7000);
-                setShowHands(true);
-                await delay(10000);
-                logUI();
-
-            } catch (err) {
-                console.error("🔥 Error during deal or pre-bid:", err);
-            }
+            // Final UI adjustments
+            await delay(7000);
+            setShowHands(true);
+            await delay(10000);
+            logUI();
         };
 
-        runDealSequence();
+        runDealAnimation();
 
-    }, [newRound, backendPositions, viewerPosition, deckPosition]);
-
-
-
+    }, [newRound, players, viewerPosition, backendPositions, deckPosition]);
 
     const updatePositions = () => {
         const bounds = localRef.current?.getBoundingClientRect();
@@ -214,26 +175,84 @@ export default function CardPlayZone({ onCardPlayed }) {
         register(`CardPlayZone-${direction}`, localRef);
     }, [viewerPosition, positionToDirection, register]);
 
+    useEffect(() => {
+        const bidsComplete = (bids?.length === 4);
+        const iWonBid = (winningPlayerName === playerName);
 
-    const handleDrop = (e) => {
+        setShowFinalizeBid(bidsComplete && iWonBid);
+
+        logUI();
+        logPosition();
+        logGameState();
+    }, [bids, winningPlayerName, playerName])
+
+
+    const handleDrop = async (e) => {
         e.preventDefault();
-        const fullPath = e.dataTransfer.getData('text/plain');
-        const cardName = fullPath.split('/').pop();
-        console.log("Parsed card name:", cardName); // ✅
 
+        const rawData = e.dataTransfer.getData('application/json');
+        if (!rawData) {
+            console.warn("No drag data found");
+            return;
+        }
+
+        const card = JSON.parse(rawData);
+        console.log("Dropped card:", card);
+
+        // Only continue if actually over drop zone
+        if (!isOver) {
+            console.log("Drop ignored: not over drop-zone");
+            return;
+        }
+
+        // Backend call to submit card play
+        try {
+            const res = await fetch('/api/game/play', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    gameId: gameId,
+                    player: viewerPosition,
+                    card: card
+                })
+            });
+
+            if (!res.ok) {
+                console.error("Backend rejected card play");
+                return;
+            }
+        } catch (err) {
+            console.error("Failed to send playCard:", err);
+            return;
+        }
+
+        // Track for visual rendering
         if (positionToDirection[viewerPosition] === 'south') {
-            setPlayedCard(cardName);
-            onCardPlayed?.(cardName);
+            setPlayedCard(card); // store full card object
+            onCardPlayed?.(card);
+        }
+
+        if (dropZoneRef.current && localRef.current) {
+            const rect = dropZoneRef.current.getBoundingClientRect();
+            const parentRect = localRef.current.getBoundingClientRect();
+
+            setPlayedCardPosition({
+                x: rect.left - parentRect.left,
+                y: rect.top - parentRect.top,
+            });
         }
 
         setIsOver(false);
     };
+
+
 
     if (positionToDirection[viewerPosition] !== 'south') return null;
 
     return (
         <div ref={localRef} className="card-play-zone">
             <div
+                ref={dropZoneRef}
                 className={`drop-zone south ${isOver ? 'highlight' : ''}`}
                 onDragOver={(e) => e.preventDefault()}
                 onDragEnter={() => setIsOver(true)}
@@ -251,18 +270,23 @@ export default function CardPlayZone({ onCardPlayed }) {
                             setShowShuffle(false)}
                     />
                 )}
-
-                    <BiddingPanel closeBidding={() => setShowBidding(false)} />
-
-
-
-                {playedCard && (
+                <BiddingPanel closeBidding={() => setShowBidding(false)} />
+                <BidTypePanel closeBidTypePanel={() => setShowFinalizeBid(false)} />
+                {playedCard && playedCardPosition && (
                     <img
                         src={`/static/img/deck/${playedCard}`}
                         alt="Played card"
                         className="card-img"
+                        style={{
+                            position: 'absolute',
+                            left: playedCardPosition.x,
+                            top: playedCardPosition.y,
+                            zIndex: 11, // above drop zone
+                            transition: 'transform 0.2s ease'
+                        }}
                     />
                 )}
+
                 {showAnimatedCards && (
                     <div>
                         {animatedCards.map((card, i) => (

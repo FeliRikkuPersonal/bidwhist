@@ -1,15 +1,15 @@
 // src/compnents/ModeSelector.jsx
 import '../css/ModeSelector.css';
 import { useState } from 'react';
+import { useGameState } from '../context/GameStateContext';
 
 // No multiplayer for now. Removed isMultiplayer, setIsMultiplayer, 
 function ModeSelector({ onStartGame }) {
-    const [mode, setMode] = useState('single');
+    const { setGameId } = useGameState();
+    const { mode, difficulty, setDifficulty } = useGameState();
     const [newPlayerName, setNewPlayerName] = useState('');
-
-    {/* Reserved for Multiplayer 
     const [lobbyCode, setLobbyCode] = useState('');
-    */}
+    
 
     const handleStart = () => {
         const trimmedName = newPlayerName.trim();
@@ -18,29 +18,74 @@ function ModeSelector({ onStartGame }) {
         console.log("[ModeSelector] Start button clicked. Name:", trimmedName);
 
         if (trimmedName) {
-            onStartGame(trimmedName);
-        }
-    };
-
-    {/* Reserved for Multiplayer 
-    const handleJoin = () => {
-        if (playerName.trim() && lobbyCode.trim()) {
-            alert(`Joining lobby ${lobbyCode} as ${playerName}`);
-        }
-    };
-
-    const handleCreate = () => {
-        if (playerName.trim()) {
             const code = Math.random().toString(36).substring(2, 8).toUpperCase();
-            setLobbyCode(code);
-            alert(`Created lobby ${code} as ${playerName}`);
+            setGameId(code);
+            onStartGame(trimmedName, difficulty, code);
         }
     };
-    */}
+
+    const handleJoin = async () => {
+        if (!newPlayerName.trim() || !lobbyCode.trim()) return;
+
+        try {
+            const res = await fetch('/api/game/join', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    gameId: lobbyCode.trim(),
+                    playerName: newPlayerName.trim()
+                })
+            });
+
+            const data = await res.json();
+            setGameId(lobbyCode);
+
+            if (res.ok) {
+                console.log("✅ Joined game:", data);
+                // Navigate to game screen or update app state as needed
+                setMode('multiplayer');
+            } else {
+                console.error("❌ Failed to join game:", data);
+            }
+        } catch (err) {
+            console.error("🔥 Network error joining game:", err);
+        }
+    };
+
+    const handleCreate = async () => {
+        if (!newPlayerName.trim()) return;
+
+        const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+        setLobbyCode(code);
+        setGameId(code);
+
+        try {
+            const res = await fetch('/api/game/create-multiplayer', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    gameId: code,
+                    newPlayerName: newPlayerName.trim()
+                })
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                console.log("✅ Game created:", data);
+                // Navigate to game screen or save gameId/player info as needed
+                setMode('multiplayer');
+            } else {
+                console.error("❌ Failed to create game:", data);
+            }
+        } catch (err) {
+            console.error("🔥 Network error creating game:", err);
+        }
+    };
 
     return (
         <>
-        <h1 className="h1-welcome">Welcome to Bid Whist Online!</h1>
+            <h1 className="h1-welcome">Welcome to Bid Whist Online!</h1>
             <div className="mode-slider-toggle">
                 <label className="switch">
                     <input
@@ -66,11 +111,20 @@ function ModeSelector({ onStartGame }) {
                             value={newPlayerName}
                             onChange={(e) => setNewPlayerName(e.target.value)}
                         />
+
+                        {/* 🎯 NEW: Difficulty selector */}
+                        <select
+                            className="index-input-box"
+                            value={difficulty}
+                            onChange={(e) => setDifficulty(e.target.value)}
+                        >
+                            <option value="EASY">Easy</option>
+                            <option value="MEDIUM">Medium</option>
+                            <option value="HARD">Hard</option>
+                        </select>
                         <button className="index-button" onClick={handleStart}>Start Game</button>
                     </div>
 
-
-                    {/* MULTIPLAYER 
                     <div className="mode-form multi">
                         <input
                             className="index-input-box"
@@ -91,19 +145,18 @@ function ModeSelector({ onStartGame }) {
                             <button className="index-button" onClick={handleCreate}>Create Lobby</button>
                         </div>
                     </div>
-                    */}
+
                 </div>
             </div>
         </>
     );
 }
 
-/*
 <p className="index-text">
-                Please enter your name to play:<br />
-                <input type={"text"} className={"index-input-box"} placeholder={"Enter your name"} />
-                <button className={"index-button"}>Start Game</button>
-            </p>
- */
+    Please enter your name to play:<br />
+    <input type={"text"} className={"index-input-box"} placeholder={"Enter your name"} />
+    <button className={"index-button"}>Start Game</button>
+</p>
+
 
 export default ModeSelector;

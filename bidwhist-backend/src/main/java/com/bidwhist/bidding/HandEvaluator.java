@@ -31,16 +31,14 @@ public class HandEvaluator {
 
     // --- Static rank orderings ---
     public static final List<Rank> UPTOWN_ORDER = List.of(
-        Rank.ACE, Rank.KING, Rank.QUEEN, Rank.JACK,
-        Rank.TEN, Rank.NINE, Rank.EIGHT, Rank.SEVEN,
-        Rank.SIX, Rank.FIVE, Rank.FOUR, Rank.THREE, Rank.TWO
-    );
+            Rank.ACE, Rank.KING, Rank.QUEEN, Rank.JACK,
+            Rank.TEN, Rank.NINE, Rank.EIGHT, Rank.SEVEN,
+            Rank.SIX, Rank.FIVE, Rank.FOUR, Rank.THREE, Rank.TWO);
 
     public static final List<Rank> DOWNTOWN_ORDER = List.of(
-        Rank.ACE, Rank.TWO, Rank.THREE, Rank.FOUR, Rank.FIVE,
-        Rank.SIX, Rank.SEVEN, Rank.EIGHT, Rank.NINE, Rank.TEN,
-        Rank.JACK, Rank.QUEEN, Rank.KING
-    );
+            Rank.ACE, Rank.TWO, Rank.THREE, Rank.FOUR, Rank.FIVE,
+            Rank.SIX, Rank.SEVEN, Rank.EIGHT, Rank.NINE, Rank.TEN,
+            Rank.JACK, Rank.QUEEN, Rank.KING);
 
     /**
      * Binds this evaluator to a specific player's hand.
@@ -50,8 +48,8 @@ public class HandEvaluator {
         this.jokerCount = JokerUtils.countJokers(player.getHand());
 
         List<Card> nonJokers = cards.stream()
-            .filter(card -> !card.getRank().name().contains("JOKER"))
-            .toList();
+                .filter(card -> !card.getRank().name().contains("JOKER"))
+                .toList();
 
         this.suits = splitBySuit(nonJokers);
     }
@@ -125,9 +123,13 @@ public class HandEvaluator {
             List<Rank> ranks = cards.stream().map(Card::getRank).toList();
 
             int high = evaluateRun(ranks, jokerCount, UPTOWN_ORDER);
-            int low  = evaluateRun(ranks, jokerCount, DOWNTOWN_ORDER);
+            int low = evaluateRun(ranks, jokerCount, DOWNTOWN_ORDER);
 
             results.add(new SuitEvaluation(suit, high, low, cards.size()));
+        }
+
+        for (SuitEvaluation result : results) {
+            System.out.println(result.toString());
         }
 
         return results;
@@ -165,8 +167,8 @@ public class HandEvaluator {
      */
     public static int evaluatePureRun(List<Card> cards, List<Rank> order) {
         Set<Rank> ranksInHand = cards.stream()
-            .map(Card::getRank)
-            .collect(Collectors.toSet());
+                .map(Card::getRank)
+                .collect(Collectors.toSet());
 
         int run = 0;
         for (Rank rank : order) {
@@ -184,8 +186,8 @@ public class HandEvaluator {
      */
     public static int evaluateNoBidHigh(Map<Suit, List<Card>> suits) {
         return suits.values().stream()
-            .mapToInt(cards -> evaluatePureRun(cards, UPTOWN_ORDER))
-            .sum();
+                .mapToInt(cards -> evaluatePureRun(cards, UPTOWN_ORDER))
+                .sum();
     }
 
     /**
@@ -193,7 +195,42 @@ public class HandEvaluator {
      */
     public static int evaluateNoBidLow(Map<Suit, List<Card>> suits) {
         return suits.values().stream()
-            .mapToInt(cards -> evaluatePureRun(cards, DOWNTOWN_ORDER))
-            .sum();
+                .mapToInt(cards -> evaluatePureRun(cards, DOWNTOWN_ORDER))
+                .sum();
     }
+
+    public FinalBid getForcedMinimumBid(PlayerPos player) {
+        evaluateHand(); // Ensure hand is evaluated
+
+        FinalBid bestBid = null;
+        int bestStrength = -1;
+
+        // Look through all suits for the best strength (Uptown or Downtown), no
+        // No-Trumps
+        for (SuitEvaluation eval : suitEvals) {
+            for (BidType type : List.of(BidType.UPTOWN, BidType.DOWNTOWN)) {
+                int strength = (type == BidType.UPTOWN) ? eval.getUptownStrength() : eval.getDowntownStrength();
+
+                if (strength > bestStrength) {
+                    bestStrength = strength;
+                    bestBid = new FinalBid(
+                            player,
+                            4, // Forced minimum bid value
+                            false, // not No Trump
+                            false, // not passed
+                            type,
+                            eval.getSuit() // best suit for this bid
+                    );
+                }
+            }
+        }
+
+        // Fallback (shouldn't happen, but defensively)
+        if (bestBid == null) {
+            bestBid = new FinalBid(player, 4, false, false, BidType.UPTOWN, Suit.SPADES);
+        }
+
+        return bestBid;
+    }
+
 }

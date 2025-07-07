@@ -1,14 +1,13 @@
 package com.bidwhist.model;
 
 public enum GamePhase {
+    INITIATED,
     START,
     SHUFFLE,
     DEAL,
-    PRE_BID,
     BID,
     KITTY,
     PLAY,
     SCORE,
-    NEXT_ROUND,
-
+    END,
 }

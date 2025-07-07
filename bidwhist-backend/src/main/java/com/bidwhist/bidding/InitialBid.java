@@ -39,14 +39,6 @@ public class InitialBid {
     }
 
 
-    public BidRequest toRequest() {
-        return new BidRequest(
-                this.player, // PlayerPos enum
-                this.value,
-                this.isNo
-        );
-    }
-
     // Show initial bid state only (for bidding phase)
     public String showInitialBid() {
         if (isPassed)

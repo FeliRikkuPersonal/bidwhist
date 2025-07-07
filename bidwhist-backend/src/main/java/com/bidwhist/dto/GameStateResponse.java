@@ -9,6 +9,7 @@ import com.bidwhist.model.PlayerPos;
 import com.bidwhist.model.Suit;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.bidwhist.bidding.BidType;
+import com.bidwhist.bidding.FinalBid;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class GameStateResponse {
@@ -26,39 +27,30 @@ public class GameStateResponse {
     private PlayerPos firstBidder;
     private int bidTurnIndex;
     private List<InitialBid> bids;
+    private FinalBid winningFinalBid;
+    private int lobbySize;
 
 public GameStateResponse(
         List<PlayerView> players,
         List<Card> kitty,
         int currentTurnIndex,
         GamePhase phase,
-        Suit trumpSuit,
-        BidType bidType,
-        String winningPlayerName,
-        InitialBid highestBid,
         List<Card> shuffledDeck,
         PlayerPos playerPosition,
         String viewerName,
         PlayerPos firstBidder,
-        int bidTurnIndex,
-        List<InitialBid> bids
+        int bidTurnIndex
 ) {
     this.players = players;
     this.kitty = kitty;
     this.currentTurnIndex = currentTurnIndex;
     this.phase = phase;
-    this.trumpSuit = trumpSuit;
-    this.bidType = bidType;
-    this.winningPlayerName = winningPlayerName;
-    this.highestBid = highestBid;
     this.shuffledDeck = shuffledDeck;
     this.playerPosition = playerPosition;
     this.viewerName  = viewerName;
     this.firstBidder = firstBidder;
     this.bidTurnIndex = bidTurnIndex;
-    this.bids = bids;
 }
-
 
     public void setShuffledDeck(List<Card> shuffledDeck) {
         this.shuffledDeck = shuffledDeck;
@@ -92,6 +84,10 @@ public GameStateResponse(
         return phase;
     }
 
+    public void setBids(List<InitialBid> bids) {
+        this.bids = bids;
+    }
+
     public Suit getTrumpSuit() {
         return trumpSuit;
     }
@@ -112,6 +108,10 @@ public GameStateResponse(
         return winningPlayerName;
     }
 
+    public FinalBid getWinningbid() {
+        return winningFinalBid;
+    }
+
     public void setWinningPlayerName(String winningPlayerName) {
         this.winningPlayerName = winningPlayerName;
     }
@@ -122,6 +122,10 @@ public GameStateResponse(
 
     public BidType getBidType() {
         return bidType;
+    }
+
+    public int getLobbySize() {
+        return lobbySize;
     }
 
     public void setHighestBid(InitialBid highestBid) {
@@ -158,5 +162,13 @@ public GameStateResponse(
 
     public void setBidType(BidType newBidType) {
         bidType = newBidType;
+    }
+    
+    public void setWinningBid(FinalBid winningBid) {
+        this.winningFinalBid = winningBid;
+    }
+
+    public void setLobbySize(int size) {
+        this.lobbySize = size;
     }
 }

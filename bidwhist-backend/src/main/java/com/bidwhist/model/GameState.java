@@ -4,15 +4,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import com.bidwhist.bidding.FinalBid;
 import com.bidwhist.bidding.InitialBid;
 import com.bidwhist.bidding.BidType;
 import com.bidwhist.utils.PlayerUtils;
 import com.bidwhist.service.DeckService;
+import com.bidwhist.model.GameRoom;
 
 public class GameState {
 
+    private final String gameId;
     private final List<Player> players;
     private final Deck deck;
     private List<Card> kitty;
@@ -22,13 +25,47 @@ public class GameState {
     private final List<InitialBid> bids;
     private int bidTurnIndex;
     private InitialBid highestBid;
+    private BidType trumpType;
     private Map<PlayerPos, FinalBid> finalBidCache = new HashMap<>();
     private FinalBid winningBid;
     private String winningPlayerName; // <-- NEW FIELD
     private List<Card> shuffledDeck;
     private PlayerPos firstBidder;
+    private Difficulty difficulty;
+    private GameRoom room;
+
+    private List<PlayedCard> currentTrick = new ArrayList<>();
+    private List<Book> completedTricks = new ArrayList<>();
+    private int currentPlayerIndex;
+
+    private int round = 0;
+    private int teamAScore = 0;
+    private int teamBScore = 0;
+    private int teamATricksWon = 0;
+    private int teamBTricksWon = 0;
+
+    private Map<Team, Integer> teamTrickCounts = new HashMap<>();
+    private Map<Team, Integer> teamScores = new HashMap<>();
 
     public GameState() {
+        this.gameId = UUID.randomUUID().toString();
+        this.room = new GameRoom(gameId);
+        this.players = new ArrayList<>();
+        this.deck = DeckService.createNewDeck();
+        this.kitty = new ArrayList<>();
+        this.currentTurnIndex = 0;
+        this.phase = GamePhase.DEAL;
+        this.trumpSuit = null;
+        this.bids = new ArrayList<>();
+        this.bidTurnIndex = 0;
+        this.highestBid = null;
+        this.winningPlayerName = null; // <-- Initialize
+        this.shuffledDeck = deck.getCards();
+    }
+
+        public GameState(String gameId) {
+        this.room = new GameRoom(gameId);
+        this.gameId = gameId;
         this.players = new ArrayList<>();
         this.deck = DeckService.createNewDeck();
         this.kitty = new ArrayList<>();
@@ -48,6 +85,10 @@ public class GameState {
 
     public void addPlayer(Player player) {
         players.add(player);
+    }
+
+    public GameRoom getRoom() {
+        return room;
     }
 
     public int getCurrentTurnIndex() {
@@ -76,6 +117,13 @@ public class GameState {
 
     public PlayerPos getFirstBidder() {
         return firstBidder;
+    }
+    public BidType getTrumpType() {
+        return trumpType;
+    }
+
+    public void setTrumpType(BidType trumpType) {
+        this.trumpType = trumpType;
     }
 
     public void setKitty(List<Card> kitty) {
@@ -155,5 +203,105 @@ public class GameState {
 
     public void setFirstBidder(PlayerPos firstBidder) {
         this.firstBidder = firstBidder;
+    }
+
+    public FinalBid getWinningBid() {
+        return winningBid;
+    }
+
+    public void setWinningBid(FinalBid winningBid) {
+        this.winningBid = winningBid;
+    }
+
+    public String getGameId() {
+        return gameId;
+    }
+
+    public List<PlayedCard> getCurrentTrick() {
+        return currentTrick;
+    }
+
+    public void setCurrentTrick(List<PlayedCard> currentTrick) {
+        this.currentTrick = currentTrick;
+    }
+
+    public List<Book> getCompletedTricks() {
+        return completedTricks;
+    }
+
+    public void setCompletedTricks(List<Book> completedTricks) {
+        this.completedTricks = completedTricks;
+    }
+
+    public int getCurrentPlayerIndex() {
+        return currentPlayerIndex;
+    }
+
+    public void setCurrentPlayerIndex(int currentPlayerIndex) {
+        this.currentPlayerIndex = currentPlayerIndex;
+    }
+
+    public Difficulty getDifficulty() {
+        return difficulty;
+    }
+
+    public void setDifficulty(Difficulty difficulty) {
+        this.difficulty = difficulty;
+    }
+
+    public void setRound(int round) {
+        this.round = round;
+    }
+
+    public int getRound() {
+        return round;
+    }
+
+    public int getTeamAScore() {
+        return teamAScore;
+    }
+
+    public void setTeamAScore(int teamAScore) {
+        this.teamAScore = teamAScore;
+    }
+
+    public int getTeamBScore() {
+        return teamBScore;
+    }
+
+    public void setTeamBScore(int teamBScore) {
+        this.teamBScore = teamBScore;
+    }
+
+    public int getTeamATricksWon() {
+        return teamATricksWon;
+    }
+
+    public void setTeamATricksWon(int teamATricksWon) {
+        this.teamATricksWon = teamATricksWon;
+    }
+
+    public int getTeamBTricksWon() {
+        return teamBTricksWon;
+    }
+
+    public void setTeamBTricksWon(int teamBTricksWon) {
+        this.teamBTricksWon = teamBTricksWon;
+    }
+
+    public Map<Team, Integer> getTeamTrickCounts() {
+        return teamTrickCounts;
+    }
+
+    public void setTeamTrickCounts(Map<Team, Integer> teamTrickCounts) {
+        this.teamTrickCounts = teamTrickCounts;
+    }
+
+    public Map<Team, Integer> getTeamScores() {
+        return teamScores;
+    }
+
+    public void setTeamScores(Map<Team, Integer> teamScores) {
+        this.teamScores = teamScores;
     }
 }

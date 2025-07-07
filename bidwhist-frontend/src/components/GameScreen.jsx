@@ -1,21 +1,20 @@
 // src/components/GameScreen.jsx
-import React from 'react';
+import React, { useRef } from 'react';
 import '../css/GameScreen.css';
 import '../css/Card.css';
 import '../css/PlayerZone.css';
 import CardPlayZone from './CardPlayZone';
 import PlayerZone from './PlayerZone';
+import BidZone from './BidZone.jsx';
 import { useGameState } from '../context/GameStateContext.jsx';
 import { usePositionContext } from '../context/PositionContext.jsx';
 import { useUIDisplay } from '../context/UIDisplayContext.jsx';
 
 export default function GameScreen() {
-    const { debugLog: logGameState } = useGameState();
-    const { debugLog: logPosition } = usePositionContext();
-    const { debugLog: logUI } = useUIDisplay();
-
 
     const {
+        gameId,
+        updateFromResponse,
         players,
         showHands,
     } = useGameState();
@@ -25,6 +24,13 @@ export default function GameScreen() {
         viewerPosition,
         viewerDirection,
     } = usePositionContext();
+    const {
+        awardKitty,
+        setAwardKitty,
+        discardPile,
+        setDiscardPile } = useUIDisplay();
+
+    const dropZoneRef = useRef();
 
     const getPlayerProps = (direction) => {
 
@@ -44,7 +50,7 @@ export default function GameScreen() {
 
         const [position] = entry;
         const player = players.find(p => p.position === position);
-    
+
 
 
         return {
@@ -67,6 +73,34 @@ export default function GameScreen() {
         south: getPlayerProps("south"),
     };
 
+    const discard = async () => {
+        const payload = {
+            gameId: gameId,
+            player: viewerPosition,
+            discards: discardPile,
+        };
+
+        try {
+            const res = await fetch('/api/game/kitty', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                updateFromResponse(data);
+                setDiscardPile([]);
+                setAwardKitty(false);
+            } else {
+                console.error("Discard failed:", data);
+            }
+        } catch (error) {
+            console.error("Network error:", error);
+        }
+    }
+
     return (
 
         <div className="game-screen-container">
@@ -80,7 +114,7 @@ export default function GameScreen() {
                     <PlayerZone {...playerProps.north.props} />
                 </div>
                 <div className="grid-item top-right">
-                    <div className="placeholder-zone"> empty </div>
+                    <BidZone />
                 </div>
 
                 {/* Middle row */}
@@ -90,7 +124,8 @@ export default function GameScreen() {
 
                 <div className="grid-item center">
                     <CardPlayZone
-                        onCardPlayed={(card) => console.log("Played:", card)}
+                        dropZoneRef={dropZoneRef}
+                    onCardPlayed={(card) => console.log("Played:", card)}
                     />
                 </div>
 
@@ -104,7 +139,12 @@ export default function GameScreen() {
                 </div>
 
                 <div className="grid-item bottom-center">
-                    <PlayerZone {...playerProps.south.props} />
+                    <PlayerZone dropZoneRef = { dropZoneRef } {...playerProps.south.props} />
+                    {awardKitty && (
+                        <button className="index-button settings-button" onClick={discard}>
+                            Submit
+                        </button>
+                    )}
                 </div>
 
                 <div className="grid-item bottom-right">

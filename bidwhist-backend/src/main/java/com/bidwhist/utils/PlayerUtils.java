@@ -23,4 +23,12 @@ public class PlayerUtils {
                 .orElseThrow(() -> new IllegalArgumentException("No player found named " + playerName));
     }
 
+    public static Player getPlayerByPosition(PlayerPos playerPosition, List<Player> players) {
+    return players.stream()
+            .filter(p -> p.getPosition() == playerPosition)
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("No player found at position: " + playerPosition));
+}
+
+
 }

@@ -2,5 +2,6 @@ package com.bidwhist.bidding;
 
 public enum BidType {
     UPTOWN,
-    DOWNTOWN
+    DOWNTOWN, 
+    NO_TRUMP
 }

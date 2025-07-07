@@ -1,16 +1,16 @@
 package com.bidwhist.model;
 
 public class PlayedCard {
-    private final String playerName;
+    private final PlayerPos player;
     private final Card card;
 
-    public PlayedCard(String playerName, Card card) {
-        this.playerName = playerName;
+    public PlayedCard(PlayerPos player, Card card) {
+        this.player = player;
         this.card = card;
     }
 
-    public String getPlayerName() {
-        return playerName;
+    public PlayerPos getPlayer() {
+        return player;
     }
 
     public Card getCard() {

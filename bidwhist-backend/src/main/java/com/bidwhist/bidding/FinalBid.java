@@ -7,7 +7,6 @@ public class FinalBid {
     private final PlayerPos player;
     private final int value; // 4 to 7
     private final boolean isNo;
-    private final boolean isPassed;
     private final BidType type;
     private final Suit suit;
 
@@ -18,7 +17,6 @@ public class FinalBid {
         this.player = baseBid.getPlayer();
         this.value = baseBid.getValue();
         this.isNo = baseBid.isNo();
-        this.isPassed = false;
         this.type = type;
         this.suit = suit;
     }
@@ -30,15 +28,12 @@ public class FinalBid {
         this.player = player;
         this.value = value;
         this.isNo = isNo;
-        this.isPassed = false;
         this.type = type;
         this.suit = suit;
     }
 
     @Override
     public String toString() {
-        if (isPassed)
-            return player + " passes";
         return player + " bids " + value + (isNo ? " No" : "") + " " + type + " in " + suit;
     }
 
@@ -53,10 +48,6 @@ public class FinalBid {
 
     public boolean isNo() {
         return isNo;
-    }
-
-    public boolean isPassed() {
-        return isPassed;
     }
 
     public BidType getType() {

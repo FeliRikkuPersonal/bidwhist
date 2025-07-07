@@ -10,6 +10,7 @@ import com.bidwhist.model.Player;
  * DTO representing a player's bid submission, typically from client → server.
  */
 public class BidRequest {
+    private String gameId;
     private PlayerPos player; // Player name or identifier
     private int value; // Bid value (4–7), or 0 if pass
     private BidType type; // UPTOWN or DOWNTown
@@ -19,7 +20,8 @@ public class BidRequest {
     public BidRequest() {
     }
 
-    public BidRequest(PlayerPos player, int value, boolean isNo) {
+    public BidRequest(String gameId, PlayerPos player, int value, boolean isNo) {
+        this.gameId = gameId;
         this.player = player;
         this.value = value;
         this.isNo = isNo;
@@ -41,6 +43,10 @@ public class BidRequest {
                 player,
                 req.getValue(),
                 req.isNo());
+    }
+
+    public String getGameId() {
+        return gameId;
     }
 
     public PlayerPos getPlayer() {
