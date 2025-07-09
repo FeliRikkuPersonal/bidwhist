@@ -1,0 +1,39 @@
+.final-score-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.final-score-panel {
+    width: 45vw;
+    height: 45vh;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    border: 1px solid darkgreen;
+    border-radius: 25px;
+    box-shadow: 30px 30px 42px rgba(0, 0, 0, 0.12),
+    -30px -30px 42px rgba(0, 0, 0, 0.12);
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+}
+
+.score-button {
+    width: 10vw;
+    margin-top: 15px;
+}
+
+.score-panel-text {
+    padding: 5px;
+}

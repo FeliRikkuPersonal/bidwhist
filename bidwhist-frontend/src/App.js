@@ -6,6 +6,7 @@ import CardPlayZone from './components/CardPlayZone';
 import SettingsPanel from './components/SettingsPanel';
 import Scoreboard from './components/Scoreboard';
 import BiddingPanel from './components/BiddingPanel';
+import FinalScorePanel from './components/FinalScorePanel';
 
 function App() {
     const [playerName, setPlayerName] = useState('');
@@ -15,8 +16,11 @@ function App() {
     const [hands, setHands] = useState([[], [], [], []]);
     const [playCard, setPlayCard] = useState(false);
     const [showBidding, setShowBidding] = useState(false);
+    const [finalScores, setFinalScore] = useState(false);
 
+    // Method to handle starting a game.  Used for new games as well.
     const handleStartGame = () => {
+        setFinalScore(null);
         if (playerName.trim() !== "") {
             const fullDeck = shuffleDeck(buildDeck());
             const dealtHands = dealHands(fullDeck);
@@ -26,6 +30,7 @@ function App() {
         }
     };
 
+    // Allows for the Setting Panel to appear.
     const toggleSettings = () => {
         setShowSettings(prev => !prev);
     }
@@ -35,6 +40,7 @@ function App() {
     const ranks = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
     const jokers = ['Joker_B', 'Joker_L'];
 
+    // Function that builds the deck.
     function buildDeck() {
         const deck = [];
         suits.forEach(suit => {
@@ -44,6 +50,7 @@ function App() {
         return deck;
     }
 
+    // Shuffle Deck
     function shuffleDeck(deck) {
         for (let i = deck.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -52,6 +59,7 @@ function App() {
         return deck;
     }
 
+    // Deal Cards
     function dealHands(deck, numPlayers = 4) {
         const hands = Array.from({ length: numPlayers }, () => []);
         for (let i = 0; i < 13 * numPlayers; i++) {
@@ -60,11 +68,23 @@ function App() {
         return hands;
     }
 
+    // Triggers end game state and shows the final scoreboard.
+    const endGame = () => {
+        {/* Arbitrary numbers to see panel in UI.  Need to connect to backend */}
+        const scores = [
+            {team: playerName, points: 7},
+            {team: "AI Team", points: 0}
+        ];
+        setFinalScore(scores);
+    }
+
+    // Submit Bid
     const handleBidSubmit = (bid) => {
         console.log('Bid submitted:', bid);
         setShowBidding(false); // Hide bidding panel after bid
     };
 
+    // Skip bid
     const handleSkipBid = () => {
         console.log('Bid skipped.');
         setShowBidding(false); // Hide if skipped
@@ -72,7 +92,7 @@ function App() {
 
     return (
         <div className="index-wrapper">
-            {showWelcome ? (
+            {showWelcome ? ( // Allows user to input their name, or select multiplayer.
                 <div className="index-container">
                     <h1>Welcome to Bid Whist Online!</h1>
                     <ModeSelector
@@ -110,6 +130,15 @@ function App() {
                         <div className="index-container settings-panel">
                             <SettingsPanel closeSettings={toggleSettings} />
                         </div>
+                    )}
+                    {finalScores ? (
+                        <FinalScorePanel scores={finalScores} onNewGame={handleStartGame} />
+                    ) : (
+                        <>
+                            {/* Existing Game UI */} {/* Temporary Button to force endGame state */}
+                            <button onClick={endGame}>End Game</button>
+                            {/* Remove with integration */}
+                        </>
                     )}
                 </>
             )}
