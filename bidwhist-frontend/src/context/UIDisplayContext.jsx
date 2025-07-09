@@ -18,12 +18,19 @@ export function UIDisplayProvider({ children }) {
   const [awardKitty, setAwardKitty] = useState(false);
   const [myTurn, setMyTurn] = useState(false);
   const [discardPile, setDiscardPile] = useState([]);
-  const [selectedCard, setSelectedCard] =useState([]);
+  const [selectedCard, setSelectedCard] = useState([]);
   const [loadGame, setLoadGame] = useState(false);
   const [showLobby, setShowLobby] = useState(false);
   const [playedCard, setPlayedCard] = useState(null);
+  const [animationQueue, setAnimationQueue] = useState([]);
+  const [teamATricks, setTeamATricks] = useState(0);
+  const [teamBTricks, setTeamBTricks] = useState(0);
 
-    const debugLog = () => {
+  const queueAnimationFromResponse = (response) => {
+    if ('animationQueue' in response) setAnimationQueue(response.animationQueue);
+  }
+
+  const debugLog = () => {
     console.log("[🧠 UIDisplayContext Snapshot]", {
       showGameScreen,
       showAnimatedCards,
@@ -42,6 +49,9 @@ export function UIDisplayProvider({ children }) {
       selectedCard,
       loadGame,
       showLobby,
+      playedCard,
+      teamATricks,
+      teamBTricks,
     });
   }
 
@@ -83,6 +93,13 @@ export function UIDisplayProvider({ children }) {
       setShowLobby,
       playedCard,
       setPlayedCard,
+      animationQueue,
+      setAnimationQueue,
+      teamATricks,
+      setTeamATricks,
+      teamBTricks,
+      setTeamBTricks,
+      queueAnimationFromResponse,
       debugLog,
     }}>
       {children}

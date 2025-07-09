@@ -1,46 +1,47 @@
 // src/components/AnimatedCard.jsx
 import { useEffect, useState } from "react";
-
 import '../css/Card.css';
 import { getCardImage } from "../utils/CardUtils";
-import { useGameState } from "../context/GameStateContext.jsx";
 import { usePositionContext } from "../context/PositionContext.jsx";
-import { useUIDisplay } from "../context/UIDisplayContext.jsx";
 
-export default function AnimatedCard({ card, from, to, zIndex }) {
-  const { debugLog: logGameState } = useGameState();
-const { debugLog: logPosition } = usePositionContext();
-const { debugLog: logUI } = useUIDisplay();
-
-
+export default function AnimatedCard({ card, from, to, zIndex = 10, onComplete }) {
   const { viewerName } = usePositionContext();
-  
+
   const [style, setStyle] = useState({
     position: 'absolute',
-    top: from.y,
     left: from.x,
+    top: from.y,
     transform: 'translate(-50%, -50%)',
-    transition: 'transform 0.8s ease-in-out',
     zIndex,
+    transition: 'left 0.6s ease, top 0.6s ease',
   });
 
   useEffect(() => {
-    const dx = to.x - from.x;
-    const dy = to.y - from.y;
-
+    // Trigger transition on next frame
     requestAnimationFrame(() => {
       setStyle(prev => ({
         ...prev,
-        transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`
+        left: to.x,
+        top: to.y,
       }));
     });
-  }, [from, to]);
+
+    // Optional completion callback after animation
+    const timeout = setTimeout(() => {
+      onComplete?.();
+    }, 700);
+
+    return () => clearTimeout(timeout);
+  }, [to.x, to.y, onComplete]);
 
   const image = getCardImage(card, viewerName);
 
   return (
-    <>
-      <img src={image} className="card-img" style={style} alt="card" />
-    </>
+    <img
+      src={image}
+      alt="Animated card"
+      className="card-img"
+      style={style}
+    />
   );
 }

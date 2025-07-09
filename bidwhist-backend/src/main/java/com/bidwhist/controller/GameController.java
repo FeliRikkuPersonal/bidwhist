@@ -19,6 +19,7 @@ import com.bidwhist.dto.KittyRequest;
 import com.bidwhist.dto.PlayerRequest;
 import com.bidwhist.dto.PlayRequest;
 import com.bidwhist.dto.PollRequest;
+import com.bidwhist.dto.PopAnimationRequest;
 import com.bidwhist.model.GamePhase;
 import com.bidwhist.model.GameState;
 import com.bidwhist.model.Player;
@@ -60,6 +61,11 @@ public class GameController {
     @PostMapping("/play")
     public GameStateResponse playTurn(@RequestBody PlayRequest request) {
         return gameService.playCard(request);
+    }
+
+    @PostMapping("/pop-animation")
+    public void popCompletedAnimation(@RequestBody PopAnimationRequest request) {
+        gameService.popAnimation(request);
     }
 
     @PostMapping("/state")

@@ -12,11 +12,10 @@ import { useGameState } from './context/GameStateContext.jsx';
 import { usePositionContext } from './context/PositionContext.jsx';
 
 function App() {
-  const { debugLog: logGameState, updateFromResponse } = useGameState();
-  const { debugLog: logPosition } = usePositionContext();
-  const { debugLog: logUI } = useUIDisplay();
 
   const {
+    debugLog: showGameState,
+    updateFromResponse,
     gameId,
     setGameId,
     setPlayers,
@@ -32,6 +31,7 @@ function App() {
     difficulty,
     lobbySize
   } = useGameState();
+
   const {
     playerName,
     setPlayerName,
@@ -40,6 +40,7 @@ function App() {
     backendPositions,
     setBackendPositions,
   } = usePositionContext();
+
   const {
     setShowAnimatedCards,
     showGameScreen,
@@ -49,8 +50,8 @@ function App() {
     setLoadGame,
     showLobby,
     setShowLobby,
+    queueAnimationFromResponse,
   } = useUIDisplay();
-
 
   const onStartGame = useCallback(async (name, difficulty, code) => {
     const trimmedName = name.trim();
@@ -177,6 +178,7 @@ function App() {
         const viewerIndex = positions.indexOf(viewerPosition);
 
         updateFromResponse(data);
+        queueAnimationFromResponse(data);
         setMyTurn((currentTurnIndex === viewerIndex) && (phase === 'PLAY'));
 
       } catch (err) {

@@ -6,6 +6,7 @@ export const PositionContext = createContext(null);
 export function PositionProvider({ children }) {
   const [playerName, setPlayerName] = useState(null);
   const [viewerPosition, setViewerPosition] = useState(null);
+  const [viewerTeam, setViewerTeam] = useState(null);
   const [backendPositions, setBackendPositions] = useState({}); // position → name map
   const viewerDirection = 'south'; // always fixed for local user
 
@@ -57,11 +58,13 @@ export function PositionProvider({ children }) {
     console.log('[🧠 PositionContext Snapshot]', {
       playerName,
       viewerPosition,
+      viewerTeam,
       viewerDirection,
       backendPositions,
       positionToDirection,
       directionToPosition,
       frontendPositions,
+
     });
   };
 
@@ -75,6 +78,8 @@ export function PositionProvider({ children }) {
       setPlayerName,
       viewerPosition,
       setViewerPosition,
+      viewerTeam,
+      setViewerTeam,
       backendPositions,
       setBackendPositions, // expects: { P1: 'Alice', P2: 'AI 1', ... }
       viewerDirection,

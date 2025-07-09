@@ -36,7 +36,7 @@ export function dealCardsClockwise(
       if (!card) continue;
 
       const visualPosition = positionMap[player];
-      const targetRef = get(visualPosition)?.current;
+      const targetRef = get(`hand-${visualPosition}`)?.current;
       const toRect = targetRef?.getBoundingClientRect();
 
       if (!toRect) {

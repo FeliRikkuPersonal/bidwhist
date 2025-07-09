@@ -22,6 +22,7 @@ export default function BiddingPanel({ closeBidding, onBidPlaced }) {
         const isMyTurn = viewerPosition === turnPlayerPos;
 
         setShowBidding(bidPhase && isMyTurn);
+        console.log(`BidPhase? ${bidPhase} MyTurn?: ${isMyTurn}`);
 
         console.log('[BiddingPanel Log]');
         logGameState();

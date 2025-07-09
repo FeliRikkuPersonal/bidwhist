@@ -130,8 +130,8 @@ function ModeSelector({ onStartGame }) {
                             className="index-input-box"
                             type="text"
                             placeholder="Enter your name"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
+                            value={newPlayerName}
+                            onChange={(e) => setNewPlayerName(e.target.value)}
                         />
                         <input
                             className="index-input-box"
@@ -151,12 +151,5 @@ function ModeSelector({ onStartGame }) {
         </>
     );
 }
-
-<p className="index-text">
-    Please enter your name to play:<br />
-    <input type={"text"} className={"index-input-box"} placeholder={"Enter your name"} />
-    <button className={"index-button"}>Start Game</button>
-</p>
-
 
 export default ModeSelector;

@@ -1,13 +1,16 @@
 package com.bidwhist.model;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.UUID;
 
 import com.bidwhist.bidding.FinalBid;
 import com.bidwhist.bidding.InitialBid;
+import com.bidwhist.dto.Animation;
 import com.bidwhist.bidding.BidType;
 import com.bidwhist.utils.PlayerUtils;
 import com.bidwhist.service.DeckService;
@@ -33,6 +36,7 @@ public class GameState {
     private PlayerPos firstBidder;
     private Difficulty difficulty;
     private GameRoom room;
+    private Map<PlayerPos, List<Animation>> animationList = new EnumMap<>(PlayerPos.class);
 
     private List<PlayedCard> currentTrick = new ArrayList<>();
     private List<Book> completedTricks = new ArrayList<>();
@@ -47,23 +51,7 @@ public class GameState {
     private Map<Team, Integer> teamTrickCounts = new HashMap<>();
     private Map<Team, Integer> teamScores = new HashMap<>();
 
-    public GameState() {
-        this.gameId = UUID.randomUUID().toString();
-        this.room = new GameRoom(gameId);
-        this.players = new ArrayList<>();
-        this.deck = DeckService.createNewDeck();
-        this.kitty = new ArrayList<>();
-        this.currentTurnIndex = 0;
-        this.phase = GamePhase.DEAL;
-        this.trumpSuit = null;
-        this.bids = new ArrayList<>();
-        this.bidTurnIndex = 0;
-        this.highestBid = null;
-        this.winningPlayerName = null; // <-- Initialize
-        this.shuffledDeck = deck.getCards();
-    }
-
-        public GameState(String gameId) {
+    public GameState(String gameId) {
         this.room = new GameRoom(gameId);
         this.gameId = gameId;
         this.players = new ArrayList<>();
@@ -77,6 +65,54 @@ public class GameState {
         this.highestBid = null;
         this.winningPlayerName = null; // <-- Initialize
         this.shuffledDeck = deck.getCards();
+
+        for (PlayerPos pos : PlayerPos.values()) {
+            animationList.put(pos, new ArrayList<>());
+        }
+    }
+
+    public void addAnimation(Animation animation) {
+        if (animationList == null)
+            return;
+
+        for (List<Animation> queue : animationList.values()) {
+            queue.add(animation);
+        }
+    }
+
+    public boolean removeAnimationById(PlayerPos player, String animationId) {
+        List<Animation> animations = animationList.get(player);
+
+        if (animations == null) {
+            System.out.println("⚠️ No animations found for player: " + player);
+            return false;
+        }
+
+        System.out.println("🔍 Attempting to remove animationId: " + animationId + " for player: " + player);
+
+        boolean removed = animations.removeIf(animation -> {
+            String currentId = animation.getId();
+            System.out.println("   → Comparing against animation ID: " + currentId);
+            return animationId != null && currentId != null &&
+                    animationId.trim().equalsIgnoreCase(currentId.trim());
+        });
+
+        if (removed) {
+            System.out.println("✅ Animation removed successfully.");
+        } else {
+            System.out.println("❌ No matching animation found for ID: " + animationId);
+        }
+
+        return removed;
+    }
+
+    public Team getTeamByPlayerPos(List<Player> players, PlayerPos playerPos) {
+        for (Player p : players) {
+            if (p.getPosition().equals(playerPos)) {
+                return p.getTeam();
+            }
+        }
+        return null; // or "UNKNOWN", or throw new IllegalArgumentException(...)
     }
 
     public List<Player> getPlayers() {
@@ -118,8 +154,13 @@ public class GameState {
     public PlayerPos getFirstBidder() {
         return firstBidder;
     }
+
     public BidType getTrumpType() {
         return trumpType;
+    }
+
+    public Map<PlayerPos, List<Animation>> getAnimationList() {
+        return animationList;
     }
 
     public void setTrumpType(BidType trumpType) {
@@ -304,4 +345,9 @@ public class GameState {
     public void setTeamScores(Map<Team, Integer> teamScores) {
         this.teamScores = teamScores;
     }
+
+    public void setAnimationList(Map<PlayerPos, List<Animation>> animationList) {
+        this.animationList = animationList;
+    }
+
 }

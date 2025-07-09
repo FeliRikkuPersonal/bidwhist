@@ -6,6 +6,7 @@
 /Users/felirikku/VSCode/bidwhist/bidwhist-backend/src/main/java/com/bidwhist/bidding/InitialBid.java
 /Users/felirikku/VSCode/bidwhist/bidwhist-backend/src/main/java/com/bidwhist/bidding/SuitEvaluation.java
 /Users/felirikku/VSCode/bidwhist/bidwhist-backend/src/main/java/com/bidwhist/controller/GameController.java
+/Users/felirikku/VSCode/bidwhist/bidwhist-backend/src/main/java/com/bidwhist/dto/Animation.java
 /Users/felirikku/VSCode/bidwhist/bidwhist-backend/src/main/java/com/bidwhist/dto/AnimationType.java
 /Users/felirikku/VSCode/bidwhist/bidwhist-backend/src/main/java/com/bidwhist/dto/BidRequest.java
 /Users/felirikku/VSCode/bidwhist/bidwhist-backend/src/main/java/com/bidwhist/dto/CardAnimationSignal.java
@@ -19,6 +20,8 @@
 /Users/felirikku/VSCode/bidwhist/bidwhist-backend/src/main/java/com/bidwhist/dto/PlayRequest.java
 /Users/felirikku/VSCode/bidwhist/bidwhist-backend/src/main/java/com/bidwhist/dto/PlayerRequest.java
 /Users/felirikku/VSCode/bidwhist/bidwhist-backend/src/main/java/com/bidwhist/dto/PlayerView.java
+/Users/felirikku/VSCode/bidwhist/bidwhist-backend/src/main/java/com/bidwhist/dto/PollRequest.java
+/Users/felirikku/VSCode/bidwhist/bidwhist-backend/src/main/java/com/bidwhist/dto/PopAnimationRequest.java
 /Users/felirikku/VSCode/bidwhist/bidwhist-backend/src/main/java/com/bidwhist/dto/StartGameRequest.java
 /Users/felirikku/VSCode/bidwhist/bidwhist-backend/src/main/java/com/bidwhist/dto/TargetLocation.java
 /Users/felirikku/VSCode/bidwhist/bidwhist-backend/src/main/java/com/bidwhist/model/Book.java

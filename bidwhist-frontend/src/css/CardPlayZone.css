@@ -27,30 +27,6 @@
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
-.played-card.north {
-    top: -30px;
-    left: 50%;
-    transform: translateX(-50%);
-}
-
-.played-card.south {
-    bottom: -30px;
-    left: 50%;
-    transform: translateX(-50%);
-}
-
-.played-card.east {
-    right: -30px;
-    top: 50%;
-    transform: translateY(-50%);
-}
-
-.played-card.west {
-    left: -30px;
-    top: 50%;
-    transform: translateY(-50%);
-}
-
 .drop-zone {
     position: absolute;
     bottom: 0;
@@ -125,4 +101,32 @@
 .floating-card-layer .interactive {
   pointer-events: auto;
   z-index: 2000;
+}
+
+.play-slot.north {
+  position: absolute;
+  top: 20%; /* or wherever your play area is */
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.play-slot.south {
+  position: absolute;
+  bottom: 20%; /* or wherever your play area is */
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.play-slot.east {
+  position: absolute;
+  top: 50%; /* or wherever your play area is */
+  right: 20%;
+  transform: translate(-50%, -50%);
+}
+
+.play-slot.west {
+  position: absolute;
+  top: 50%; /* or wherever your play area is */
+  left: 20%;
+  transform: translate(-50%, -50%);
 }

@@ -16,21 +16,24 @@ export default function GameScreen() {
         gameId,
         updateFromResponse,
         players,
-        showHands,
     } = useGameState();
     const {
-        playerName,
         positionToDirection,
         viewerPosition,
-        viewerDirection,
     } = usePositionContext();
     const {
         awardKitty,
         setAwardKitty,
         discardPile,
-        setDiscardPile } = useUIDisplay();
+        setDiscardPile,
+        teamATricks,
+        teamBTricks,
+    } = useUIDisplay();
 
     const dropZoneRef = useRef();
+    const yourTrickRef = useRef();
+    const theirTrickRef = useRef();
+
 
     const getPlayerProps = (direction) => {
 
@@ -107,7 +110,22 @@ export default function GameScreen() {
             <div className="game-grid">
                 {/* Top row */}
                 <div className="grid-item top-left">
-                    <div className="placeholder-zone">Other Team Tricks</div>
+                    <div className="placeholder-zone" ref={theirTrickRef}>
+                        {[...Array(teamBTricks)].map((_, i) => (
+                            <img
+                                key={i} src="/static/img/deck/Deck_Back.png"
+                                alt="Card Back"
+                                className="card-img"
+                                style={{
+                                    position: 'absolute',
+                                    left: `calc(50% + ${i * -15}px)`, // start at center and go left
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    zIndex: i,             // stack visually
+                                }}
+                            />
+                        ))}
+                    </div>
                 </div>
 
                 <div className="grid-item top-center">
@@ -125,7 +143,9 @@ export default function GameScreen() {
                 <div className="grid-item center">
                     <CardPlayZone
                         dropZoneRef={dropZoneRef}
-                    onCardPlayed={(card) => console.log("Played:", card)}
+                        yourTrickRef={yourTrickRef}
+                        theirTrickRef={theirTrickRef}
+                        onCardPlayed={(card) => console.log("Played:", card)}
                     />
                 </div>
 
@@ -139,7 +159,7 @@ export default function GameScreen() {
                 </div>
 
                 <div className="grid-item bottom-center">
-                    <PlayerZone dropZoneRef = { dropZoneRef } {...playerProps.south.props} />
+                    <PlayerZone dropZoneRef={dropZoneRef} {...playerProps.south.props} />
                     {awardKitty && (
                         <button className="index-button settings-button" onClick={discard}>
                             Submit
@@ -148,7 +168,22 @@ export default function GameScreen() {
                 </div>
 
                 <div className="grid-item bottom-right">
-                    <div className="placeholder-zone">Your Tricks</div>
+                    <div className="placeholder-zone" ref={yourTrickRef}>
+                        {[...Array(teamATricks)].map((_, i) => (
+                            <img
+                                key={i} src="/static/img/deck/Deck_Back.png"
+                                alt="Card Back"
+                                className="card-img"
+                                style={{
+                                    position: 'absolute',
+                                    left: `calc(50% + ${i * -15}px)`, // start at center and go left
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    zIndex: i,             // stack visually
+                                }}
+                            />
+                        ))}
+                    </div>
                 </div>
             </div>
         </div>

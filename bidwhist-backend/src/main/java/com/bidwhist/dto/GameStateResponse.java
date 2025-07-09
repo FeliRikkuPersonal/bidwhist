@@ -1,11 +1,14 @@
 package com.bidwhist.dto;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 
 import com.bidwhist.bidding.InitialBid;
 import com.bidwhist.model.Card;
 import com.bidwhist.model.GamePhase;
 import com.bidwhist.model.PlayerPos;
+import com.bidwhist.model.Team;
 import com.bidwhist.model.Suit;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.bidwhist.bidding.BidType;
@@ -23,14 +26,17 @@ public class GameStateResponse {
     private InitialBid highestBid; // NEW FIELD
     private List<Card> shuffledDeck;
     private PlayerPos playerPosition;
+    private Team playerTeam;
     private String viewerName;
     private PlayerPos firstBidder;
     private int bidTurnIndex;
     private List<InitialBid> bids;
     private FinalBid winningFinalBid;
     private int lobbySize;
+    List<Animation> animationQueue;
 
 public GameStateResponse(
+        List<Animation> animationQueue,
         List<PlayerView> players,
         List<Card> kitty,
         int currentTurnIndex,
@@ -41,6 +47,7 @@ public GameStateResponse(
         PlayerPos firstBidder,
         int bidTurnIndex
 ) {
+    this.animationQueue = animationQueue;
     this.players = players;
     this.kitty = kitty;
     this.currentTurnIndex = currentTurnIndex;
@@ -62,6 +69,10 @@ public GameStateResponse(
 
     public PlayerPos getPlayerPosition() {
         return playerPosition;
+    }
+
+    public Team getPlayerTeam() {
+        return playerTeam;
     }
 
     public String getViewerName() {
@@ -128,6 +139,10 @@ public GameStateResponse(
         return lobbySize;
     }
 
+    public List<Animation> getAnimationQueue() {
+        return animationQueue;
+    }
+
     public void setHighestBid(InitialBid highestBid) {
         this.highestBid = highestBid;
     }
@@ -138,6 +153,10 @@ public GameStateResponse(
 
     public void setPlayerPosition(PlayerPos playerPosition) {
         this.playerPosition = playerPosition;
+    }
+
+    public void setPlayerTeam(Team team) {
+        this.playerTeam = team;
     }
 
     public void setViewerName(String viewerName) {
@@ -170,5 +189,9 @@ public GameStateResponse(
 
     public void setLobbySize(int size) {
         this.lobbySize = size;
+    }
+
+    public void setAnimationQueue(List<Animation> queue) {
+        this.animationQueue = queue;
     }
 }

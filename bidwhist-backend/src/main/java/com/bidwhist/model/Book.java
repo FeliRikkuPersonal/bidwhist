@@ -9,13 +9,37 @@ import java.util.List;
 
 public class Book {
     public List<PlayedCard> cards = new ArrayList<>();
+    private Team winningTeam;
 
-    public Book(List<PlayedCard> cards) {
+    public Book(List<PlayedCard> cards, Team team) {
+        this.cards = cards;
+        this.winningTeam = team;
+    }
+
+    public void setCards(List<PlayedCard> cards) {
         this.cards = cards;
     }
+
+    public void setWinningTeam(Team team) {
+        this.winningTeam = team;
+    }
     
-    public List<PlayedCard> getCards() {
+    public List<PlayedCard> getPlayedCards() {
         return cards;
+    }
+
+    public List<Card> getCards() {
+        List<Card> cardList = new ArrayList<>();
+        
+        for(PlayedCard pc : cards) {
+            cardList.add(pc.getCard());
+        }
+
+        return cardList;
+    }
+
+    public Team getWinningTeam() {
+        return winningTeam;
     }
 }
 

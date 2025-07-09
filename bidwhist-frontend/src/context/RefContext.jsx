@@ -5,9 +5,14 @@ const RefContext = createContext();
 export function RefProvider({ children }) {
   const refs = useRef(new Map());
 
-  const register = (key, refObj) => {
+const register = (key, refObj) => {
+  if (refObj && refObj.current) {
     refs.current.set(key, refObj);
-  };
+  } else {
+    console.warn(`[⚠️ register] Attempted to register ${key} with invalid ref`, refObj);
+  }
+};
+
 
   const get = (key) => refs.current.get(key);
 

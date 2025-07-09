@@ -7,30 +7,25 @@ import { useGameState } from '../context/GameStateContext.jsx';
 import { usePositionContext } from '../context/PositionContext.jsx';
 import { useUIDisplay } from '../context/UIDisplayContext.jsx';
 
-const PlayerZone = forwardRef(({ dropZoneRef, position, direction, name, revealHand, cards = [] }, ref) => {
-  const { debugLog: logGameState, phase, kitty, gameId } = useGameState();
-  const { debugLog: logPosition } = usePositionContext();
-  const { 
-    debugLog: logUI, 
-    showHands, 
-    awardKitty, 
-    myTurn, 
-    setDiscardPile, 
-    setSelectedCard, 
+const PlayerZone = forwardRef(({ direction, name, revealHand, cards = [] }, ref) => {
+  const { kitty } = useGameState();
+  const {
+    showHands,
+    awardKitty,
+    myTurn,
+    setDiscardPile,
+    setSelectedCard,
     playedCard,
-    setPlayedCard,
-    playedCardPosition 
+    playedCardPosition
   } = useUIDisplay();
 
-  {/* comment out until debuglog is deleted }
-  const { phase } = useGameState();
-  */}
   const [draggingCardIndex, setDraggingCardIndex] = useState(null);
   const [selectedIndices, setSelectedIndices] = useState([]);
-  const [dropCoordinates, setDropCoordinates] = useState({});
 
+  const handRef = useRef();
+  const playRef = useRef();
   const zoneRef = useRef();
-  const { register, debug: logZoneRef } = useZoneRefs();
+  const { register } = useZoneRefs();
   const fullHand = [...cards, ...(awardKitty ? kitty : [])];
 
 
@@ -57,27 +52,55 @@ const PlayerZone = forwardRef(({ dropZoneRef, position, direction, name, revealH
     }
   };
 
+useEffect(() => {
+  if (handRef.current) {
+    register(`hand-${direction}`, handRef);
+
+    const attemptRegisterOrigin = () => {
+      const firstCard = handRef.current.querySelector('.card-img');
+      if (firstCard) {
+        register(`card-origin-${direction}`, { current: firstCard });
+      } else {
+        // Retry in 100ms
+        setTimeout(attemptRegisterOrigin, 100);
+      }
+    };
+
+    attemptRegisterOrigin();
+  }
+
+  if (playRef.current) {
+    register(`play-${direction}`, playRef);
+  }
+}, [direction, register]);
+
+
+
   useImperativeHandle(ref, () => ({
     getPosition: () => zoneRef.current?.getBoundingClientRect()
   }));
 
   useEffect(() => {
-    if (zoneRef.current) {
-      console.log(`[PlayerZone] Registering ref for direction: ${direction}`);
-      register(direction, zoneRef);
+    if (handRef.current) {
+      register(`hand-${direction}`, handRef);
+    }
+    if (playRef.current) {
+      register(`play-${direction}`, playRef);
     }
   }, [direction, register]);
 
 
-
   return (
     <div ref={zoneRef} className={`player-zone ${direction}`}>
-      {["west", "east"].includes(direction) && <div className="player-name">{name}</div>}
+      <div ref={playRef} className={`play-slot ${direction}`}></div>
 
-      {showHands && (
-        <div className={`player-hand ${direction}`}>
-          {revealHand
-            ? fullHand.map((card, i) => (
+      {["west", "east"].includes(direction) && <div className="player-name">{name}</div>}
+      <div ref={handRef} className={`player-hand ${direction}`}>
+        {showHands &&
+          (revealHand
+            ? fullHand
+            .filter(c => !(playedCard?.cardImage === c.cardImage && direction === 'south'))
+            .map((card, i) => (
               <img
                 key={i}
                 src={`/static/img/deck/${card.cardImage}`}
@@ -85,7 +108,7 @@ const PlayerZone = forwardRef(({ dropZoneRef, position, direction, name, revealH
                 className="card-img draggable"
                 style={{
                   transform: playedCard?.cardImage === card.cardImage
-                    ? `translate(${playedCardPosition.x}px, ${playedCardPosition.y}px)` 
+                    ? `translate(${playedCardPosition.x}px, ${playedCardPosition.y}px)`
                     : selectedIndices.includes(i)
                       ? 'translateY(-30px)'
                       : 'translateY(0)',
@@ -114,9 +137,9 @@ const PlayerZone = forwardRef(({ dropZoneRef, position, direction, name, revealH
                 className="card-img"
                 style={{ visibility: draggingCardIndex === i ? 'hidden' : 'visible' }}
               />
-            ))}
-        </div>
-      )}
+            )))}
+      </div>
+
 
       {["north", "south"].includes(direction) && <div className="player-name">{name}</div>}
     </div>

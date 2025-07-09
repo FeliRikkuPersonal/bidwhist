@@ -11,6 +11,7 @@ import java.util.HashMap;
 
 import org.springframework.stereotype.Service;
 
+import com.bidwhist.dto.Animation;
 import com.bidwhist.dto.BidRequest;
 import com.bidwhist.dto.CardVisibility;
 import com.bidwhist.dto.FinalBidRequest;
@@ -21,6 +22,7 @@ import com.bidwhist.dto.PlayRequest;
 import com.bidwhist.dto.PlayerRequest;
 import com.bidwhist.dto.PlayerView;
 import com.bidwhist.dto.PollRequest;
+import com.bidwhist.dto.PopAnimationRequest;
 import com.bidwhist.dto.StartGameRequest;
 import com.bidwhist.dto.CardOwner;
 import com.bidwhist.bidding.InitialBid;
@@ -98,6 +100,7 @@ public class GameService {
         games.put(game.getGameId(), game);
         System.out.println(game.getGameId());
         dealToPlayers(game);
+
         return response;
     }
 
@@ -191,7 +194,12 @@ public class GameService {
                 }
             }
         }
+        
+        List<Player> players = game.getPlayers();
+        Team myTeam = game.getTeamByPlayerPos(players, playerPosition);
+
         GameStateResponse response = new GameStateResponse(
+                game.getAnimationList().getOrDefault(playerPosition, new ArrayList<>()),
                 playerViews,
                 myKittyView,
                 game.getCurrentTurnIndex(),
@@ -212,6 +220,7 @@ public class GameService {
         response.setHighestBid(game.getHighestBid());
         response.setBids(game.getBids());
         response.setWinningBid(game.getWinningBid());
+        response.setPlayerTeam(myTeam);
         return response;
     }
 
@@ -257,6 +266,10 @@ public class GameService {
         }
 
         game.getDeck().deal(game.getPlayers()); // Perform actual dealing
+
+        // Animation signal : DEAL
+        game.addAnimation(new Animation(game.getShuffledDeck()));
+
         game.setKitty(game.getDeck().getKitty().getCards()); // Move kitty over
         game.setPhase(GamePhase.BID); // Advance phase
         System.out.println("Current phase: " + game.getPhase());
@@ -368,7 +381,11 @@ public class GameService {
             game.setFirstBidder(PlayerPos.values()[nextTurn]);
             game.setCurrentTurnIndex(winnerPos.ordinal());
             game.setWinningPlayerName(winner.getName());
-            game.setPhase(GamePhase.KITTY);
+            if (winner.isAI()) {
+                game.setPhase(GamePhase.PLAY);
+            } else {
+                game.setPhase(GamePhase.KITTY);
+            }
         }
 
         return getGameStateForPlayer(game, request.getPlayer());
@@ -496,8 +513,8 @@ public class GameService {
         Player currentPlayer = PlayerUtils.getPlayerByPosition(request.getPlayer(), game.getPlayers());
         System.out.println("DEBUG: Current turn is player index " + game.getCurrentTurnIndex()
                 + " (" + currentPlayer.getName() + ")");
-        System.out.println("DEBUG: Player " + request.getPlayer() + " playing: " + 
-        request.getCard().getRank() + " of " + request.getCard().getSuit());
+        System.out.println("DEBUG: Player " + request.getPlayer() + " playing: " +
+                request.getCard().getRank() + " of " + request.getCard().getSuit());
 
         if (game.getCurrentTurnIndex() != request.getPlayer().ordinal()) {
             throw new IllegalStateException("It's not " + request.getPlayer() + "'s turn");
@@ -506,7 +523,7 @@ public class GameService {
         Card cardToPlay = request.getCard();
         if (!currentPlayer.getHand().getCards().contains(cardToPlay)) {
             throw new IllegalArgumentException("Player does not have the specified card " +
-            cardToPlay.getRank() + " of " + cardToPlay.getSuit());
+                    cardToPlay.getRank() + " of " + cardToPlay.getSuit());
         }
 
         List<PlayedCard> currentTrick = game.getCurrentTrick();
@@ -519,8 +536,13 @@ public class GameService {
             }
         }
 
+        PlayedCard validPlayedCard = new PlayedCard(request.getPlayer(), cardToPlay);
+
         currentPlayer.getHand().getCards().remove(cardToPlay);
-        currentTrick.add(new PlayedCard(request.getPlayer(), cardToPlay));
+        currentTrick.add(validPlayedCard);
+
+        // Animation Signal : PLAY
+        game.addAnimation(new Animation(validPlayedCard));
 
         // Advance turn
         game.setCurrentTurnIndex((game.getCurrentTurnIndex() + 1) % 4);
@@ -536,7 +558,13 @@ public class GameService {
                     winnerTeam,
                     game.getTeamTrickCounts().get(winnerTeam) + 1);
 
-            game.getCompletedTricks().add(new Book(currentTrick));
+            Book currentBook = new Book(currentTrick, winnerTeam);
+
+            game.getCompletedTricks().add(currentBook);
+
+            // Animation signal - COLLECT
+            game.addAnimation(new Animation(currentBook));
+
             currentTrick.clear();
             game.setCurrentTurnIndex(winner.getPosition().ordinal());
 
@@ -586,16 +614,21 @@ public class GameService {
         while (true) {
             Player current = game.getPlayers().get(game.getCurrentTurnIndex());
             if (!current.isAI()) {
-                System.out.println("DEBUG: Human player's turn: " + current.getName());
                 break;
             }
 
-            System.out.println("DEBUG: AI Player " + current.getName() + " is taking a turn.");
             Card chosenCard = chooseCardForAI(game, current, game.getCurrentTrick());
-            System.out.println("DEBUG: AI played card: " + chosenCard);
+            System.out.println(
+                    "DEBUG: " + current.getName() + " played card: " + chosenCard + " " + game.getCurrentTurnIndex());
 
             current.getHand().getCards().remove(chosenCard);
-            game.getCurrentTrick().add(new PlayedCard(current.getPosition(), chosenCard));
+
+            PlayedCard validPlayedCard = new PlayedCard(current.getPosition(), chosenCard);
+
+            game.getCurrentTrick().add(validPlayedCard);
+
+            // Animation Signal : PLAY
+            game.addAnimation(new Animation(validPlayedCard));
 
             game.setCurrentTurnIndex((game.getCurrentTurnIndex() + 1) % 4);
 
@@ -604,14 +637,20 @@ public class GameService {
                 PlayedCard winner = determineTrickWinner(game.getCurrentTrick(), game.getTrumpType());
 
                 Player winnerPlayer = PlayerUtils.getPlayerByPosition(winner.getPlayer(), game.getPlayers());
-                Team team = winnerPlayer.getTeam();
-                System.out.println("DEBUG: Trick won by " + winnerPlayer.getName() + " (Team " + team + ")");
+                Team winnerTeam = winnerPlayer.getTeam();
+                System.out.println("DEBUG: Trick won by " + winnerPlayer.getName() + " (Team " + winnerTeam + ")");
+                List<PlayedCard> currentTrick = game.getCurrentTrick();
+                Book currentBook = new Book(currentTrick, winnerTeam);
 
-                game.getTeamTrickCounts().putIfAbsent(team, 0);
-                game.getTeamTrickCounts().put(team, game.getTeamTrickCounts().get(team) + 1);
+                // Animation signal - COLLECT
+                game.addAnimation(new Animation(currentBook));
+
+                game.getTeamTrickCounts().putIfAbsent(winnerTeam, 0);
+                game.getTeamTrickCounts().put(winnerTeam, game.getTeamTrickCounts().get(winnerTeam) + 1);
                 System.out.println("DEBUG: Team trick counts: " + game.getTeamTrickCounts());
 
-                game.getCompletedTricks().add(new Book(game.getCurrentTrick()));
+                game.getCompletedTricks().add(currentBook);
+
                 game.getCurrentTrick().clear();
                 game.setCurrentTurnIndex(winnerPlayer.getPosition().ordinal());
 
@@ -763,9 +802,18 @@ public class GameService {
         };
     }
 
+    public void popAnimation(PopAnimationRequest request) {
+        GameState game = getGameById(request.getGameId());
+        PlayerPos playerPosition = request.getPlayer();
+        String animationId = request.getAnimationId();
+
+        game.removeAnimationById(playerPosition, animationId);
+    }
+
     public GameStateResponse updateState(PollRequest request) {
         PlayerPos playerPosition = request.getPlayer();
         GameState game = getGameById(request.getGameId());
+        autoPlayAITurns(game);
 
         return getGameStateForPlayer(game, playerPosition);
     }
