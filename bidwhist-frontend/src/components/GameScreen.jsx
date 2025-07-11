@@ -1,5 +1,5 @@
 // src/components/GameScreen.jsx
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 import '../css/GameScreen.css';
 import '../css/Card.css';
 import '../css/PlayerZone.css';
@@ -9,7 +9,12 @@ import BidZone from './BidZone.jsx';
 import { useGameState } from '../context/GameStateContext.jsx';
 import { usePositionContext } from '../context/PositionContext.jsx';
 import { useUIDisplay } from '../context/UIDisplayContext.jsx';
+import { useAlert } from '../context/AlertContext.jsx'
 
+
+// --- GameScreen Component ---
+/* The GameScreen component manages the main game interface, including player zones, card play zones, 
+   bid zone, and handling discard actions. It uses various context providers to manage state and interactions. */
 export default function GameScreen() {
 
     const {
@@ -17,10 +22,12 @@ export default function GameScreen() {
         updateFromResponse,
         players,
     } = useGameState();
+
     const {
         positionToDirection,
         viewerPosition,
     } = usePositionContext();
+
     const {
         awardKitty,
         setAwardKitty,
@@ -30,11 +37,15 @@ export default function GameScreen() {
         teamBTricks,
     } = useUIDisplay();
 
+    const { showAlert } = useAlert();
     const dropZoneRef = useRef();
     const yourTrickRef = useRef();
     const theirTrickRef = useRef();
 
 
+    // --- getPlayerProps Function ---
+    /* Retrieves the player properties (name, cards, etc.) for a given direction (north, south, east, west). 
+       This function checks the current positions and assigns the corresponding player data. */
     const getPlayerProps = (direction) => {
 
         if (!positionToDirection) {
@@ -55,7 +66,7 @@ export default function GameScreen() {
         const player = players.find(p => p.position === position);
 
 
-
+        // Return player properties for this direction
         return {
             key: position,
             props: {
@@ -76,13 +87,22 @@ export default function GameScreen() {
         south: getPlayerProps("south"),
     };
 
+
+    // --- discard Function ---
+    /* Handles the discard action, ensuring exactly 6 cards are selected before submitting. */
     const discard = async () => {
+        if (discardPile.length != 6) {
+            showAlert('You must discard exactly 6 cards.');
+            return;
+        }
+
         const payload = {
             gameId: gameId,
             player: viewerPosition,
             discards: discardPile,
         };
 
+        // Make API call to submit the discard pile
         try {
             const res = await fetch('/api/game/kitty', {
                 method: 'POST',
@@ -104,8 +124,10 @@ export default function GameScreen() {
         }
     }
 
-    return (
 
+    // --- JSX Rendering ---
+    /* The rendering of the game screen, with the appropriate layout for player zones, cards, and bid zones. */
+    return (
         <div className="game-screen-container">
             <div className="game-grid">
                 {/* Top row */}

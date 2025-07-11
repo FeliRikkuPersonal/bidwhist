@@ -1,5 +1,6 @@
 // src/App.jsx
-import React, { useEffect, useState, useCallback } from 'react';
+
+import { useEffect, useCallback } from 'react';
 import './css/index.css';
 import './css/Card.css';
 import './css/Animations.css';
@@ -11,10 +12,13 @@ import { useUIDisplay } from './context/UIDisplayContext.jsx';
 import { useGameState } from './context/GameStateContext.jsx';
 import { usePositionContext } from './context/PositionContext.jsx';
 
+/*
+* Includes handling game start, updating game state from the backend, and rendering 
+* either the Lobby or Game Screen. 
+*/
 function App() {
 
   const {
-    debugLog: showGameState,
     updateFromResponse,
     gameId,
     setGameId,
@@ -53,6 +57,12 @@ function App() {
     queueAnimationFromResponse,
   } = useUIDisplay();
 
+
+  // --- onStartGame Function ---
+  /* 
+  * Called when the user starts the game. Validates the player's name and 
+  * sends the game start request to the backend. 
+  */
   const onStartGame = useCallback(async (name, difficulty, code) => {
     const trimmedName = name.trim();
     if (!trimmedName) {
@@ -68,7 +78,7 @@ function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           playerName: trimmedName,
-          difficulty: difficulty, // make sure `difficulty` is in scope
+          difficulty: difficulty,
           gameId: code,
         }),
       });
@@ -118,9 +128,15 @@ function App() {
     setBackendPositions,
     setShowGameScreen,
     setShowAnimatedCards,
-    difficulty, // include all used values from outer scope
+    difficulty,
   ]);
 
+
+  // --- useEffect for URL Parameters ---
+  /* 
+  * Extracts gameId and playerPosition from URL parameters and updates the context if they 
+  * are found. 
+  */
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const gameIdFromUrl = params.get('gameId');
@@ -128,13 +144,16 @@ function App() {
 
     console.log("[URL Sync] Extracted from URL:", { gameIdFromUrl, posFromUrl });
 
-    if (gameIdFromUrl) setGameId(gameIdFromUrl);            // ✅ updates the global context
+    if (gameIdFromUrl) setGameId(gameIdFromUrl);
     console.log("[URL Sync] setGameId:", gameIdFromUrl);
 
-    if (posFromUrl) setViewerPosition(posFromUrl);          // ✅ same here
+    if (posFromUrl) setViewerPosition(posFromUrl);
     console.log("[URL Sync] setViewerPosition:", posFromUrl);
   }, []);
 
+
+  // --- useEffect to Sync URL with GameState ---
+  // Updates the URL with the latest gameId and playerPosition if they change. 
   useEffect(() => {
     if (!gameId || !viewerPosition) return;
 
@@ -148,17 +167,12 @@ function App() {
     }
   }, [gameId, viewerPosition]);
 
-  useEffect(() => {
-    console.log("[Frontend] gameId from response:", gameId);
-  }, [gameId]);
 
+  // --- Polling for Game State ---
+  // Starts a polling loop that fetches the game state from the server every 2 seconds.
   useEffect(() => {
-    if (!viewerPosition || !gameId) {
-      console.warn("[Polling] viewerPosition or gameId missing:", { viewerPosition, gameId });
-      return;
-    }
 
-    console.log(`[Polling] Starting polling loop for gameId=${gameId} and viewerPosition=${viewerPosition}`);
+    if (!playerName || !gameId) return;
 
     const interval = setInterval(async () => {
       try {
@@ -189,6 +203,9 @@ function App() {
     return () => clearInterval(interval);
   }, [viewerPosition, currentTurnIndex, phase, gameId]);
 
+
+  // --- useEffect for Mode, Lobby, and Game State Updates ---
+  // Controls the visibility of different screens based on game mode and lobby size.
   useEffect(() => {
     if (mode === 'multiplayer') {
       setShowLobby(lobbySize > 0 && lobbySize < 4);
@@ -198,12 +215,18 @@ function App() {
     const isSinglePlayer = (mode === 'single');
     const validPositions = ['P1', 'P2', 'P3', 'P4'];
 
-    const singlePlayerReady = showGameScreen && validPositions.includes(viewerPosition) && isSinglePlayer;
-    const multiPlayerReady = showGameScreen && validPositions.includes(viewerPosition) && !isSinglePlayer;
+    const singlePlayerReady = showGameScreen && validPositions.includes(viewerPosition)
+      && isSinglePlayer;
+    const multiPlayerReady = showGameScreen && validPositions.includes(viewerPosition)
+      && !isSinglePlayer;
 
     setLoadGame(singlePlayerReady || multiPlayerReady);
   }, [mode, lobbySize, showGameScreen, viewerPosition]);
 
+  // --- Return JSX for App Rendering ---
+  /* 
+  * Renders the appropriate screen (ModeSelector, LobbyScreen, or GameScreen) based 
+  * on the game state. */
   return (
     <div className="index-wrapper">
       <div className="scoreboard-container">

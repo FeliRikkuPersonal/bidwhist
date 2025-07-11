@@ -6,17 +6,20 @@ import App from './App.jsx'
 import { GameStateProvider } from './context/GameStateContext.jsx'
 import { PositionProvider } from './context/PositionContext.jsx'
 import { UIDisplayProvider } from './context/UIDisplayContext.jsx'
+import { AlertProvider } from './context/AlertContext.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <RefProvider>
-      <GameStateProvider>
-        <PositionProvider>
-          <UIDisplayProvider>
-            <App />
-          </UIDisplayProvider>
-        </PositionProvider>
-      </GameStateProvider>
-    </RefProvider>
+    <AlertProvider>
+      <RefProvider>
+        <GameStateProvider>
+          <PositionProvider>
+            <UIDisplayProvider>
+              <App />
+            </UIDisplayProvider>
+          </PositionProvider>
+        </GameStateProvider>
+      </RefProvider>
+    </AlertProvider>
   </StrictMode>,
 )

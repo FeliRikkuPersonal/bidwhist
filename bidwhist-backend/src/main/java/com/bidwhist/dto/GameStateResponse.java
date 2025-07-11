@@ -43,7 +43,6 @@ public GameStateResponse(
         GamePhase phase,
         List<Card> shuffledDeck,
         PlayerPos playerPosition,
-        String viewerName,
         PlayerPos firstBidder,
         int bidTurnIndex
 ) {
@@ -54,7 +53,6 @@ public GameStateResponse(
     this.phase = phase;
     this.shuffledDeck = shuffledDeck;
     this.playerPosition = playerPosition;
-    this.viewerName  = viewerName;
     this.firstBidder = firstBidder;
     this.bidTurnIndex = bidTurnIndex;
 }
@@ -149,6 +147,10 @@ public GameStateResponse(
 
     public void setPlayers(List<PlayerView> players) {
         this.players = players;
+    }
+
+    public void setPlayerName(String name) {
+        this.viewerName = name;
     }
 
     public void setPlayerPosition(PlayerPos playerPosition) {

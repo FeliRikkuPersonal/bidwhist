@@ -1,8 +1,5 @@
 package com.bidwhist.model;
 
-import java.util.Collection;
-import java.util.Collections;
-
 import com.bidwhist.utils.CardUtils;
 
 public class Player {

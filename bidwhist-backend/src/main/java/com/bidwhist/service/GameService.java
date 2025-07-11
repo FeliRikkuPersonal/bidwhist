@@ -12,6 +12,7 @@ import java.util.HashMap;
 import org.springframework.stereotype.Service;
 
 import com.bidwhist.dto.Animation;
+import com.bidwhist.dto.AnimationType;
 import com.bidwhist.dto.BidRequest;
 import com.bidwhist.dto.CardVisibility;
 import com.bidwhist.dto.FinalBidRequest;
@@ -113,12 +114,17 @@ public class GameService {
 
         Player player = new Player(request.getPlayerName(), false, PlayerPos.values()[0], Team.A);
         game.getRoom().addPlayer(player);
+        game.getPlayers().add(player);
 
         game.getDeck().shuffle();
         game.setShuffledDeck(game.getDeck().getCards());
 
         game.getRoom().setStatus(RoomStatus.WAITING_FOR_PLAYERS);
         game.setPhase(GamePhase.INITIATED);
+
+        games.putIfAbsent(request.getGameId(), game);
+
+        games.putIfAbsent(game.getGameId(), game);
 
         GameStateResponse response = getGameStateForPlayer(game, player.getPosition());
         response.setPlayerPosition(player.getPosition());
@@ -134,6 +140,7 @@ public class GameService {
     public GameStateResponse joinGame(JoinGameRequest request) {
         GameState game = getGameById(request.getGameId());
         game.getRoom().addPlayer(request.getPlayerName());
+        game.getPlayers().add(game.getRoom().getPlayers().getLast());
         PlayerPos position = game.getRoom().getPlayerPositionByName(request.getPlayerName());
         if (game.getRoom().getStatus() == RoomStatus.READY) {
             game.setPhase(GamePhase.SHUFFLE);
@@ -152,7 +159,6 @@ public class GameService {
     // Return GameState for specific player with dummy cards for other players
     public GameStateResponse getGameStateForPlayer(GameState game, PlayerPos playerPosition) {
         List<PlayerView> playerViews = new ArrayList<>();
-        String viewerName = PlayerUtils.getNameByPosition(playerPosition, game.getPlayers());
 
         for (Player p : game.getPlayers()) {
             List<Card> visibleHand;
@@ -194,7 +200,7 @@ public class GameService {
                 }
             }
         }
-        
+
         List<Player> players = game.getPlayers();
         Team myTeam = game.getTeamByPlayerPos(players, playerPosition);
 
@@ -206,7 +212,6 @@ public class GameService {
                 game.getPhase(),
                 game.getShuffledDeck(),
                 playerPosition,
-                viewerName,
                 game.getFirstBidder(),
                 game.getBidTurnIndex());
 
@@ -256,11 +261,6 @@ public class GameService {
             throw new IllegalStateException("Game not started.");
         }
 
-        if (game.getRound() != 0) {
-            startNewHand(game);
-            game.getDeck().shuffle();
-        }
-
         if (game.getPhase() != GamePhase.SHUFFLE) {
             throw new IllegalStateException("Can only deal after shuffle.");
         }
@@ -288,8 +288,11 @@ public class GameService {
         game.setTrumpType(null);
         game.getTeamTrickCounts().clear();
         game.getFinalBidCache().clear();
-        game.getShuffledDeck().clear();
-        game.setRound(game.getRound() + 1);
+
+        game.getDeck().shuffle();
+        game.setShuffledDeck(game.getDeck().getCards());
+
+        dealToPlayers(game);
     }
 
     // Collects bid from players and generates AI Bids
@@ -359,7 +362,8 @@ public class GameService {
 
             game.setBidTurnIndex((game.getBidTurnIndex() + 1) % game.getPlayers().size());
         }
-
+        
+        GameStateResponse response = getGameStateForPlayer(game, request.getPlayer());
         // Once all 4 bids are in, set phase and finalize AI if needed
         if (game.getBids().size() >= 4) {
             PlayerPos winnerPos = game.getHighestBid().getPlayer();
@@ -367,6 +371,8 @@ public class GameService {
                     .filter(p -> p.getPosition().equals(winnerPos))
                     .findFirst()
                     .orElseThrow(() -> new IllegalStateException("Winner not found"));
+
+            response.setWinningPlayerName(winner.getName());
 
             if (winner.isAI()) {
                 FinalBid finalBid = game.getFinalBidCache().get(winnerPos);
@@ -379,8 +385,6 @@ public class GameService {
             int nextTurn = (game.getBidTurnIndex() + 1) % 4;
             game.setBidTurnIndex(nextTurn);
             game.setFirstBidder(PlayerPos.values()[nextTurn]);
-            game.setCurrentTurnIndex(winnerPos.ordinal());
-            game.setWinningPlayerName(winner.getName());
             if (winner.isAI()) {
                 game.setPhase(GamePhase.PLAY);
             } else {
@@ -388,7 +392,7 @@ public class GameService {
             }
         }
 
-        return getGameStateForPlayer(game, request.getPlayer());
+        return response;
     }
 
     // Evaluates AI player's hand to provide an appropriate bid
@@ -498,6 +502,7 @@ public class GameService {
         game.getKitty().clear();
         game.getDeck().assignTrumpSuitToJokers(winningBid.getSuit());
         game.setPhase(GamePhase.PLAY);
+        game.setCurrentTurnIndex(winnerPos.ordinal());
 
         return getGameStateForPlayer(game, request.getPlayer());
 
@@ -570,12 +575,17 @@ public class GameService {
 
             if (game.getCompletedTricks().size() == 12) {
                 scoreHand(game);
-                game.setPhase(GamePhase.END);
+                if (game.getTeamAScore() >= 7 || game.getTeamBScore() >= 7) {
+                    game.setPhase(GamePhase.END);
+                } else {
+                    // Animation signal : CLEAR
+                    game.addAnimation(new Animation(AnimationType.CLEAR));
+                    startNewHand(game);
+                }
                 return getGameStateForPlayer(game, request.getPlayer());
             }
         }
-        if (PlayerUtils.getPlayerByPosition(PlayerPos.values()[game.getCurrentTurnIndex()],
-                game.getPlayers()).isAI()) {
+        if (PlayerUtils.getPlayerByPosition(PlayerPos.values()[game.getCurrentTurnIndex()], game.getPlayers()).isAI()) {
 
             // Always let AI play if it's their turn now
             autoPlayAITurns(game);
@@ -654,9 +664,15 @@ public class GameService {
                 game.getCurrentTrick().clear();
                 game.setCurrentTurnIndex(winnerPlayer.getPosition().ordinal());
 
-                if (game.getCompletedTricks().size() == 13) {
+                if (game.getCompletedTricks().size() == 12) {
                     scoreHand(game);
-                    game.setPhase(GamePhase.END);
+                    if (game.getTeamAScore() >= 7 || game.getTeamBScore() >= 7) {
+                        game.setPhase(GamePhase.END);
+                    } else {
+                        // Animation signal : CLEAR
+                        game.addAnimation(new Animation(AnimationType.CLEAR));
+                        startNewHand(game);
+                    }
                     return;
                 }
 
@@ -778,16 +794,14 @@ public class GameService {
                 .orElseThrow();
 
         int tricksWon = game.getTeamTrickCounts().getOrDefault(winningTeam, 0);
-        int bidValue = winningBid.getValue();
+        int tricksMin = winningBid.getValue() + 5;
 
-        boolean success = tricksWon >= bidValue;
-        int points = success ? bidValue : -bidValue;
+        boolean success = tricksWon >= tricksMin;
+        int points = success ? tricksWon - 5 : (tricksMin) - tricksWon;
 
         game.getTeamScores().putIfAbsent(winningTeam, 0);
-        game.getTeamScores().put(winningTeam,
-                game.getTeamScores().get(winningTeam) + points);
+        game.getTeamScores().put(winningTeam, game.getTeamScores().get(winningTeam) + points);
     }
-    // Place this just before the final closing brace of GameService
 
     private Suit getTrumpSuitFromBidType(GameState game) {
         return switch (game.getTrumpType()) {
@@ -813,7 +827,6 @@ public class GameService {
     public GameStateResponse updateState(PollRequest request) {
         PlayerPos playerPosition = request.getPlayer();
         GameState game = getGameById(request.getGameId());
-        autoPlayAITurns(game);
 
         return getGameStateForPlayer(game, playerPosition);
     }

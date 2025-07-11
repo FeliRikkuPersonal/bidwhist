@@ -38,6 +38,11 @@ public class GameController {
         return gameService.startSoloGame(request);
     }
 
+    @PostMapping("/create-multiplayer")
+    public GameStateResponse createMuliplayerGame(@RequestBody StartGameRequest request) {
+        return gameService.createMutliplayerGame(request);
+    }
+
     @PostMapping("/join")
     public GameStateResponse joinGameByCode(@RequestBody JoinGameRequest request) {
         return gameService.joinGame(request);

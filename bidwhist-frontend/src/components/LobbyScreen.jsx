@@ -1,8 +1,7 @@
 // src/components/LobbyScreen.jsx
-import React from 'react';
 import { useGameState } from '../context/GameStateContext';
 
-function LobbyScreen({ gameId, playerName }) {
+function LobbyScreen({ gameId }) {
     const { players } = useGameState();  // 🔁 Global context state
 
     // Trigger game start if 4 players are ready

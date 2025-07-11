@@ -23,7 +23,7 @@ export default function BidTypePanel({ closeBidTypePanel }) {
     const [direction, setDirection] = useState('UPTOWN');
     const [suit, setSuit] = useState('HEARTS');
 
-    const isNoTrump = highestBid?.isNo;
+    const isNoTrump = highestBid?.no;
 
     if (!showFinalizeBid) return null;
 

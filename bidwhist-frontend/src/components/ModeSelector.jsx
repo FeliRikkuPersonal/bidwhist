@@ -1,31 +1,47 @@
 // src/compnents/ModeSelector.jsx
+
 import '../css/ModeSelector.css';
 import { useState } from 'react';
 import { useGameState } from '../context/GameStateContext';
+import { usePositionContext } from '../context/PositionContext';
 
-// No multiplayer for now. Removed isMultiplayer, setIsMultiplayer, 
+/* The ModeSelector component handles the logic for selecting the game mode (single-player or multiplayer),
+   entering player name, setting difficulty, joining an existing game, or creating a new game. */
 function ModeSelector({ onStartGame }) {
-    const { setGameId } = useGameState();
-    const { mode, difficulty, setDifficulty } = useGameState();
+    const { 
+        setGameId, 
+        mode, 
+        setMode, 
+        difficulty, 
+        setDifficulty 
+    } = useGameState();
+
+    const { setPlayerName } = usePositionContext();
+
     const [newPlayerName, setNewPlayerName] = useState('');
     const [lobbyCode, setLobbyCode] = useState('');
-    
 
+
+    // --- handleStart Function ---
+    /* Handles starting the game in single-player mode. Generates a random game ID, 
+       sets the game ID in the context, and calls the `onStartGame` function passed as a prop. */
     const handleStart = () => {
         const trimmedName = newPlayerName.trim();
 
-        // debug log
-        console.log("[ModeSelector] Start button clicked. Name:", trimmedName);
-
         if (trimmedName) {
             const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+            setPlayerName(trimmedName);
             setGameId(code);
             onStartGame(trimmedName, difficulty, code);
         }
     };
 
+    // --- handleJoin Function ---
+    /* Handles joining an existing multiplayer game. It sends a POST request with the player's name and lobby code. */
     const handleJoin = async () => {
         if (!newPlayerName.trim() || !lobbyCode.trim()) return;
+            setPlayerName(newPlayerName.trim());
+            setGameId(lobbyCode.trim())
 
         try {
             const res = await fetch('/api/game/join', {
@@ -41,23 +57,27 @@ function ModeSelector({ onStartGame }) {
             setGameId(lobbyCode);
 
             if (res.ok) {
-                console.log("✅ Joined game:", data);
+                console.log("Joined game:", data);
                 // Navigate to game screen or update app state as needed
                 setMode('multiplayer');
             } else {
-                console.error("❌ Failed to join game:", data);
+                console.error("Failed to join game:", data);
             }
         } catch (err) {
-            console.error("🔥 Network error joining game:", err);
+            console.error("Network error joining game:", err);
         }
     };
 
+
+    // --- handleCreate Function ---
+    /* Handles creating a new multiplayer game. It generates a new lobby code and sends a POST request to create the game. */
     const handleCreate = async () => {
         if (!newPlayerName.trim()) return;
 
-        const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+        const code = Math.random().toString(36).substring(2, 8).toUpperCase().trim();
         setLobbyCode(code);
         setGameId(code);
+        setPlayerName(newPlayerName.trim());
 
         try {
             const res = await fetch('/api/game/create-multiplayer', {
@@ -65,7 +85,7 @@ function ModeSelector({ onStartGame }) {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     gameId: code,
-                    newPlayerName: newPlayerName.trim()
+                    playerName: newPlayerName.trim()
                 })
             });
 
@@ -83,6 +103,10 @@ function ModeSelector({ onStartGame }) {
         }
     };
 
+
+    // --- JSX Rendering ---
+    /* Renders the mode selector interface, including the input for player name, difficulty, and 
+    buttons for starting, joining, or creating a game. */
     return (
         <>
             <h1 className="h1-welcome">Welcome to Bid Whist Online!</h1>

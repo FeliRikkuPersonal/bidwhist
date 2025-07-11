@@ -48,6 +48,10 @@ public class Animation {
         this.winningTeam = trick.getWinningTeam(); // fixed typo
     }
 
+    public Animation(AnimationType type) {
+        this.type = type;
+    }
+
     // Getters
     public String getId() {
         return id;

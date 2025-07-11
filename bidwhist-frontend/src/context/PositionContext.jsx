@@ -10,7 +10,7 @@ export function PositionProvider({ children }) {
   const [backendPositions, setBackendPositions] = useState({}); // position → name map
   const viewerDirection = 'south'; // always fixed for local user
 
-  // ⬅️ CLOCKWISE UTILITY
+  // CLOCKWISE UTILITY
   const clockwiseOrder = ['P1', 'P2', 'P3', 'P4'];
 
   const positionToDirection = useMemo(() => {

@@ -74,12 +74,12 @@ public class HandEvaluator {
         // Suit-based bids
         for (SuitEvaluation eval : suitEvals) {
             for (BidType type : List.of(BidType.UPTOWN, BidType.DOWNTOWN)) {
-                for (boolean isNo : List.of(false, true)) {
-                    FinalBid bid = AiBidOption.fromEvaluation(player, eval, type, isNo);
-                    if (bid != null) {
-                        bidOptions.add(bid);
-                    }
+
+                FinalBid bid = AiBidOption.fromEvaluation(player, eval, type, false);
+                if (bid != null) {
+                    bidOptions.add(bid);
                 }
+
             }
         }
 
@@ -91,6 +91,10 @@ public class HandEvaluator {
                 int value = strength - 5;
                 bidOptions.add(new FinalBid(player, value, true, false, type, null));
             }
+        }
+
+        for (FinalBid bid : bidOptions) {
+            System.out.println(bid.toString());
         }
 
         return bidOptions;
@@ -147,13 +151,17 @@ public class HandEvaluator {
             workingList.remove(workingList.size() - 1);
         }
 
-        for (int i = 0; i < workingList.size(); i++) {
+        for (int i = 0, j = 0; i < workingList.size(); i++) {
             Rank rank = workingList.get(i);
             if (ranksInSuit.contains(rank)) {
                 kept.add(rank);
             } else if (i < workingList.size() - 1) {
-                workingList.remove(workingList.size() - 1);
-                i--; // Re-check after shortening
+                j++;
+                if (j == 2) {
+                    workingList.remove(workingList.size() - 1);
+                    i--; // Re-check after shortening
+                    j = 0;
+                }
             } else {
                 break;
             }
@@ -185,18 +193,24 @@ public class HandEvaluator {
      * Calculates the total high-direction run score for a No bid.
      */
     public static int evaluateNoBidHigh(Map<Suit, List<Card>> suits) {
-        return suits.values().stream()
+        int run = suits.values().stream()
                 .mapToInt(cards -> evaluatePureRun(cards, UPTOWN_ORDER))
                 .sum();
+
+        System.out.println("No-Up: " + run);
+        return run;
     }
 
     /**
      * Calculates the total low-direction run score for a No bid.
      */
     public static int evaluateNoBidLow(Map<Suit, List<Card>> suits) {
-        return suits.values().stream()
+        int run = suits.values().stream()
                 .mapToInt(cards -> evaluatePureRun(cards, DOWNTOWN_ORDER))
                 .sum();
+
+        System.out.println("No-Down: " + run);
+        return run;
     }
 
     public FinalBid getForcedMinimumBid(PlayerPos player) {

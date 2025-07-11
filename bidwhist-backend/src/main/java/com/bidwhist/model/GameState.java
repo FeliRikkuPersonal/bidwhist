@@ -133,6 +133,7 @@ public class GameState {
 
     public void setCurrentTurnIndex(int index) {
         this.currentTurnIndex = index;
+        System.out.println("DEBUG: Current Turn Index is " + currentTurnIndex);
     }
 
     public Deck getDeck() {

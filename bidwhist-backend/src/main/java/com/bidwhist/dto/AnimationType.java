@@ -1,5 +1,5 @@
 package com.bidwhist.dto;
 
 public enum AnimationType {
-    DEAL, PLAY, COLLECT
+    DEAL, PLAY, COLLECT, CLEAR
 }

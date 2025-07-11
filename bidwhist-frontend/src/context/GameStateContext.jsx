@@ -29,6 +29,7 @@ export const GameStateProvider = ({ children }) => {
   const [teamBScore, setTeamBScore] = useState(0);
   const [teamATricksWon, setTeamATricksWon] = useState(0);
   const [teamBTricksWon, setTeamBTricksWon] = useState(0);
+  const [finalScore, setFinalScore] = useState(false);
 
   const updateFromResponse = (response) => {
     if ('players' in response) setPlayers(response.players);
@@ -52,6 +53,7 @@ export const GameStateProvider = ({ children }) => {
     if ('teamBScore' in response) setTeamBScore(response.teamBScore);
     if ('teamATricksWon'in response) setTeamATricksWon(response.teamATricksWon);
     if ('teamBTricksWon' in response) setTeamBTricksWon(response.teamBTricksWon);
+    if ('finalScore' in response) setFinalScore(response.finalScore)
   };
 
   const debugLog = () => {
@@ -72,7 +74,8 @@ export const GameStateProvider = ({ children }) => {
       lobbySize,
       mode,
       difficulty,
-      gameId
+      gameId,
+      finalScore,
     });
   }
 
@@ -126,6 +129,8 @@ export const GameStateProvider = ({ children }) => {
         setTeamATricksWon,
         teamBTricksWon,
         setTeamBTricksWon,
+        finalScore,
+        setFinalScore,
         updateFromResponse,
         debugLog,
       }}

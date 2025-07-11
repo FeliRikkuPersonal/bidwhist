@@ -1,26 +1,25 @@
-import React, { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useGameState } from "../context/GameStateContext.jsx";
-import { useUIDisplay } from "../context/UIDisplayContext.jsx";
+import { usePositionContext } from "../context/PositionContext.jsx";
 
 export default function Scoreboard() {
-    const { gameState, phase } = useGameState();
-    const { bidPhase, setBidPhase } = useUIDisplay();
+    const { teamAScore, teamBScore } = useGameState();
+    const { viewerPosition } = usePositionContext();
+    let myTeam;
+    let theirTeam;
 
-{/* Depricated
+
     useEffect(() => {
-        if (gameState?.phase === 'BID') {
-            setBidPhase(true);
-        } else {
-            setBidPhase(false);
-        }
-    }, [gameState?.phase]);
-    */}
+    const myTeam = viewerPosition === 'P1' || viewerPosition === 'P3' ? teamAScore : teamBScore;
+    const theirTeam = viewerPosition === 'P1' || viewerPosition === 'P3' ? teamBScore : teamAScore;
+
+    }, [viewerPosition, teamAScore, teamBScore])
 
     return (
         <div className="scoreboard">
             <h4>Scoreboard</h4>
-            <p>Team: 0</p>
-            <p>Opponents: 0</p>
+            <p>Team: {myTeam}</p>
+            <p>Opponents: {theirTeam}</p>
             
         </div>
     );

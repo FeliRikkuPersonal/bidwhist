@@ -33,11 +33,13 @@ public class AiBidOption {
             return null; // Not valid for suit-based evaluation
         }
 
-        if (strength < 9 || strength > 12) {
+        if (strength < 4) {
             return null; // Too weak — interpreted as a pass
         }
+        if (strength > 7) {
+            strength = 7;
+        }
 
-        int value = strength - 5;
-        return new FinalBid(player, value, isNo, false, type, eval.getSuit());
+        return new FinalBid(player, strength, isNo, false, type, eval.getSuit());
     }
 }

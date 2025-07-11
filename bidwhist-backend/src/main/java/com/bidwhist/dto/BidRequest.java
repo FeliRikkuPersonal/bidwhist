@@ -11,7 +11,7 @@ import com.bidwhist.model.Player;
  */
 public class BidRequest {
     private String gameId;
-    private PlayerPos player; // Player name or identifier
+    private PlayerPos player; // Player identifier
     private int value; // Bid value (4–7), or 0 if pass
     private BidType type; // UPTOWN or DOWNTown
     private boolean isNo; // "No" bid flag
