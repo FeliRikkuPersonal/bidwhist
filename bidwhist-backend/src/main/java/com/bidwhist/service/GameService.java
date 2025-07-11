@@ -140,7 +140,10 @@ public class GameService {
     public GameStateResponse joinGame(JoinGameRequest request) {
         GameState game = getGameById(request.getGameId());
         game.getRoom().addPlayer(request.getPlayerName());
-        game.getPlayers().add(game.getRoom().getPlayers().getLast());
+
+        List<Player> roomPlayers = game.getRoom().getPlayers();
+        Player thisPlayer = roomPlayers.get(roomPlayers.size() - 1);
+        game.getPlayers().add(thisPlayer);
         PlayerPos position = game.getRoom().getPlayerPositionByName(request.getPlayerName());
         if (game.getRoom().getStatus() == RoomStatus.READY) {
             game.setPhase(GamePhase.SHUFFLE);
@@ -221,11 +224,10 @@ public class GameService {
         response.setLobbySize(game.getRoom().getPlayers().size());
         response.setTrumpSuit(game.getTrumpSuit());
         response.setBidType(game.getFinalBidType());
-        response.setWinningPlayerName(game.getWinningPlayerName());
-        response.setHighestBid(game.getHighestBid());
         response.setBids(game.getBids());
         response.setWinningBid(game.getWinningBid());
         response.setPlayerTeam(myTeam);
+        response.setBidWinnerPos(game.getBidWinnerPos());
         return response;
     }
 
@@ -363,7 +365,6 @@ public class GameService {
             game.setBidTurnIndex((game.getBidTurnIndex() + 1) % game.getPlayers().size());
         }
         
-        GameStateResponse response = getGameStateForPlayer(game, request.getPlayer());
         // Once all 4 bids are in, set phase and finalize AI if needed
         if (game.getBids().size() >= 4) {
             PlayerPos winnerPos = game.getHighestBid().getPlayer();
@@ -372,7 +373,7 @@ public class GameService {
                     .findFirst()
                     .orElseThrow(() -> new IllegalStateException("Winner not found"));
 
-            response.setWinningPlayerName(winner.getName());
+            game.setBidWinnerPos(winnerPos);
 
             if (winner.isAI()) {
                 FinalBid finalBid = game.getFinalBidCache().get(winnerPos);
@@ -392,7 +393,7 @@ public class GameService {
             }
         }
 
-        return response;
+        return getGameStateForPlayer(game, request.getPlayer());
     }
 
     // Evaluates AI player's hand to provide an appropriate bid

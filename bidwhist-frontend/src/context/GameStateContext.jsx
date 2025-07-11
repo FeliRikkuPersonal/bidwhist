@@ -18,6 +18,7 @@ export const GameStateProvider = ({ children }) => {
   const [firstBidder, setFirstBidder] = useState(null); // PlayerPos
   const [bidTurnIndex, setBidTurnIndex] = useState(0);
   const [bids, setBids] = useState([]); // List<InitialBid>
+  const [bidWinnerPos, setBidWinnerPos] = useState(null);
   const [winningBid, setWinningBid] = useState(null);
   const [lobbySize, setLobbySize] = useState(0);
   const [mode, setMode] = useState('single');
@@ -45,6 +46,7 @@ export const GameStateProvider = ({ children }) => {
     if ('bidTurnIndex' in response) setBidTurnIndex(response.bidTurnIndex);
     if ('bids' in response) setBids(response.bids);
     if ('winningBid' in response) setWinningBid(response.winningBid);
+    if ('bidWinnerPos' in response) setBidWinnerPos(response.bidWinnerPos);
     if ('lobbySize' in response) setLobbySize(response.lobbySize);
     if (!gameId && 'gameId' in response && response.gameId) setGameId(response.gameId);
     if ('currentTrick' in response) setCurrentTrick(response.currentTrick);
@@ -95,6 +97,8 @@ export const GameStateProvider = ({ children }) => {
         setTrumpSuit,
         bidType,
         setBidType,
+        bidWinnerPos,
+        setBidWinnerPos,
         winningPlayerName,
         setWinningPlayerName,
         highestBid,

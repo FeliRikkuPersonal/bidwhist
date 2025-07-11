@@ -34,6 +34,7 @@ public class GameStateResponse {
     private FinalBid winningFinalBid;
     private int lobbySize;
     List<Animation> animationQueue;
+    private PlayerPos bidWinnerPos;
 
 public GameStateResponse(
         List<Animation> animationQueue,
@@ -195,5 +196,13 @@ public GameStateResponse(
 
     public void setAnimationQueue(List<Animation> queue) {
         this.animationQueue = queue;
+    }
+
+    public PlayerPos getBidWinnerPos() {
+        return bidWinnerPos;
+    }
+
+    public void setBidWinnerPos(PlayerPos winnerPos) {
+        this.bidWinnerPos = winnerPos;
     }
 }

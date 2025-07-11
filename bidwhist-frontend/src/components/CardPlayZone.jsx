@@ -45,6 +45,7 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
         players,
         bids,
         winningPlayerName,
+        bidWinnerPos,
     } = useGameState();
 
     const [isOver, setIsOver] = useState(false);
@@ -240,7 +241,9 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
     /* Checks if the bid phase is complete and if the player won the bid, then shows the finalize bid panel. */
     useEffect(() => {
         const bidsComplete = (bids?.length === 4);
-        const iWonBid = (winningPlayerName === playerName);
+        console.log(`Bid length = ${bids?.length}`);
+        const iWonBid = (bidWinnerPos === viewerPosition);
+        console.log(`Winner Positions: ${bidWinnerPos} Player Position ${viewerPosition}`);
         setShowFinalizeBid(bidsComplete && iWonBid);
     }, [bids, winningPlayerName, playerName]);
 

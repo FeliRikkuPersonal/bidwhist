@@ -37,6 +37,7 @@ public class GameState {
     private Difficulty difficulty;
     private GameRoom room;
     private Map<PlayerPos, List<Animation>> animationList = new EnumMap<>(PlayerPos.class);
+    private PlayerPos bidWinnderPos;
 
     private List<PlayedCard> currentTrick = new ArrayList<>();
     private List<Book> completedTricks = new ArrayList<>();
@@ -192,6 +193,10 @@ public class GameState {
         return bids;
     }
 
+    public PlayerPos getBidWinnerPos() {
+        return bidWinnderPos;
+    }
+
     public void addBid(InitialBid bid) {
         bids.add(bid);
     }
@@ -291,14 +296,6 @@ public class GameState {
         this.difficulty = difficulty;
     }
 
-    public void setRound(int round) {
-        this.round = round;
-    }
-
-    public int getRound() {
-        return round;
-    }
-
     public int getTeamAScore() {
         return teamAScore;
     }
@@ -349,6 +346,10 @@ public class GameState {
 
     public void setAnimationList(Map<PlayerPos, List<Animation>> animationList) {
         this.animationList = animationList;
+    }
+
+    public void setBidWinnerPos(PlayerPos winnerPos) {
+        this.bidWinnderPos = winnerPos;
     }
 
 }
