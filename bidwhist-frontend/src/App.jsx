@@ -57,6 +57,7 @@ function App() {
     queueAnimationFromResponse,
   } = useUIDisplay();
 
+  const API = process.env.REACT_APP_API_URL;
 
   // --- onStartGame Function ---
   /* 
@@ -73,7 +74,7 @@ function App() {
     setPlayerName(trimmedName); // Sets local name immediately for UI
 
     try {
-      const res = await fetch('/api/game/start', {
+      const res = await fetch(`${API}/api/game/start`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -176,7 +177,7 @@ function App() {
 
     const interval = setInterval(async () => {
       try {
-        const res = await fetch('/api/game/state', {
+        const res = await fetch(`${API}/api/game/state`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

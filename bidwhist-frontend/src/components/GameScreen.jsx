@@ -102,9 +102,11 @@ export default function GameScreen() {
             discards: discardPile,
         };
 
+        const API = process.env.REACT_APP_API_URL;
+
         // Make API call to submit the discard pile
         try {
-            const res = await fetch('/api/game/kitty', {
+            const res = await fetch(`${API}/api/game/kitty`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)

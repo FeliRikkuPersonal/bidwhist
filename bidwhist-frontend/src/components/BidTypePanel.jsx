@@ -35,8 +35,10 @@ export default function BidTypePanel({ closeBidTypePanel }) {
             suit: isNoTrump ? null : suit // Only send suit if not No Trump
         };
 
+        const API = process.env.REACT_APP_API_URL;
+
         try {
-            const res = await fetch('/api/game/finalizeBid', {
+            const res = await fetch(`${API}/api/game/finalizeBid`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)

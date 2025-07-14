@@ -32,8 +32,10 @@ export default function BiddingPanel({ closeBidding, onBidPlaced }) {
 
     if (!showBidding) return null;
 
+    const API = process.env.REACT_APP_API_URL;
+
     const sendBidRequest = async (bidBody) => {
-        const res = await fetch('/api/game/bid', {
+        const res = await fetch(`${API}/api/game/bid`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(bidBody)

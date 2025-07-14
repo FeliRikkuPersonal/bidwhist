@@ -61,6 +61,7 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
 
     const localRef = useRef();
     const { register, get } = useZoneRefs();
+    const API = process.env.REACT_APP_API_URL;
 
 
     // --- useEffect for Animations ---
@@ -191,7 +192,7 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
             }
 
             // Notify backend that animation has completed
-            await fetch('/api/game/pop-animation', {
+            await fetch(`${API}/api/game/pop-animation`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ gameId, player: viewerPosition, animationId: animation.id }),
@@ -266,7 +267,7 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
         if (!rawData || !isOver) return;
         const card = JSON.parse(rawData);
 
-        await fetch('/api/game/play', {
+        await fetch(`${API}/api/game/play`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ gameId, player: viewerPosition, card })

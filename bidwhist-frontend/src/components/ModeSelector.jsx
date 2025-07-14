@@ -20,6 +20,7 @@ function ModeSelector({ onStartGame }) {
 
     const [newPlayerName, setNewPlayerName] = useState('');
     const [lobbyCode, setLobbyCode] = useState('');
+    const API = process.env.REACT_APP_API_URL;
 
 
     // --- handleStart Function ---
@@ -44,7 +45,7 @@ function ModeSelector({ onStartGame }) {
             setGameId(lobbyCode.trim())
 
         try {
-            const res = await fetch('/api/game/join', {
+            const res = await fetch(`${API}/api/game/join`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -80,7 +81,7 @@ function ModeSelector({ onStartGame }) {
         setPlayerName(newPlayerName.trim());
 
         try {
-            const res = await fetch('/api/game/create-multiplayer', {
+            const res = await fetch(`${API}/api/game/create-multiplayer`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
