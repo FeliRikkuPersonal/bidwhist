@@ -43,7 +43,6 @@ public class GameState {
     private List<Book> completedTricks = new ArrayList<>();
     private int currentPlayerIndex;
 
-    private int round = 0;
     private int teamAScore = 0;
     private int teamBScore = 0;
     private int teamATricksWon = 0;

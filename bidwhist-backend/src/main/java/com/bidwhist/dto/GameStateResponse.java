@@ -35,6 +35,10 @@ public class GameStateResponse {
     private int lobbySize;
     List<Animation> animationQueue;
     private PlayerPos bidWinnerPos;
+    private int teamAScore = 0;
+    private int teamBScore = 0;
+    private int teamATricksWon = 0;
+    private int teamBTricksWon = 0;
 
 public GameStateResponse(
         List<Animation> animationQueue,
@@ -92,6 +96,38 @@ public GameStateResponse(
 
     public GamePhase getPhase() {
         return phase;
+    }
+       
+    public int getTeamAScore() {
+        return teamAScore;
+    }
+
+    public int getTeamBScore() {
+        return teamBScore;
+    }
+
+    public int getTeamATricksWon() {
+        return teamATricksWon;
+    }
+
+    public int getTeamBTricksWon() {
+        return teamBTricksWon;
+    }
+
+    public void setTeamAScore(int score) {
+        this.teamAScore = score;
+    }
+
+    public void setTeamBScore(int score) {
+        this.teamBScore = score;
+    }
+
+    public void setTeamATricksWon(int tricks) {
+        this.teamATricksWon = tricks;
+    }
+
+    public void setTeamBTricksWon(int tricks) {
+        this.teamBTricksWon = tricks;
     }
 
     public void setBids(List<InitialBid> bids) {

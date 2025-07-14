@@ -167,6 +167,10 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
                     ]);
                 }
 
+                if (animation.type === 'COLLECT') {
+                    
+                }
+
                 // Increment trick count
                 if (winningTeam === 'A') {
                     setTeamATricks(prev => prev + 1);
@@ -179,6 +183,8 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
                     setPlayedCardsByDirection({ north: null, south: null, east: null, west: null });
                 }, cardList.length * 150 + 300);
             }
+
+
 
             // Notify backend that animation has completed
             await fetch('/api/game/pop-animation', {

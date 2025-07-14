@@ -272,6 +272,11 @@ public class GameService {
         // Animation signal : DEAL
         game.addAnimation(new Animation(game.getShuffledDeck()));
 
+        System.out.println("Current Kitty:");
+        for(Card card : game.getKitty()) {
+            System.out.println(card.toString());
+        }
+
         game.setKitty(game.getDeck().getKitty().getCards()); // Move kitty over
         game.setPhase(GamePhase.BID); // Advance phase
         System.out.println("Current phase: " + game.getPhase());
@@ -281,6 +286,9 @@ public class GameService {
     public void startNewHand(GameState game) {
 
         game.getKitty().clear();
+        game.getDeck().clearKitty();
+        game.setTeamATricksWon(0);
+        game.setTeamBTricksWon(0);
         game.setPhase(GamePhase.SHUFFLE);
         game.getBids().clear();
         game.getCompletedTricks().clear();
