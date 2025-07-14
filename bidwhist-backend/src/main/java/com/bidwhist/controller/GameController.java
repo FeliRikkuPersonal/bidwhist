@@ -2,32 +2,23 @@ package com.bidwhist.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bidwhist.bidding.FinalBid;
-import com.bidwhist.bidding.InitialBid;
 import com.bidwhist.dto.BidRequest;
 import com.bidwhist.dto.FinalBidRequest;
 import com.bidwhist.dto.JoinGameRequest;
 import com.bidwhist.dto.GameStateResponse;
 import com.bidwhist.dto.StartGameRequest;
 import com.bidwhist.dto.KittyRequest;
-import com.bidwhist.dto.PlayerRequest;
 import com.bidwhist.dto.PlayRequest;
 import com.bidwhist.dto.PollRequest;
 import com.bidwhist.dto.PopAnimationRequest;
-import com.bidwhist.model.GamePhase;
-import com.bidwhist.model.GameState;
-import com.bidwhist.model.Player;
-import com.bidwhist.model.PlayerPos;
 import com.bidwhist.service.GameService;
 
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "https://bidwhist.onrender.com/")
 @RestController
 @RequestMapping("/api/game")
 public class GameController {
