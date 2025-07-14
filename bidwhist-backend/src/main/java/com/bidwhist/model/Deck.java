@@ -82,7 +82,8 @@ public class Deck {
     }
 
     public void clearKitty() {
-        this.kitty.getCards().clear();
+        System.out.println("[clearKitty]");
+        kitty.clear();
     }
 
     public List<Card> getCards() {

@@ -39,6 +39,7 @@ import com.bidwhist.model.GameState;
 import com.bidwhist.model.PlayedCard;
 import com.bidwhist.model.Player;
 import com.bidwhist.model.PlayerPos;
+import com.bidwhist.model.Rank;
 import com.bidwhist.model.RoomStatus;
 import com.bidwhist.model.Suit;
 import com.bidwhist.model.Team;
@@ -228,6 +229,8 @@ public class GameService {
         response.setWinningBid(game.getWinningBid());
         response.setPlayerTeam(myTeam);
         response.setBidWinnerPos(game.getBidWinnerPos());
+        response.setTeamAScore(game.getTeamAScore());
+        response.setTeamBScore(game.getTeamBScore());
         return response;
     }
 
@@ -258,6 +261,7 @@ public class GameService {
          */}
 
     public void dealToPlayers(GameState game) {
+        System.out.println("[dealToPlayers]");
 
         if (game == null) {
             throw new IllegalStateException("Game not started.");
@@ -284,9 +288,11 @@ public class GameService {
     }
 
     public void startNewHand(GameState game) {
+        System.out.println("[startNewHand]");
 
         game.getKitty().clear();
         game.getDeck().clearKitty();
+        game.setWinningBid(null);
         game.setTeamATricksWon(0);
         game.setTeamBTricksWon(0);
         game.setPhase(GamePhase.SHUFFLE);
@@ -297,6 +303,7 @@ public class GameService {
         game.setWinningPlayerName(null);
         game.setTrumpType(null);
         game.getTeamTrickCounts().clear();
+        game.getDeck().resetJokerSuits();
         game.getFinalBidCache().clear();
 
         game.getDeck().shuffle();
@@ -382,6 +389,7 @@ public class GameService {
                     .orElseThrow(() -> new IllegalStateException("Winner not found"));
 
             game.setBidWinnerPos(winnerPos);
+            
 
             if (winner.isAI()) {
                 FinalBid finalBid = game.getFinalBidCache().get(winnerPos);
@@ -390,6 +398,7 @@ public class GameService {
                 }
                 game.setWinningBidStats(finalBid);
                 applyAIAutoKitty(game, winner);
+                game.getDeck().assignTrumpSuitToJokers(finalBid.getSuit());
             }
             int nextTurn = (game.getBidTurnIndex() + 1) % 4;
             game.setBidTurnIndex(nextTurn);
@@ -457,6 +466,7 @@ public class GameService {
         game.getBids().clear();
         game.setTrumpType(request.getType());
         game.setTrumpSuit(request.getSuit());
+        game.getDeck().assignTrumpSuitToJokers(request.getSuit());
 
         GameStateResponse response = getGameStateForPlayer(game, winnerPos);
         response.setKitty(game.getKitty());
@@ -518,6 +528,8 @@ public class GameService {
     }
 
     public GameStateResponse playCard(PlayRequest request) {
+        System.out.println("[playCard]");
+
         GameState game = getGameById(request.getGameId());
 
         if (game.getPhase() != GamePhase.PLAY) {
@@ -562,7 +574,7 @@ public class GameService {
         game.setCurrentTurnIndex((game.getCurrentTurnIndex() + 1) % 4);
 
         if (currentTrick.size() == 4) {
-            PlayedCard winningPlay = determineTrickWinner(currentTrick, game.getTrumpType());
+            PlayedCard winningPlay = determineTrickWinner(game, currentTrick);
             Player winner = PlayerUtils.getPlayerByPosition(winningPlay.getPlayer(), game.getPlayers());
             Team winnerTeam = winner.getTeam();
             System.out.println("DEBUG: Trick won by " + winner.getName() + " (Team " + winnerTeam + ")");
@@ -603,17 +615,54 @@ public class GameService {
         return getGameStateForPlayer(game, request.getPlayer());
     }
 
-    private PlayedCard determineTrickWinner(List<PlayedCard> trick, BidType trumpType) {
-        Suit leadSuit = trick.get(0).getCard().getSuit();
+ private PlayedCard determineTrickWinner(GameState game, List<PlayedCard> trick) {
+        if (trick == null || trick.isEmpty()) {
+            throw new IllegalArgumentException("Cannot determine trick winner: trick is empty.");
+        }
 
+        Suit leadSuit = trick.get(0).getCard().getSuit();
+        Suit trumpSuit = game.getTrumpSuit();
+        BidType bidType = game.getTrumpType();
+
+        // If bid type is NO_TRUMP, only lead suit cards can win
+        if (bidType == BidType.NO_TRUMP) {
+            return trick.stream()
+                    .filter(pc -> pc.getCard().getSuit() == leadSuit)
+                    .max(Comparator.comparing(pc -> pc.getCard().getRank().getValue()))
+                    .orElseThrow(() -> new IllegalStateException("No cards of lead suit found in NO_TRUMP bid"));
+        }
+
+        // For DOWNTOWN, invert rank values for non-joker/ACE cards
+        if (bidType == BidType.DOWNTOWN) {
+            return trick.stream().max(Comparator.comparing(pc -> {
+                Card c = pc.getCard();
+                boolean isTrump = trumpSuit != null && c.getSuit() == trumpSuit;
+                boolean isLead = c.getSuit() == leadSuit;
+                Rank rank = c.getRank();
+                int rankValue;
+
+                // JOKER_B, JOKER_S, ACE keep their high values
+                if (rank == Rank.JOKER_B || rank == Rank.JOKER_S || rank == Rank.ACE) {
+                    rankValue = rank.getValue();
+                } else {
+                    // Invert non-joker/ACE ranks: TWO (2) becomes highest (13), THREE (3) becomes (12), etc.
+                    rankValue = 15 - rank.getValue(); // Max non-joker/ACE value is 13 (KING), so 15 - 13 = 2 for KING
+                }
+
+                return (isTrump ? 1000 : (isLead ? 100 : 0)) + rankValue;
+            })).orElseThrow();
+        }
+
+        // UPTOWN or other cases: use standard rank values
         return trick.stream().max(Comparator.comparing(pc -> {
             Card c = pc.getCard();
-            boolean isTrump = isTrumpSuit(c, trumpType);
+            boolean isTrump = trumpSuit != null && c.getSuit() == trumpSuit;
             boolean isLead = c.getSuit() == leadSuit;
             int rankValue = c.getRank().getValue();
             return (isTrump ? 1000 : (isLead ? 100 : 0)) + rankValue;
         })).orElseThrow();
     }
+
 
     private boolean isTrumpSuit(Card card, BidType bidType) {
         Suit suit = card.getSuit();
@@ -653,7 +702,7 @@ public class GameService {
 
             if (game.getCurrentTrick().size() == 4) {
                 System.out.println("DEBUG: Trick complete. Evaluating winner...");
-                PlayedCard winner = determineTrickWinner(game.getCurrentTrick(), game.getTrumpType());
+                PlayedCard winner = determineTrickWinner(game, game.getCurrentTrick());
 
                 Player winnerPlayer = PlayerUtils.getPlayerByPosition(winner.getPlayer(), game.getPlayers());
                 Team winnerTeam = winnerPlayer.getTeam();

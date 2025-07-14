@@ -27,6 +27,7 @@ public class Kitty {
     }
 
     public void clear() {
+        System.out.println("[Kitty: clear]");
         cards.clear();
     }
 

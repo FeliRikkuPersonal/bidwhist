@@ -154,7 +154,7 @@ public GameStateResponse(
         return winningPlayerName;
     }
 
-    public FinalBid getWinningbid() {
+    public FinalBid getWinningBid() {
         return winningFinalBid;
     }
 
