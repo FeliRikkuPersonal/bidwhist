@@ -102,7 +102,7 @@ export default function GameScreen() {
             discards: discardPile,
         };
 
-        const API = process.env.REACT_APP_API_URL;
+        const API = import.meta.env.VITE_API_URL || process.env.REACT_APP_API_URL;
 
         // Make API call to submit the discard pile
         try {

@@ -61,7 +61,7 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
 
     const localRef = useRef();
     const { register, get } = useZoneRefs();
-    const API = process.env.REACT_APP_API_URL;
+    const API = import.meta.env.VITE_API_URL || process.env.REACT_APP_API_URL;
 
 
     // --- useEffect for Animations ---
