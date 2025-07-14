@@ -35,7 +35,7 @@ export default function BidTypePanel({ closeBidTypePanel }) {
             suit: isNoTrump ? null : suit // Only send suit if not No Trump
         };
 
-        const API = import.meta.env.VITE_API_URL || process.env.REACT_APP_API_URL;
+        const API = import.meta.env.VITE_API_URL
 
         try {
             const res = await fetch(`${API}/api/game/finalizeBid`, {

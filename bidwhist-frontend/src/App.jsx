@@ -57,7 +57,7 @@ function App() {
     queueAnimationFromResponse,
   } = useUIDisplay();
 
-  const API = import.meta.env.VITE_API_URL || process.env.REACT_APP_API_URL;
+  const API = import.meta.env.VITE_API_URL
 
   // --- onStartGame Function ---
   /* 
