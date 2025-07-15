@@ -7,6 +7,7 @@ import { useGameState } from "../context/GameStateContext.jsx";
 import { useUIDisplay } from "../context/UIDisplayContext.jsx";
 
 export default function BiddingPanel({ closeBidding, onBidPlaced }) {
+  const API = import.meta.env.VITE_API_URL;
   const { debugLog: logPosition, viewerPosition } = usePositionContext();
   const {
     debugLog: logGameState,
@@ -45,8 +46,6 @@ export default function BiddingPanel({ closeBidding, onBidPlaced }) {
   }, [bids, bidPhase, currentTurnIndex, viewerPosition]);
 
   if (!showBidding) return null;
-
-  const API = import.meta.env.VITE_API_URL;
 
   const sendBidRequest = async (bidBody) => {
     const res = await fetch(`${API}/game/bid`, {
@@ -99,18 +98,18 @@ export default function BiddingPanel({ closeBidding, onBidPlaced }) {
           type="number"
           min="4"
           max="7"
-          placeholder="Enter bid (4–7)"
+          placeholder="Enter bid (4-7)"
           value={bidValue}
           onChange={(e) => setBidValue(e.target.value)}
           className="index-input-box short-box"
         />
 
-        <label style={{ display: "block", marginTop: "10px" }}>
+        <label>
           <input
             type="checkbox"
             checked={isNo}
             onChange={(e) => setIsNo(e.target.checked)}
-          />{" "}
+          />
           No Trump
         </label>
 
