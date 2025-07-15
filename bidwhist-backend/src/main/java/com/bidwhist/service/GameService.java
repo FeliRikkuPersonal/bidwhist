@@ -1,16 +1,18 @@
 package com.bidwhist.service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-import java.util.Comparator;
-import java.util.HashMap;
 
 import org.springframework.stereotype.Service;
 
+import com.bidwhist.bidding.BidType;
+import com.bidwhist.bidding.FinalBid;
+import com.bidwhist.bidding.HandEvaluator;
+import com.bidwhist.bidding.InitialBid;
 import com.bidwhist.dto.Animation;
 import com.bidwhist.dto.AnimationType;
 import com.bidwhist.dto.BidRequest;
@@ -20,17 +22,10 @@ import com.bidwhist.dto.GameStateResponse;
 import com.bidwhist.dto.JoinGameRequest;
 import com.bidwhist.dto.KittyRequest;
 import com.bidwhist.dto.PlayRequest;
-import com.bidwhist.dto.PlayerRequest;
 import com.bidwhist.dto.PlayerView;
 import com.bidwhist.dto.PollRequest;
 import com.bidwhist.dto.PopAnimationRequest;
 import com.bidwhist.dto.StartGameRequest;
-import com.bidwhist.dto.CardOwner;
-import com.bidwhist.bidding.InitialBid;
-import com.bidwhist.bidding.FinalBid;
-import com.bidwhist.bidding.HandEvaluator;
-import com.bidwhist.bidding.BidType;
-import com.bidwhist.model.GameRoom;
 import com.bidwhist.model.Book;
 import com.bidwhist.model.Card;
 import com.bidwhist.model.Difficulty;
@@ -49,11 +44,9 @@ import com.bidwhist.utils.PlayerUtils;
 @Service
 public class GameService {
 
-    private final DeckService deckService;
     private final Map<String, GameState> games = new ConcurrentHashMap<>();
 
     public GameService(DeckService deckService) {
-        this.deckService = deckService;
     }
 
     // Start New Game, add players and shuffled deck
@@ -190,7 +183,7 @@ public class GameService {
 
         List<Card> myKittyView = new ArrayList<>(game.getKitty());
 
-        if (myKittyView.size() > 0) {
+        if (!myKittyView.isEmpty()) {
             if (PlayerUtils.getNameByPosition(playerPosition, game.getPlayers())
                     .equals(game.getWinningPlayerName())) {
                 for (Card card : myKittyView) {
@@ -234,7 +227,7 @@ public class GameService {
         return response;
     }
 
-    {
+    static {
         /*
          * NOT NEEDED???
          * public GameStateResponse getGameResultForPlayer(GameState game, PlayerPos
@@ -258,7 +251,8 @@ public class GameService {
          * 
          * return response;
          * }
-         */}
+         */
+    }
 
     public void dealToPlayers(GameState game) {
         System.out.println("[dealToPlayers]");
@@ -277,7 +271,7 @@ public class GameService {
         game.addAnimation(new Animation(game.getShuffledDeck()));
 
         System.out.println("Current Kitty:");
-        for(Card card : game.getKitty()) {
+        for (Card card : game.getKitty()) {
             System.out.println(card.toString());
         }
 
@@ -329,9 +323,9 @@ public class GameService {
         InitialBid bid = BidRequest.fromRequest(request, bidder);
         game.addBid(bid);
 
-        if (!bid.isPassed() &&
-                (game.getHighestBid() == null ||
-                        bid.getValue() > game.getHighestBid().getValue())) {
+        if (!bid.isPassed()
+                && (game.getHighestBid() == null
+                || bid.getValue() > game.getHighestBid().getValue())) {
             game.setHighestBid(bid);
         }
 
@@ -371,15 +365,15 @@ public class GameService {
 
             game.addBid(aiBid);
 
-            if (!aiBid.isPassed() &&
-                    (game.getHighestBid() == null ||
-                            aiBid.getValue() > game.getHighestBid().getValue())) {
+            if (!aiBid.isPassed()
+                    && (game.getHighestBid() == null
+                    || aiBid.getValue() > game.getHighestBid().getValue())) {
                 game.setHighestBid(aiBid);
             }
 
             game.setBidTurnIndex((game.getBidTurnIndex() + 1) % game.getPlayers().size());
         }
-        
+
         // Once all 4 bids are in, set phase and finalize AI if needed
         if (game.getBids().size() >= 4) {
             PlayerPos winnerPos = game.getHighestBid().getPlayer();
@@ -389,7 +383,6 @@ public class GameService {
                     .orElseThrow(() -> new IllegalStateException("Winner not found"));
 
             game.setBidWinnerPos(winnerPos);
-            
 
             if (winner.isAI()) {
                 FinalBid finalBid = game.getFinalBidCache().get(winnerPos);
@@ -489,7 +482,7 @@ public class GameService {
 
         Player winner = game.getPlayers().stream()
                 .filter(p -> p.getName()
-                        .equals(PlayerUtils.getNameByPosition(request.getPlayer(), game.getPlayers())))
+                .equals(PlayerUtils.getNameByPosition(request.getPlayer(), game.getPlayers())))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Winning player not found."));
 
@@ -539,8 +532,8 @@ public class GameService {
         Player currentPlayer = PlayerUtils.getPlayerByPosition(request.getPlayer(), game.getPlayers());
         System.out.println("DEBUG: Current turn is player index " + game.getCurrentTurnIndex()
                 + " (" + currentPlayer.getName() + ")");
-        System.out.println("DEBUG: Player " + request.getPlayer() + " playing: " +
-                request.getCard().getRank() + " of " + request.getCard().getSuit());
+        System.out.println("DEBUG: Player " + request.getPlayer() + " playing: "
+                + request.getCard().getRank() + " of " + request.getCard().getSuit());
 
         if (game.getCurrentTurnIndex() != request.getPlayer().ordinal()) {
             throw new IllegalStateException("It's not " + request.getPlayer() + "'s turn");
@@ -548,8 +541,8 @@ public class GameService {
 
         Card cardToPlay = request.getCard();
         if (!currentPlayer.getHand().getCards().contains(cardToPlay)) {
-            throw new IllegalArgumentException("Player does not have the specified card " +
-                    cardToPlay.getRank() + " of " + cardToPlay.getSuit());
+            throw new IllegalArgumentException("Player does not have the specified card "
+                    + cardToPlay.getRank() + " of " + cardToPlay.getSuit());
         }
 
         List<PlayedCard> currentTrick = game.getCurrentTrick();
@@ -583,6 +576,7 @@ public class GameService {
             game.getTeamTrickCounts().put(
                     winnerTeam,
                     game.getTeamTrickCounts().get(winnerTeam) + 1);
+            System.out.println("DEBUG: Team trick counts: " + game.getTeamTrickCounts());
 
             Book currentBook = new Book(currentTrick, winnerTeam);
 
@@ -615,7 +609,7 @@ public class GameService {
         return getGameStateForPlayer(game, request.getPlayer());
     }
 
- private PlayedCard determineTrickWinner(GameState game, List<PlayedCard> trick) {
+    private PlayedCard determineTrickWinner(GameState game, List<PlayedCard> trick) {
         if (trick == null || trick.isEmpty()) {
             throw new IllegalArgumentException("Cannot determine trick winner: trick is empty.");
         }
@@ -661,21 +655,6 @@ public class GameService {
             int rankValue = c.getRank().getValue();
             return (isTrump ? 1000 : (isLead ? 100 : 0)) + rankValue;
         })).orElseThrow();
-    }
-
-
-    private boolean isTrumpSuit(Card card, BidType bidType) {
-        Suit suit = card.getSuit();
-        if (bidType == BidType.NO_TRUMP) {
-            return false;
-        }
-        if (bidType == BidType.UPTOWN) {
-            return suit == Suit.SPADES || suit == Suit.CLUBS;
-        }
-        if (bidType == BidType.DOWNTOWN) {
-            return suit == Suit.HEARTS || suit == Suit.DIAMONDS;
-        }
-        return false;
     }
 
     private void autoPlayAITurns(GameState game) {
@@ -843,22 +822,29 @@ public class GameService {
     }
 
     private void scoreHand(GameState game) {
-
         FinalBid winningBid = game.getWinningBid();
         Team winningTeam = game.getPlayers().stream()
                 .filter(p -> p.getPosition().equals(winningBid.getPlayer()))
                 .findFirst()
                 .map(Player::getTeam)
                 .orElseThrow();
-
         int tricksWon = game.getTeamTrickCounts().getOrDefault(winningTeam, 0);
         int tricksMin = winningBid.getValue() + 5;
-
         boolean success = tricksWon >= tricksMin;
-        int points = success ? tricksWon - 5 : (tricksMin) - tricksWon;
-
-        game.getTeamScores().putIfAbsent(winningTeam, 0);
-        game.getTeamScores().put(winningTeam, game.getTeamScores().get(winningTeam) + points);
+        int points = success ? tricksWon - 5 : tricksWon - tricksMin;
+        System.out.println("DEBUG: Calculated points for " + winningTeam + ": " + points);
+        int currentScore = game.getTeamScores().getOrDefault(winningTeam, 0);
+        int newScore = currentScore + points;
+        game.getTeamScores().put(winningTeam, newScore);
+        if (winningTeam == Team.A) {
+            game.setTeamAScore(newScore);
+        } else {
+            game.setTeamBScore(newScore);
+        }
+        System.out.println("DEBUG: Bidding team: " + winningTeam + ", Bid: " + winningBid.getValue()
+                + ", Tricks won: " + tricksWon + ", Success: " + success);
+        System.out.println("DEBUG: Team scores - Team A: " + game.getTeamAScore()
+                + ", Team B: " + game.getTeamBScore());
     }
 
     private Suit getTrumpSuitFromBidType(GameState game) {
