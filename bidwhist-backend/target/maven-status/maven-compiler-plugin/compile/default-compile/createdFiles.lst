@@ -1,7 +1,9 @@
 com/bidwhist/model/Card$CardLocation.class
 com/bidwhist/model/Hand.class
+com/bidwhist/dto/WebConfig$1.class
 com/bidwhist/dto/PlayerRequest.class
 com/bidwhist/dto/CardVisibility.class
+com/bidwhist/dto/WebConfig.class
 com/bidwhist/model/PlayedCard.class
 com/bidwhist/bidding/AiBidOption.class
 com/bidwhist/model/Card$1.class
@@ -25,8 +27,8 @@ com/bidwhist/dto/PollRequest.class
 com/bidwhist/dto/GameStateResponse.class
 com/bidwhist/service/GameService.class
 com/bidwhist/model/Book.class
-com/bidwhist/dto/JoinGameRequest.class
 com/bidwhist/BidWhistGameApplication.class
+com/bidwhist/dto/JoinGameRequest.class
 com/bidwhist/model/Kitty$State.class
 com/bidwhist/dto/PlayRequest.class
 com/bidwhist/bidding/InitialBid.class
@@ -45,7 +47,7 @@ com/bidwhist/dto/PlayerView.class
 com/bidwhist/controller/GameController.class
 com/bidwhist/model/Deck.class
 com/bidwhist/model/PlayerPos.class
-com/bidwhist/dto/AnimationType.class
 com/bidwhist/bidding/BidType.class
+com/bidwhist/dto/AnimationType.class
 com/bidwhist/utils/CardUtils$1.class
 com/bidwhist/model/HandBookState.class

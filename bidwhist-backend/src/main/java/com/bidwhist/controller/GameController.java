@@ -18,7 +18,8 @@ import com.bidwhist.dto.PollRequest;
 import com.bidwhist.dto.PopAnimationRequest;
 import com.bidwhist.service.GameService;
 
-@CrossOrigin(origins = "https://bidwhist.onrender.com/")
+
+@CrossOrigin(origins = {"https://bidwhist.onrender.com","http://localhost:5173"})
 @RestController
 @RequestMapping("/api/game")
 public class GameController {
