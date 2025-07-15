@@ -64,11 +64,11 @@ export default function BidTypePanel({ closeBidTypePanel }) {
   };
 
   return (
-    <div className="bidding-overlay card-play-zone grid-item center">
+    <div className="bidding-overlay">
       <div className="bidding-panel">
         <h2>Finalize Your Bid</h2>
 
-        <label style={{ display: "block", marginBottom: "10px" }}>
+        <label>
           Direction:
           <select
             value={direction}

@@ -1,142 +1,141 @@
 .index-wrapper {
-    height: 100%;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .scoreboard-container {
-    position: absolute;
-    top: 0;
-    right: 0;
-    padding: 12px;
-    z-index: 10;
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 12px;
+  z-index: 10;
 }
 
 .index-container {
-    width: 65vw;
-    height: 65vh;
-    overflow: hidden;
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    border: 1px solid darkgreen;
-    border-radius: 25px;
-    box-shadow: 30px 30px 42px rgba(0, 0, 0, 0.12),
-        -30px -30px 42px rgba(0, 0, 0, 0.12);
-    background: rgba(255, 255, 255, 0.01);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
+  width: 65vw;
+  height: 80vh;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  border: 1px solid darkgreen;
+  border-radius: 25px;
+  box-shadow: 30px 30px 42px rgba(0, 0, 0, 0.12),
+    -30px -30px 42px rgba(0, 0, 0, 0.12);
+  background: rgba(255, 255, 255, 0.01);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
 }
 
 .index-text {
-    padding-bottom: 10px;
-    width: 250px;
+  padding-bottom: 10px;
+  width: 250px;
 }
 
 .index-input-box {
-    background-color: #0a341f;
-    color: #8ca62d;
-    margin-top: 15px;
-    margin-bottom: 15px;
-    padding-left: 5px;
-    border: 1px solid darkgreen;
-    border-radius: 15px;
-    height: 25px;
-    width: 25vw;
-    text-align: center;
-    box-shadow: inset 0 0 5px #0e241d;
-    transition: box-shadow 0.2s ease;
-    outline: none;
+  background-color: #0a341f;
+  color: #8ca62d;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  padding-left: 5px;
+  border: 1px solid darkgreen;
+  border-radius: 15px;
+  height: 25px;
+  width: 25vw;
+  text-align: center;
+  box-shadow: inset 0 0 5px #0e241d;
+  transition: box-shadow 0.2s ease;
+  outline: none;
 }
 
 .index-input-box::placeholder {
-    color: #476757;
+  color: #476757;
 }
 
 .index-input-box:focus {
-    border: 1px solid darkgreen;
-    box-shadow: 0 0 6px 2px #8ca62d;
+  border: 1px solid darkgreen;
+  box-shadow: 0 0 6px 2px #8ca62d;
 }
 
 .index-button {
-    background-color: #8ca62d;
-    color: #0a341f;
-    border: none;
-    border-radius: 12px;
-    height: 25px;
-    width: 25vw;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.2s ease, transform 0.1s ease;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background-color: #8ca62d;
+  color: #0a341f;
+  border: none;
+  border-radius: 12px;
+  height: 25px;
+  width: 25vw;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .multi-button {
-    width: 12.5vw !important;
+  width: 12.5vw !important;
 }
 
 .settings-actions {
-    gap: 12px;
-    display: flex;
-    flex-direction: row;
-    padding-top: 10px;
+  gap: 12px;
+  display: flex;
+  flex-direction: row;
+  padding-top: 10px;
 }
 
 .settings-button {
-
-    width: 5vw !important;
+  width: 5vw !important;
 }
 
 .index-button:hover {
-    background-color: #a5c43d;
+  background-color: #a5c43d;
 }
 
 .index-button:active {
-    background-color: #708b1c;
-    transform: scale(0.97);
+  background-color: #708b1c;
+  transform: scale(0.97);
 }
 
 .h1-welcome {
-    font-size: 2rem;
-    margin-bottom: 10px;
-    color: floralwhite;
+  font-size: 2rem;
+  margin-bottom: 10px;
+  color: floralwhite;
 }
 
 body {
-    margin: 0;
-    background-image: url('/static/img/table.png');
-    background-size: auto;
-    background-repeat: repeat;
-    background-position: top left;
-    background-attachment: fixed;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-        sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  background-image: url("/static/img/table.png");
+  background-size: auto;
+  background-repeat: repeat;
+  background-position: top left;
+  background-attachment: fixed;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 html,
 body {
-    /* Main HTML and BODY styling */
-    color: floralwhite;
-    background-color: darkgreen;
-    /* Background Color in lieu of Image loading */
-    position: relative;
-    height: 100%;
-    width: 100%;
-    overflow: hidden;
-    /* No Scrolling */
-    margin: 0;
-    padding: 0;
+  /* Main HTML and BODY styling */
+  color: floralwhite;
+  background-color: darkgreen;
+  /* Background Color in lieu of Image loading */
+  position: relative;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  /* No Scrolling */
+  margin: 0;
+  padding: 0;
 }
 
 code {
-    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-        monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
 }

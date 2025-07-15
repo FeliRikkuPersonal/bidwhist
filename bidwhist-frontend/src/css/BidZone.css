@@ -1,18 +1,15 @@
 .bid-zone {
-    background-color: rgba(255, 255, 255, 0.1);
-    justify-content: center;
-    align-items: center;
+  background-color: rgba(255, 255, 255, 0.1);
+  justify-content: center;
+  align-items: center;
 }
 
 .player-bids {
-    position: absolute;
-    top: -10%;
-    left: 25%;
-
+  position: absolute;
+  top: -10%;
+  left: 25%;
 }
 
 .bidding-history {
-    position: absolute;
-
-
+  position: absolute;
 }

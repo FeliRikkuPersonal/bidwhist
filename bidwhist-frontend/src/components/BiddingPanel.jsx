@@ -63,7 +63,7 @@ export default function BiddingPanel({ closeBidding, onBidPlaced }) {
       setPhase(bidData.phase);
       setFirstBidder(bidData.firstBidder);
       setCurrentTurnIndex(bidData.currentTurnIndex);
-      closeBidding?.();
+      closeBidding();
     } else {
       console.error("Bid failed:", bidData);
     }
@@ -90,7 +90,7 @@ export default function BiddingPanel({ closeBidding, onBidPlaced }) {
   };
 
   return (
-    <div className="bidding-overlay card-play-zone grid-item center">
+    <div className="bidding-overlay  grid-item center">
       <div className="bidding-panel">
         <h2>Place Your Bid</h2>
 

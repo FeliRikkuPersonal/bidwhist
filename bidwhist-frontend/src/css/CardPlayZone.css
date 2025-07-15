@@ -1,100 +1,86 @@
 .card-play-zone {
-    width: 400px;
-    height: 400px;
-    background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 16px;
-    box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.center-deck {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 30; /* below animated cards, above background */
-  pointer-events: none;
+  height: 80%;
+  width: 80%;
+  border-radius: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.103);
+  border: 1px solid rgba(0, 0, 0, 0);
+  box-shadow: 1px 2px 4px 2px rgba(0, 0, 0, 0.3);
 }
 
 .played-card {
-    position: absolute;
-    font-size: 2rem;
-    background: white;
-    border-radius: 8px;
-    padding: 6px 10px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  position: absolute;
+  font-size: 2rem;
+  background: white;
+  border-radius: 8px;
+  padding: 6px 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 .drop-zone {
-    position: absolute;
-    bottom: 0;
-    width: 80px;
-    height: 120px;
-    border: 2px dashed transparent;
-    margin: auto;
-    left: 50%;
-    transform: translateX(-50%) translateY(50%);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: border-color 0.3s ease;
-    z-index: 10;
+  position: absolute;
+  bottom: 0;
+  width: 80px;
+  height: 120px;
+  border: 2px dashed transparent;
+  margin: auto;
+  left: 50%;
+  transform: translateX(-50%) translateY(50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: border-color 0.3s ease;
+  z-index: 10;
 }
 
 .drop-zone.highlight {
-    border-color: gold;
-    background-color: rgba(255, 215, 0, 0.1);
-    border-radius: 8px;
+  border-color: gold;
+  background-color: rgba(255, 215, 0, 0.1);
+  border-radius: 8px;
 }
 
 .card-img {
-    width: 60px;
-    height: 90px;
-    object-fit: contain;
+  width: 60px;
+  height: 90px;
+  object-fit: contain;
 }
 
 .card-img:active {
-    opacity: 0.75;
-    transform: scale(1.1);
-    transition: transform 0.15s ease;
-    z-index: 999;
-    cursor: pointer;
+  opacity: 0.75;
+  transform: scale(1.1);
+  transition: transform 0.15s ease;
+  z-index: 999;
+  cursor: pointer;
 }
 
 .card-play-zone.north .drop-zone {
-    top: 0;
-    bottom: unset;
+  top: 0;
+  bottom: unset;
 }
 
 .card-play-zone.south .drop-zone {
-    bottom: 0;
+  bottom: 0;
 }
 
 .card-play-zone.east .drop-zone {
-    top: 50%;
-    right: 0;
-    left: unset;
-    transform: translateY(-50%);
+  top: 50%;
+  right: 0;
+  left: unset;
+  transform: translateY(-50%);
 }
 
 .card-play-zone.west .drop-zone {
-    top: 50%;
-    left: 0;
-    transform: translateY(-50%);
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
 }
 
 .floating-card-layer {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  /* Let clicks pass through */
+  width: 40%;
   z-index: 1000;
-  background-color: transparent;
 }
 
 .floating-card-layer .bidding-overlay,
