@@ -14,11 +14,12 @@ public class WebConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/api/**")
-                        .allowedOrigins("https://bidwhist.onrender.com")
+                        .allowedOrigins("https://bidwhist.netlify.app")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
-                        .allowCredentials(false); // or true if you're using cookies/auth
+                        .allowCredentials(false); // change to true if sending cookies/auth headers
             }
         };
     }
 }
+
