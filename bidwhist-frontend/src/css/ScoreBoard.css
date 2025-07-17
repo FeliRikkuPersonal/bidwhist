@@ -4,10 +4,13 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border: solid 1px rgba(0, 100, 0, 0.589);
-  background-color: rgba(28, 75, 36, 0.767);
-  border-radius: 10px;
   text-align: center;
+  border: 1px solid rgba(8, 29, 8, 0.322);
+  border-radius: 25px;
+  box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.377);
+  background: rgba(255, 255, 255, 0.01);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(15px);
 }
 
 .score-headers {
