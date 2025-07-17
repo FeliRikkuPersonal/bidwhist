@@ -26,7 +26,6 @@
 
 .player-hand.south {
   gap: 0;
-  transform: translate(5px);
 }
 
 .player-hand.south .card-img {

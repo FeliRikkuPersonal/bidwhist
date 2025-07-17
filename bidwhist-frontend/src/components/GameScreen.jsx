@@ -144,9 +144,7 @@ export default function GameScreen() {
         <div className="grid-item top-center">
           <PlayerZone {...playerProps.north.props} />
         </div>
-        <div className="grid-item top-right">
-          <BidZone />
-        </div>
+        <div className="grid-item top-right"></div>
 
         {/* Middle row */}
         <div className="grid-item middle-left">

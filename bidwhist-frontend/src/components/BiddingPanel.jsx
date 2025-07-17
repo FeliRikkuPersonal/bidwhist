@@ -101,7 +101,7 @@ export default function BiddingPanel({ closeBidding, onBidPlaced }) {
           placeholder="Enter bid (4-7)"
           value={bidValue}
           onChange={(e) => setBidValue(e.target.value)}
-          className="index-input-box short-box"
+          className="index-input-box short-box enter-bid-input"
         />
 
         <label>

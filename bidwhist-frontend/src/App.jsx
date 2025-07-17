@@ -33,6 +33,9 @@ function App() {
     setMode,
     difficulty,
     lobbySize,
+    activeGame,
+    setActiveGame,
+    bidType,
   } = useGameState();
 
   const {
@@ -57,7 +60,6 @@ function App() {
   } = useUIDisplay();
 
   const API = import.meta.env.VITE_API_URL;
-
   // --- onStartGame Function ---
   /*
    * Called when the user starts the game. Validates the player's name and
@@ -72,7 +74,6 @@ function App() {
       }
 
       setPlayerName(trimmedName); // Sets local name immediately for UI
-
       try {
         const res = await fetch(`${API}/game/start`, {
           method: "POST",
@@ -83,6 +84,7 @@ function App() {
             gameId: code,
           }),
         });
+        setActiveGame(true);
 
         const data = await res.json();
 
@@ -237,9 +239,6 @@ function App() {
    * on the game state. */
   return (
     <div className="index-wrapper">
-      <div className="scoreboard-container">
-        <Scoreboard />
-      </div>
       <div className="index-container">
         {loadGame ? (
           <GameScreen />
@@ -252,6 +251,9 @@ function App() {
             onStartGame={onStartGame}
           />
         )}
+      </div>
+      <div className="scoreboard-wrapper">
+        {activeGame && <Scoreboard bidType={bidType} />}
       </div>
     </div>
   );

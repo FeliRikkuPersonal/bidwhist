@@ -1,0 +1,18 @@
+.scoreboard {
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: solid 1px rgba(0, 100, 0, 0.589);
+  background-color: rgba(28, 75, 36, 0.767);
+  border-radius: 10px;
+  text-align: center;
+}
+
+.score-headers {
+  text-decoration: underline;
+}
+.score-value {
+  font-weight: bold;
+}

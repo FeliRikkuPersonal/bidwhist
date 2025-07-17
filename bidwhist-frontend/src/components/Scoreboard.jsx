@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { useGameState } from "../context/GameStateContext.jsx";
 import { usePositionContext } from "../context/PositionContext.jsx";
+import BidZone from "./BidZone.jsx";
+import "../css/ScoreBoard.css";
 
-export default function Scoreboard() {
+export default function Scoreboard({ bidType }) {
   const { teamAScore, teamBScore, winningBid } = useGameState();
   const { viewerPosition } = usePositionContext();
 
@@ -37,10 +39,19 @@ export default function Scoreboard() {
 
   return (
     <div className="scoreboard">
-      <h4>Scoreboard</h4>
-      <p>Team: {myTeam}</p>
-      <p>Opponents: {theirTeam}</p>
-      {formattedBid && <p>Winning Bid: {formattedBid}</p>}
+      <div className="scoreboard-content">
+        <p className="score-headers">Team</p>
+        <p className="score-value">{myTeam}</p>
+        <p className="score-headers">Opponents</p>
+        <p className="score-value">{theirTeam}</p>
+        {formattedBid && (
+          <>
+            <p className="score-headers">Winning Bid</p>
+            <p className="score-value">{formattedBid}</p>
+          </>
+        )}
+      </div>
+      {bidType && <BidZone />}
     </div>
   );
 }

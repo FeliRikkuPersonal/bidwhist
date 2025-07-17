@@ -6,10 +6,14 @@
   align-items: center;
   flex-direction: column;
   border-radius: 25px;
+  text-align: center;
 }
 
 .short-box {
-  width: 30%;
+  width: 100%;
+}
+.enter-bid-input {
+  width: 40%;
 }
 
 input[type="number"]::-webkit-inner-spin-button,

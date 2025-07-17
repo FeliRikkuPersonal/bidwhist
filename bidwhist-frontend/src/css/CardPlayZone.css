@@ -27,12 +27,11 @@
   border: 2px dashed transparent;
   margin: auto;
   left: 50%;
-  transform: translateX(-50%) translateY(50%);
+  transform: translateX(-50%);
   display: flex;
   justify-content: center;
   align-items: center;
   transition: border-color 0.3s ease;
-  z-index: 10;
 }
 
 .drop-zone.highlight {
@@ -51,7 +50,6 @@
   opacity: 0.75;
   transform: scale(1.1);
   transition: transform 0.15s ease;
-  z-index: 999;
   cursor: pointer;
 }
 
@@ -62,6 +60,7 @@
 
 .card-play-zone.south .drop-zone {
   bottom: 0;
+  z-index: 999;
 }
 
 .card-play-zone.east .drop-zone {
@@ -76,7 +75,6 @@
   left: 0;
   transform: translateY(-50%);
 }
-
 .floating-card-layer {
   position: fixed;
   width: 40%;
@@ -91,28 +89,28 @@
 
 .play-slot.north {
   position: absolute;
-  top: 20%; /* or wherever your play area is */
+  top: 20%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
 
 .play-slot.south {
   position: absolute;
-  bottom: 20%; /* or wherever your play area is */
+  bottom: 20%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
 
 .play-slot.east {
   position: absolute;
-  top: 50%; /* or wherever your play area is */
+  top: 50%;
   right: 20%;
   transform: translate(-50%, -50%);
 }
 
 .play-slot.west {
   position: absolute;
-  top: 50%; /* or wherever your play area is */
+  top: 50%;
   left: 20%;
   transform: translate(-50%, -50%);
 }
