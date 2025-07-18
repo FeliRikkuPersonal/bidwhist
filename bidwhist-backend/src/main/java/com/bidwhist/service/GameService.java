@@ -167,7 +167,6 @@ public class GameService {
                 visibleHand = new ArrayList<>();
                 for (int i = 0; i < hiddenCount; i++) {
                     Card hiddenCard = new Card(null, null);
-                    hiddenCard.setCardOwner(CardUtils.fromPlayerPos(p.getPosition()));
                     hiddenCard.setVisibility(CardVisibility.HIDDEN); // optional enum
                     visibleHand.add(hiddenCard);
                 }

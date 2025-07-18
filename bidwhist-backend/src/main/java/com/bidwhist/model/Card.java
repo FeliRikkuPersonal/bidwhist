@@ -16,7 +16,6 @@ public class Card implements Comparable<Card> {
     private Rank rank;
     private Suit suit;
     private String cardImage;
-    private CardOwner owner;
     private CardVisibility visibility;
 
     public Card(Suit suit, Rank rank) {
@@ -24,7 +23,6 @@ public class Card implements Comparable<Card> {
         this.suit = suit;
         this.cardImage = this.getCardImage();
 
-        this.owner = CardOwner.TABLE;
         this.visibility = CardVisibility.HIDDEN;
     }
 
@@ -81,10 +79,6 @@ public class Card implements Comparable<Card> {
         return rank;
     }
 
-    public CardOwner getOwner() {
-        return owner;
-    }
-
     public CardVisibility getVisibility() {
         return visibility;
     }
@@ -109,10 +103,6 @@ public class Card implements Comparable<Card> {
         }
     }
 
-    public void setCardOwner(CardOwner newOwner) {
-        this.owner = newOwner;
-    }
-
     public void setVisibility(CardVisibility newVisibility) {
         this.visibility = newVisibility;
     }
@@ -120,31 +110,6 @@ public class Card implements Comparable<Card> {
     @Override
     public String toString() {
         return rank + "of" + suit;
-    }
-
-    public void setOwnerByPlayer(Player player) {
-        if (player == null || player.getPosition() == null) {
-            throw new IllegalArgumentException("Player or player position cannot be null");
-        }
-
-        PlayerPos position = player.getPosition();
-
-        switch (position) {
-            case P1:
-                this.owner = CardOwner.P1;
-                break;
-            case P2:
-                this.owner = CardOwner.P2;
-                break;
-            case P3:
-                this.owner = CardOwner.P3;
-                break;
-            case P4:
-                this.owner = CardOwner.P4;
-                break;
-            default:
-                throw new IllegalArgumentException("Unhandled position: " + position);
-        }
     }
 
 }

@@ -20,7 +20,6 @@ public class Player {
 
     public void addCard(Card card) {
         this.hand.addCard(card);
-        card.setCardOwner(CardUtils.fromPlayerPos(position));
     }
 
     public void removeCard(Card card) {
