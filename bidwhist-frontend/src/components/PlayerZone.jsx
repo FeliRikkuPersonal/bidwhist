@@ -5,14 +5,13 @@ import '../css/PlayerZone.css';
 import '../css/CardPlayZone.css';
 import '../css/Card.css';
 import { useGameState } from '../context/GameStateContext.jsx';
-import { usePositionContext } from '../context/PositionContext.jsx';
 import { useUIDisplay } from '../context/UIDisplayContext.jsx';
 
 
 /* The PlayerZone component represents a player's area in the game,
    where their hand of cards is displayed and interactable. */
-const PlayerZone = forwardRef(({ direction, name, revealHand, cards = [] }, ref) => {
-  const { kitty } = useGameState();
+const PlayerZone = forwardRef(({ direction, position, name, revealHand, cards = [] }, ref) => {
+  const { kitty, players } = useGameState();
   const {
     showHands,
     awardKitty,
@@ -32,11 +31,6 @@ const PlayerZone = forwardRef(({ direction, name, revealHand, cards = [] }, ref)
   const playRef = useRef();
   const zoneRef = useRef();
   const { register } = useZoneRefs();
-
-  // --- Combining Hand and Kitty ---
-  /* Combines the player's cards and the kitty (discarded cards), if applicable, into one array to display. */
-  const fullHand = [...cards, ...(awardKitty ? kitty : [])];
-
 
   // --- handleCardClick Function ---
   /* Handles card selection or deselection, and manages discard pile when in awardKitty mode. */
@@ -63,47 +57,50 @@ const PlayerZone = forwardRef(({ direction, name, revealHand, cards = [] }, ref)
     }
   };
 
-
   // --- useEffect for Registering Refs ---
   /* Registers the hand and play area refs upon mount and whenever the `direction` prop changes. */
-  useEffect(() => {
-    if (handRef.current) {
-      register(`hand-${direction}`, handRef);
+useEffect(() => {
+  if (handRef.current) {
+    register(`hand-${direction}`, handRef);
 
-      const attemptRegisterOrigin = () => {
-        const firstCard = handRef.current.querySelector('.card-img');
-        if (firstCard) {
-          register(`card-origin-${direction}`, { current: firstCard });
-        } else {
-          // Retry in 100ms
-          setTimeout(attemptRegisterOrigin, 100);
-        }
-      };
-      attemptRegisterOrigin();
-    }
-    if (playRef.current) {
-      register(`play-${direction}`, playRef);
-    }
-  }, [direction, register]);
+    const attemptRegisterOrigin = () => {
+      const firstCard = handRef.current.querySelector('.card-img');
+      if (firstCard) {
+        register(`card-origin-${direction}`, { current: firstCard });
+      } else {
+        setTimeout(attemptRegisterOrigin, 100);
+      }
+    };
+    attemptRegisterOrigin();
+  }
 
+  if (playRef.current) {
+    register(`play-${direction}`, playRef);
+  }
 
-  // --- useEffect for registering refs on direction change ---
-  useEffect(() => {
-    if (handRef.current) {
-      register(`hand-${direction}`, handRef);
-    }
-    if (playRef.current) {
-      register(`play-${direction}`, playRef);
-    }
-  }, [direction, register]);
+  if (ref && typeof ref === 'object' && ref.current) {
+    register(`zone-${direction}`, ref);
+  }
+}, [direction, register, ref]);
+
 
 
   // --- useImperativeHandle ---
   /* Exposes the `getPosition` method, which retrieves the current bounding rectangle of the 
   player zone. */
   useImperativeHandle(ref, () => ({
-    getPosition: () => zoneRef.current?.getBoundingClientRect()
+    getPosition: () => zoneRef.current?.getBoundingClientRect(),
   }));
+
+
+
+useEffect(() => {
+  console.log(`[${direction}] cards prop:`, cards);
+}, [cards]);
+
+
+
+
 
 
   // --- JSX Rendering ---
@@ -117,7 +114,7 @@ const PlayerZone = forwardRef(({ direction, name, revealHand, cards = [] }, ref)
       <div ref={handRef} className={`player-hand ${direction}`}>
         {showHands &&
           (revealHand
-            ? fullHand
+            ? cards
               .filter(c => !(playedCard?.cardImage === c.cardImage && direction === 'south'))
               .map((card, i) => (
                 <img

@@ -14,7 +14,7 @@ export default function BiddingPanel({ closeBidding, onBidPlaced }) {
     gameId,
     bids,
     setBids,
-    currentTurnIndex,
+    bidTurnIndex, currentTurnIndex,
     setCurrentTurnIndex,
     setFirstBidder,
     setPhase,
@@ -37,13 +37,8 @@ export default function BiddingPanel({ closeBidding, onBidPlaced }) {
     const turnPlayerPos = ["P1", "P2", "P3", "P4"][currentTurnIndex];
     const isMyTurn = viewerPosition === turnPlayerPos;
 
-    setShowBidding(bidPhase && isMyTurn);
-    console.log(`BidPhase? ${bidPhase} MyTurn?: ${isMyTurn}`);
-
-    console.log("[BiddingPanel Log]");
-    logGameState();
-    logUI();
-  }, [bids, bidPhase, currentTurnIndex, viewerPosition]);
+        setShowBidding(bidPhase && isMyTurn);
+    }, [bids, bidPhase, currentTurnIndex, viewerPosition]);
 
   if (!showBidding) return null;
 

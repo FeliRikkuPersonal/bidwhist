@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import org.springframework.aop.support.annotation.AnnotationMethodMatcher;
 import org.springframework.stereotype.Service;
 
 import com.bidwhist.bidding.BidType;
@@ -19,6 +20,8 @@ import com.bidwhist.dto.BidRequest;
 import com.bidwhist.dto.CardVisibility;
 import com.bidwhist.dto.FinalBidRequest;
 import com.bidwhist.dto.GameStateResponse;
+import com.bidwhist.dto.HandResponse;
+import com.bidwhist.dto.HandRequest;
 import com.bidwhist.dto.JoinGameRequest;
 import com.bidwhist.dto.KittyRequest;
 import com.bidwhist.dto.PlayRequest;
@@ -131,6 +134,7 @@ public class GameService {
         return response;
     }
 
+    // Join a game in progress
     public GameStateResponse joinGame(JoinGameRequest request) {
         GameState game = getGameById(request.getGameId());
         game.getRoom().addPlayer(request.getPlayerName());
@@ -155,48 +159,9 @@ public class GameService {
 
     // Return GameState for specific player with dummy cards for other players
     public GameStateResponse getGameStateForPlayer(GameState game, PlayerPos playerPosition) {
-        List<PlayerView> playerViews = new ArrayList<>();
+        List<PlayerView> playerViews = getMyPlayerViews(game, playerPosition);
 
-        for (Player p : game.getPlayers()) {
-            List<Card> visibleHand;
-
-            if (p.getPosition().equals(playerPosition)) {
-                visibleHand = p.getHand().getCards();
-            } else {
-                int hiddenCount = p.getHand().getCards().size();
-                visibleHand = new ArrayList<>();
-                for (int i = 0; i < hiddenCount; i++) {
-                    Card hiddenCard = new Card(null, null);
-                    hiddenCard.setCardOwner(CardUtils.fromPlayerPos(p.getPosition()));
-                    hiddenCard.setVisibility(CardVisibility.HIDDEN); // optional enum
-                    visibleHand.add(hiddenCard);
-                }
-            }
-
-            playerViews.add(new PlayerView(
-                    p.getName(),
-                    p.getPosition(),
-                    p.getTeam(),
-                    p.isAI(),
-                    visibleHand));
-        }
-
-        List<Card> myKittyView = new ArrayList<>(game.getKitty());
-
-        if (!myKittyView.isEmpty()) {
-            if (PlayerUtils.getNameByPosition(playerPosition, game.getPlayers())
-                    .equals(game.getWinningPlayerName())) {
-                for (Card card : myKittyView) {
-                    card.setVisibility(CardVisibility.VISIBLE_TO_SELF);
-                }
-            } else {
-
-                for (int i = 0; i < myKittyView.size(); i++) {
-                    myKittyView.set(i, new Card(null, null));
-                    myKittyView.get(i).setVisibility(CardVisibility.HIDDEN);
-                }
-            }
-        }
+        List<Card> myKittyView = getMyKittyView(game, playerPosition);
 
         List<Player> players = game.getPlayers();
         Team myTeam = game.getTeamByPlayerPos(players, playerPosition);
@@ -227,33 +192,6 @@ public class GameService {
         return response;
     }
 
-    static {
-        /*
-         * NOT NEEDED???
-         * public GameStateResponse getGameResultForPlayer(GameState game, PlayerPos
-         * playerPosition) {
-         * GameStateResponse response = getGameStateForPlayer(game, playerPosition);
-         * 
-         * Bid highestBid = game.getHighestBid();
-         * Team biddingTeam = game.getPlayers().stream()
-         * .filter(p -> p.getName().equals(highestBid.getPlayerName()))
-         * .findFirst()
-         * .map(Player::getTeam)
-         * .orElse(null);
-         * 
-         * int tricksWon = currentGame.getTeamTrickCounts().getOrDefault(biddingTeam,
-         * 0);
-         * boolean success = tricksWon >= highestBid.getValue();
-         * 
-         * response.setBidSuccessful(success);
-         * response.setWinningTeam(success ? biddingTeam : (biddingTeam == Team.A ?
-         * Team.B : Team.A));
-         * 
-         * return response;
-         * }
-         */
-    }
-
     public void dealToPlayers(GameState game) {
         System.out.println("[dealToPlayers]");
 
@@ -269,15 +207,15 @@ public class GameService {
 
         // Animation signal : DEAL
         game.addAnimation(new Animation(game.getShuffledDeck()));
-
-        System.out.println("Current Kitty:");
-        for (Card card : game.getKitty()) {
-            System.out.println(card.toString());
-        }
-
         game.setKitty(game.getDeck().getKitty().getCards()); // Move kitty over
         game.setPhase(GamePhase.BID); // Advance phase
         System.out.println("Current phase: " + game.getPhase());
+        game.addAnimation(new Animation(AnimationType.UPDATE_CARDS));
+
+        Player nextBidder = game.getPlayers().get(game.getBidTurnIndex());
+        if (nextBidder.isAI()) {
+            processAllBids(game);
+        }
 
     }
 
@@ -287,6 +225,7 @@ public class GameService {
         game.getKitty().clear();
         game.getDeck().clearKitty();
         game.setWinningBid(null);
+        game.setBidWinnerPos(null);
         game.setTeamATricksWon(0);
         game.setTeamBTricksWon(0);
         game.setPhase(GamePhase.SHUFFLE);
@@ -325,7 +264,7 @@ public class GameService {
 
         if (!bid.isPassed()
                 && (game.getHighestBid() == null
-                || bid.getValue() > game.getHighestBid().getValue())) {
+                        || bid.getValue() > game.getHighestBid().getValue())) {
             game.setHighestBid(bid);
         }
 
@@ -333,6 +272,41 @@ public class GameService {
         int nextIndex = (game.getBidTurnIndex() + 1) % game.getPlayers().size();
         game.setBidTurnIndex(nextIndex);
 
+        processAllBids(game);
+
+        // Once all 4 bids are in, set phase and finalize AI if needed
+        if (game.getBids().size() >= 4) {
+            PlayerPos winnerPos = game.getHighestBid().getPlayer();
+            Player winner = game.getPlayers().stream()
+                    .filter(p -> p.getPosition().equals(winnerPos))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalStateException("Winner not found"));
+
+            game.setBidWinnerPos(winnerPos);
+
+            if (winner.isAI()) {
+                FinalBid finalBid = game.getFinalBidCache().get(winnerPos);
+                if (finalBid == null) {
+                    throw new IllegalStateException("AI Final bid missing for: " + winnerPos);
+                }
+                game.setWinningBidStats(finalBid);
+                applyAIAutoKitty(game, winner);
+                game.getDeck().assignTrumpSuitToJokers(finalBid.getSuit());
+            }
+            int nextTurn = (game.getBidTurnIndex() + 1) % 4;
+            game.setBidTurnIndex(nextTurn);
+            game.setFirstBidder(PlayerPos.values()[nextTurn]);
+            if (winner.isAI()) {
+                game.setPhase(GamePhase.PLAY);
+            } else {
+                game.setPhase(GamePhase.KITTY);
+            }
+        }
+
+        return getGameStateForPlayer(game, request.getPlayer());
+    }
+
+    private void processAllBids(GameState game) {
         // If no bids and final bidder is AI, evaluate force bid.
         while (game.getBids().size() < 4) {
             Player nextBidder = game.getPlayers().get(game.getBidTurnIndex());
@@ -367,43 +341,13 @@ public class GameService {
 
             if (!aiBid.isPassed()
                     && (game.getHighestBid() == null
-                    || aiBid.getValue() > game.getHighestBid().getValue())) {
+                            || aiBid.getValue() > game.getHighestBid().getValue())) {
                 game.setHighestBid(aiBid);
             }
 
             game.setBidTurnIndex((game.getBidTurnIndex() + 1) % game.getPlayers().size());
         }
 
-        // Once all 4 bids are in, set phase and finalize AI if needed
-        if (game.getBids().size() >= 4) {
-            PlayerPos winnerPos = game.getHighestBid().getPlayer();
-            Player winner = game.getPlayers().stream()
-                    .filter(p -> p.getPosition().equals(winnerPos))
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalStateException("Winner not found"));
-
-            game.setBidWinnerPos(winnerPos);
-
-            if (winner.isAI()) {
-                FinalBid finalBid = game.getFinalBidCache().get(winnerPos);
-                if (finalBid == null) {
-                    throw new IllegalStateException("AI Final bid missing for: " + winnerPos);
-                }
-                game.setWinningBidStats(finalBid);
-                applyAIAutoKitty(game, winner);
-                game.getDeck().assignTrumpSuitToJokers(finalBid.getSuit());
-            }
-            int nextTurn = (game.getBidTurnIndex() + 1) % 4;
-            game.setBidTurnIndex(nextTurn);
-            game.setFirstBidder(PlayerPos.values()[nextTurn]);
-            if (winner.isAI()) {
-                game.setPhase(GamePhase.PLAY);
-            } else {
-                game.setPhase(GamePhase.KITTY);
-            }
-        }
-
-        return getGameStateForPlayer(game, request.getPlayer());
     }
 
     // Evaluates AI player's hand to provide an appropriate bid
@@ -463,6 +407,8 @@ public class GameService {
 
         GameStateResponse response = getGameStateForPlayer(game, winnerPos);
         response.setKitty(game.getKitty());
+        winner.getHand().getCards().addAll(game.getKitty());
+        game.addAnimation(new Animation(AnimationType.UPDATE_CARDS));
 
         return response;
     }
@@ -482,11 +428,9 @@ public class GameService {
 
         Player winner = game.getPlayers().stream()
                 .filter(p -> p.getName()
-                .equals(PlayerUtils.getNameByPosition(request.getPlayer(), game.getPlayers())))
+                        .equals(PlayerUtils.getNameByPosition(request.getPlayer(), game.getPlayers())))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Winning player not found."));
-
-        winner.getHand().getCards().addAll(game.getKitty());
 
         if (request.getDiscards().size() != 6) {
             throw new IllegalArgumentException("You must discard exactly 6 cards.");
@@ -501,6 +445,7 @@ public class GameService {
             }
         }
 
+        game.addAnimation(new Animation(AnimationType.UPDATE_CARDS));
         PlayerPos winnerPos = game.getHighestBid().getPlayer();
 
         FinalBid winningBid;
@@ -584,13 +529,15 @@ public class GameService {
 
             // Animation signal - COLLECT
             game.addAnimation(new Animation(currentBook));
+            game.addAnimation(new Animation(AnimationType.UPDATE_CARDS));
 
             currentTrick.clear();
             game.setCurrentTurnIndex(winner.getPosition().ordinal());
 
             if (game.getCompletedTricks().size() == 12) {
                 scoreHand(game);
-                if (game.getTeamAScore() >= 7 || game.getTeamBScore() >= 7) {
+                if (game.getTeamAScore() >= 7 || game.getTeamBScore() <= -7) {
+                    game.addAnimation(new Animation(AnimationType.SHOW_WINNER));
                     game.setPhase(GamePhase.END);
                 } else {
                     // Animation signal : CLEAR
@@ -639,7 +586,8 @@ public class GameService {
                 if (rank == Rank.JOKER_B || rank == Rank.JOKER_S || rank == Rank.ACE) {
                     rankValue = rank.getValue();
                 } else {
-                    // Invert non-joker/ACE ranks: TWO (2) becomes highest (13), THREE (3) becomes (12), etc.
+                    // Invert non-joker/ACE ranks: TWO (2) becomes highest (13), THREE (3) becomes
+                    // (12), etc.
                     rankValue = 15 - rank.getValue(); // Max non-joker/ACE value is 13 (KING), so 15 - 13 = 2 for KING
                 }
 
@@ -691,6 +639,7 @@ public class GameService {
 
                 // Animation signal - COLLECT
                 game.addAnimation(new Animation(currentBook));
+                game.addAnimation(new Animation(AnimationType.UPDATE_CARDS));
 
                 game.getTeamTrickCounts().putIfAbsent(winnerTeam, 0);
                 game.getTeamTrickCounts().put(winnerTeam, game.getTeamTrickCounts().get(winnerTeam) + 1);
@@ -704,6 +653,7 @@ public class GameService {
                 if (game.getCompletedTricks().size() == 12) {
                     scoreHand(game);
                     if (game.getTeamAScore() >= 7 || game.getTeamBScore() >= 7) {
+                        game.addAnimation(new Animation(AnimationType.SHOW_WINNER));
                         game.setPhase(GamePhase.END);
                     } else {
                         // Animation signal : CLEAR
@@ -887,4 +837,65 @@ public class GameService {
         return game;
     }
 
+    public HandResponse provideUpdatedCards(HandRequest request) {
+        GameState game = getGameById(request.getGameId());
+        PlayerPos playerPosition = request.getPlayer();
+
+        List<PlayerView> views = getMyPlayerViews(game, playerPosition);
+        List<Card> kitty = getMyKittyView(game, playerPosition);
+
+        HandResponse response = new HandResponse(views, kitty);
+
+        return response;
+    }
+
+    public List<PlayerView> getMyPlayerViews(GameState game, PlayerPos playerPosition) {
+        List<PlayerView> playerViews = new ArrayList<>();
+
+        for (Player p : game.getPlayers()) {
+            List<Card> visibleHand;
+
+            if (p.getPosition().equals(playerPosition)) {
+                visibleHand = p.getHand().getCards();
+            } else {
+                int hiddenCount = p.getHand().getCards().size();
+                visibleHand = new ArrayList<>();
+                for (int i = 0; i < hiddenCount; i++) {
+                    Card hiddenCard = new Card(null, null);
+                    hiddenCard.setVisibility(CardVisibility.HIDDEN); // optional enum
+                    visibleHand.add(hiddenCard);
+                }
+            }
+
+            playerViews.add(new PlayerView(
+                    p.getName(),
+                    p.getPosition(),
+                    p.getTeam(),
+                    p.isAI(),
+                    visibleHand));
+
+        }
+        return playerViews;
+    }
+
+    public List<Card> getMyKittyView(GameState game, PlayerPos playerPosition) {
+
+        List<Card> myKittyView = new ArrayList<>(game.getKitty());
+
+        if (!myKittyView.isEmpty()) {
+            if (PlayerUtils.getNameByPosition(playerPosition, game.getPlayers())
+                    .equals(game.getWinningPlayerName())) {
+                for (Card card : myKittyView) {
+                    card.setVisibility(CardVisibility.VISIBLE_TO_SELF);
+                }
+            } else {
+
+                for (int i = 0; i < myKittyView.size(); i++) {
+                    myKittyView.set(i, new Card(null, null));
+                    myKittyView.get(i).setVisibility(CardVisibility.HIDDEN);
+                }
+            }
+        }
+        return myKittyView;
+    }
 }

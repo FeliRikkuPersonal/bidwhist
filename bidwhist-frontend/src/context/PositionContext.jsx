@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useMemo } from 'react';
-import { getPositionMap } from '../utils/PositionUtils';
+import { useGameState } from './GameStateContext';
 
 export const PositionContext = createContext(null);
 
@@ -9,6 +9,8 @@ export function PositionProvider({ children }) {
   const [viewerTeam, setViewerTeam] = useState(null);
   const [backendPositions, setBackendPositions] = useState({}); // position → name map
   const viewerDirection = 'south'; // always fixed for local user
+  const { players } = useGameState(); // ✅ get the list from context
+
 
   // CLOCKWISE UTILITY
   const clockwiseOrder = ['P1', 'P2', 'P3', 'P4'];
@@ -54,6 +56,17 @@ export function PositionProvider({ children }) {
     }, {});
   }, [directionToPosition, backendPositions]);
 
+  const playerTeam = useMemo(() => {
+    const map = {};
+    players.forEach(({ position, team }) => {
+      if (position && team) {
+        map[position] = team;
+      }
+    });
+    return map;
+  }, [players]);
+
+
   const debugLog = () => {
     console.log('[🧠 PositionContext Snapshot]', {
       playerName,
@@ -69,8 +82,8 @@ export function PositionProvider({ children }) {
   };
 
   useEffect(() => {
-  console.log("[📢 backendPositions changed]:", backendPositions);
-}, [backendPositions]);
+    console.log("[📢 backendPositions changed]:", backendPositions);
+  }, [backendPositions]);
 
   return (
     <PositionContext.Provider value={{
@@ -86,6 +99,7 @@ export function PositionProvider({ children }) {
       positionToDirection,
       directionToPosition,
       frontendPositions,
+      playerTeam,
       debugLog,
     }}>
       {children}

@@ -20,6 +20,7 @@ export default function CardPlayZone({
   onCardPlayed,
 }) {
   const {
+        setHandFor,
     setShowHands,
     setShowBidding,
     deckPosition,
@@ -37,11 +38,23 @@ export default function CardPlayZone({
     setTeamBTricks,
   } = useUIDisplay();
 
-  const { playerName, viewerPosition, backendPositions, positionToDirection } =
-    usePositionContext();
+    const {
+        debugLog: positionLog,
+        playerName,
+        viewerPosition,
+        backendPositions,
+        positionToDirection,
+    } = usePositionContext();
 
-  const { gameId, players, bids, winningPlayerName, bidWinnerPos } =
-    useGameState();
+    const {
+        gameId,
+        players,
+        setKitty,
+        bids,
+        winningPlayerName,
+        setWinningBid,
+        bidWinnerPos,
+    } = useGameState();
 
   const [isOver, setIsOver] = useState(false);
   const [lastAnimation, setLastAnimation] = useState(null);
@@ -199,12 +212,47 @@ export default function CardPlayZone({
         }, cardList.length * 150 + 300);
       }
 
-      // Clear table of previous tricks
-      if (animation.type === "CLEAR") {
-        setTeamATricks(0);
-        setTeamBTricks(0);
-        setShowBidding(true);
-      }
+            // Clear table of previous tricks
+            if (animation.type === 'CLEAR') {
+                setTeamATricks(0);
+                setTeamBTricks(0);
+                setWinningBid(null);
+
+            }
+
+            // Update players' displayed hand
+            if (animation.type === 'UPDATE_CARDS') {
+                try {
+                    const res = await fetch(`${API}/api/game/update-cards`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ gameId: gameId, player: viewerPosition }),
+                    });
+
+                    const data = await res.json();
+
+                    if (!res.ok || !data.players || !data.kitty) {
+                        console.error("[CardPlayZone] Invalid update response:", data);
+                        return;
+                    }
+
+                    data.players.forEach(({ position, hand }) => {
+                        const direction = positionToDirection[position];
+                        console.log(`[UPDATE_CARDS] setting hand for ${direction}:`, hand);
+                        setHandFor(direction, hand); // manually triggers card updates
+                    });
+
+                    setKitty(data.kitty);
+
+                } catch (err) {
+                    console.error('[CardPlayZone] Error updating card data:', err)
+                }
+            }
+
+            // Open bidding panel
+            if (animation.type === 'SHOW_WINNER') {
+                // insert instructions to open winner panel;
+            }
 
       // Notify backend that animation has completed
       await fetch(`${API}/game/pop-animation`, {

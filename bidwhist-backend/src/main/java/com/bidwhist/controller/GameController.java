@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bidwhist.dto.BidRequest;
 import com.bidwhist.dto.FinalBidRequest;
 import com.bidwhist.dto.JoinGameRequest;
+import com.bidwhist.dto.HandRequest;
 import com.bidwhist.dto.GameStateResponse;
+import com.bidwhist.dto.HandResponse;
 import com.bidwhist.dto.StartGameRequest;
 import com.bidwhist.dto.KittyRequest;
 import com.bidwhist.dto.PlayRequest;
@@ -18,8 +20,6 @@ import com.bidwhist.dto.PollRequest;
 import com.bidwhist.dto.PopAnimationRequest;
 import com.bidwhist.service.GameService;
 
-
-@CrossOrigin(origins = {"https://bidwhist.onrender.com","http://localhost:5173"})
 @RestController
 @RequestMapping("/api/game")
 public class GameController {
@@ -66,6 +66,12 @@ public class GameController {
     public void popCompletedAnimation(@RequestBody PopAnimationRequest request) {
         gameService.popAnimation(request);
     }
+
+    @PostMapping("/update-cards")
+    public HandResponse postMethodName(@RequestBody HandRequest request) {
+        return gameService.provideUpdatedCards(request);
+    }
+    
 
     @PostMapping("/state")
     public GameStateResponse getGameStateForPlayer(@RequestBody PollRequest request) {

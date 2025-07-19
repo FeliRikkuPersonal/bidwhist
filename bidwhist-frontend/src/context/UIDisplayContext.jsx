@@ -4,6 +4,12 @@ import { createContext, useContext, useState } from 'react';
 export const UIDisplayContext = createContext(null);
 
 export function UIDisplayProvider({ children }) {
+  const [handMap, setHandMap] = useState({
+    north: [],
+    south: [],
+    east: [],
+    west: [],
+  });
   const [showGameScreen, setShowGameScreen] = useState(false);
   const [showAnimatedCards, setShowAnimatedCards] = useState(false);
   const [deckPosition, setDeckPosition] = useState({ x: 0, y: 0 });
@@ -55,8 +61,15 @@ export function UIDisplayProvider({ children }) {
     });
   }
 
+  const setHandFor = (direction, hand) => {
+    setHandMap(prev => ({ ...prev, [direction]: hand }));
+  };
+
+
   return (
     <UIDisplayContext.Provider value={{
+      handMap,
+      setHandMap,
       showGameScreen,
       setShowGameScreen,
       showAnimatedCards,
@@ -99,6 +112,7 @@ export function UIDisplayProvider({ children }) {
       setTeamATricks,
       teamBTricks,
       setTeamBTricks,
+      setHandFor,
       queueAnimationFromResponse,
       debugLog,
     }}>

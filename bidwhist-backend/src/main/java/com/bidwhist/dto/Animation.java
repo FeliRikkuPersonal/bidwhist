@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import com.bidwhist.model.PlayerPos;
 import com.bidwhist.model.Team;
+import com.bidwhist.dto.PlayerView;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.bidwhist.model.Book;
 import com.bidwhist.model.Card;
@@ -29,6 +30,12 @@ public class Animation {
     @JsonProperty
     private Team winningTeam;
 
+    @JsonProperty
+    private List<PlayerView> playerViews;
+
+    @JsonProperty
+    private List<Card> kittyView;
+
     public Animation() {}
 
     public Animation(PlayedCard playedCard) {
@@ -45,7 +52,13 @@ public class Animation {
     public Animation(Book trick) {
         this.type = AnimationType.COLLECT;
         this.cardList = trick.getCards();
-        this.winningTeam = trick.getWinningTeam(); // fixed typo
+        this.winningTeam = trick.getWinningTeam();
+    }
+    
+    public Animation(List<PlayerView> playerViews, List<Card> kittyView) {
+        this.type = AnimationType.UPDATE_CARDS;
+        this.playerViews = playerViews;
+        this.kittyView = kittyView;
     }
 
     public Animation(AnimationType type) {
@@ -77,6 +90,14 @@ public class Animation {
         return winningTeam;
     }
 
+    public List<PlayerView> getPlayerViews() {
+        return playerViews;
+    }
+
+    public List<Card> getKittyView() {
+        return kittyView;
+}
+
     // Setters
     public void setType(AnimationType type) {
         this.type = type;
@@ -96,5 +117,13 @@ public class Animation {
 
     public void setWinningTeam(Team winningTeam) {
         this.winningTeam = winningTeam;
+    }
+
+    public void setPlayerViews(List<PlayerView> playerViews) {
+        this.playerViews = playerViews;
+    }
+
+    public void setKittyView(List<Card> kittyView) {
+        this.kittyView = kittyView;
     }
 }

@@ -1,15 +1,17 @@
 // src/components/GameScreen.jsx
-import { useRef } from "react";
-import "../css/GameScreen.css";
-import "../css/Card.css";
-import "../css/PlayerZone.css";
-import CardPlayZone from "./CardPlayZone";
-import PlayerZone from "./PlayerZone";
-import BidZone from "./BidZone.jsx";
-import { useGameState } from "../context/GameStateContext.jsx";
-import { usePositionContext } from "../context/PositionContext.jsx";
-import { useUIDisplay } from "../context/UIDisplayContext.jsx";
-import { useAlert } from "../context/AlertContext.jsx";
+import { useRef, useEffect } from 'react';
+import '../css/GameScreen.css';
+import '../css/Card.css';
+import '../css/PlayerZone.css';
+import CardPlayZone from './CardPlayZone';
+import PlayerZone from './PlayerZone';
+import BidZone from './BidZone.jsx';
+import { useGameState } from '../context/GameStateContext.jsx';
+import { usePositionContext } from '../context/PositionContext.jsx';
+import { useUIDisplay } from '../context/UIDisplayContext.jsx';
+import { useZoneRefs } from '../context/RefContext.jsx';
+import { useAlert } from '../context/AlertContext.jsx'
+
 
 // --- GameScreen Component ---
 /* The GameScreen component manages the main game interface, including player zones, card play zones, 
@@ -20,6 +22,7 @@ export default function GameScreen() {
   const { positionToDirection, viewerPosition } = usePositionContext();
 
   const {
+        handMap,
     awardKitty,
     setAwardKitty,
     discardPile,
@@ -28,10 +31,13 @@ export default function GameScreen() {
     teamBTricks,
   } = useUIDisplay();
 
-  const { showAlert } = useAlert();
-  const dropZoneRef = useRef();
-  const yourTrickRef = useRef();
-  const theirTrickRef = useRef();
+    const { showAlert } = useAlert();
+    const dropZoneRef = useRef();
+    const yourTrickRef = useRef();
+    const theirTrickRef = useRef();
+    const southZoneRef = useRef();
+    const { register } = useZoneRefs();
+
 
   // --- getPlayerProps Function ---
   /* Retrieves the player properties (name, cards, etc.) for a given direction (north, south, east, west). 
@@ -57,25 +63,33 @@ export default function GameScreen() {
     const [position] = entry;
     const player = players.find((p) => p.position === position);
 
-    // Return player properties for this direction
-    return {
-      key: position,
-      props: {
-        direction,
-        position,
-        name: player?.name || direction.toUpperCase(),
-        cards: player?.hand || [],
-        revealHand: direction === "south",
-      },
+        // Return player properties for this direction
+        return {
+            key: position,
+            props: {
+                direction,
+                position,
+                name: player?.name || direction.toUpperCase(),
+                cards: handMap[direction] || [],
+                revealHand: direction === 'south',
+            }
+        };
     };
-  };
 
-  const playerProps = {
-    north: getPlayerProps("north"),
-    west: getPlayerProps("west"),
-    east: getPlayerProps("east"),
-    south: getPlayerProps("south"),
-  };
+
+    const playerProps = {
+        north: getPlayerProps("north"),
+        west: getPlayerProps("west"),
+        east: getPlayerProps("east"),
+        south: getPlayerProps("south"),
+    };
+
+    // Register zone for displaying upated hand
+    useEffect(() => {
+        if (southZoneRef.current) {
+            register('zone-south', southZoneRef);
+        }
+    }, [southZoneRef]);
 
   // --- discard Function ---
   /* Handles the discard action, ensuring exactly 6 cards are selected before submitting. */
@@ -169,14 +183,17 @@ export default function GameScreen() {
           <div className="placeholder-zone">Kitty & Discard</div>
         </div>
 
-        <div className="grid-item bottom-center">
-          <PlayerZone dropZoneRef={dropZoneRef} {...playerProps.south.props} />
-          {awardKitty && (
-            <button className="index-button settings-button" onClick={discard}>
-              Submit
-            </button>
-          )}
-        </div>
+                <div className="grid-item bottom-center">
+                    <PlayerZone
+                        ref={southZoneRef}
+                        dropZoneRef={dropZoneRef}
+                        {...playerProps.south.props} />
+                    {awardKitty && (
+                        <button className="index-button settings-button" onClick={discard}>
+                            Submit
+                        </button>
+                    )}
+                </div>
 
         <div className="grid-item bottom-right">
           <div className="placeholder-zone" ref={yourTrickRef}>
