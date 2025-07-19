@@ -21,7 +21,7 @@ import com.bidwhist.dto.PopAnimationRequest;
 import com.bidwhist.service.GameService;
 
 @RestController
-@RequestMapping("/api/game")
+@RequestMapping("/game")
 public class GameController {
 
     @Autowired

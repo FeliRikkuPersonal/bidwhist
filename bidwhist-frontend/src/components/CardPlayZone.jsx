@@ -223,7 +223,7 @@ export default function CardPlayZone({
             // Update players' displayed hand
             if (animation.type === 'UPDATE_CARDS') {
                 try {
-                    const res = await fetch(`${API}/api/game/update-cards`, {
+                    const res = await fetch(`${API}/game/update-cards`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ gameId: gameId, player: viewerPosition }),
