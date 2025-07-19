@@ -9,7 +9,7 @@ import { useUIDisplay } from '../context/UIDisplayContext.jsx';
 export default function BiddingPanel({ closeBidding, onBidPlaced }) {
 
     const { debugLog: logPosition, viewerPosition } = usePositionContext();
-    const { debugLog: logGameState, gameId, bids, setBids, bidTurnIndex, setCurrentTurnIndex, setFirstBidder, setPhase } = useGameState();
+    const { debugLog: logGameState, gameId, bids, setBids, bidTurnIndex, currentTurnIndex, setCurrentTurnIndex, setFirstBidder, setPhase } = useGameState();
     const { debugLog: logUI, bidPhase, setBidPhase, showBidding, setShowBidding, setShowFinalizeBid } = useUIDisplay();
 
     const [bidValue, setBidValue] = useState('');
@@ -18,7 +18,7 @@ export default function BiddingPanel({ closeBidding, onBidPlaced }) {
     useEffect(() => {
         if (!bidPhase || !viewerPosition || bidTurnIndex == null) return;
 
-        const turnPlayerPos = ['P1', 'P2', 'P3', 'P4'][bidTurnIndexx];
+        const turnPlayerPos = ['P1', 'P2', 'P3', 'P4'][bidTurnIndex];
         const isMyTurn = viewerPosition === turnPlayerPos;
 
         setShowBidding(bidPhase && isMyTurn);

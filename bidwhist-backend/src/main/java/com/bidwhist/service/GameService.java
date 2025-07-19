@@ -299,9 +299,7 @@ public class GameService {
             if (winner.isAI()) {
                 game.setPhase(GamePhase.PLAY);
             } else {
-                winner.getHand().getCards().addAll(game.getKitty());
                 game.setPhase(GamePhase.KITTY);
-                game.addAnimation(new Animation(AnimationType.UPDATE_CARDS));
             }
         }
 
@@ -409,6 +407,7 @@ public class GameService {
 
         GameStateResponse response = getGameStateForPlayer(game, winnerPos);
         response.setKitty(game.getKitty());
+        winner.getHand().getCards().addAll(game.getKitty());
         game.addAnimation(new Animation(AnimationType.UPDATE_CARDS));
 
         return response;

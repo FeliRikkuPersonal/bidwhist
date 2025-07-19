@@ -13,6 +13,8 @@ C:\Users\Leh-D\VSCode\bidwhist\bidwhist-backend\src\main\java\com\bidwhist\dto\C
 C:\Users\Leh-D\VSCode\bidwhist\bidwhist-backend\src\main\java\com\bidwhist\dto\CardVisibility.java
 C:\Users\Leh-D\VSCode\bidwhist\bidwhist-backend\src\main\java\com\bidwhist\dto\FinalBidRequest.java
 C:\Users\Leh-D\VSCode\bidwhist\bidwhist-backend\src\main\java\com\bidwhist\dto\GameStateResponse.java
+C:\Users\Leh-D\VSCode\bidwhist\bidwhist-backend\src\main\java\com\bidwhist\dto\HandRequest.java
+C:\Users\Leh-D\VSCode\bidwhist\bidwhist-backend\src\main\java\com\bidwhist\dto\HandResponse.java
 C:\Users\Leh-D\VSCode\bidwhist\bidwhist-backend\src\main\java\com\bidwhist\dto\JoinGameRequest.java
 C:\Users\Leh-D\VSCode\bidwhist\bidwhist-backend\src\main\java\com\bidwhist\dto\KittyRequest.java
 C:\Users\Leh-D\VSCode\bidwhist\bidwhist-backend\src\main\java\com\bidwhist\dto\PlayerRequest.java
