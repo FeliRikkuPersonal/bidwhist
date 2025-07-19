@@ -24,8 +24,8 @@ export const GameStateProvider = ({ children }) => {
   const [mode, setMode] = useState('single');
   const [difficulty, setDifficulty] = useState('EASY'); // NEW: default to EASY
   const [gameId, setGameId] = useState(null);
-  const [currentTrick, setCurrentTrick] = useState([]);
-  const [completedTricks, setCompletedTricks] = useState([]);
+  const [currentTrick, setCurrentTrick] = useState([]); // List<Card>
+  const [completedTricks, setCompletedTricks] = useState([]); // List<Book>
   const [teamAScore, setTeamAScore] = useState(0);
   const [teamBScore, setTeamBScore] = useState(0);
   const [teamATricksWon, setTeamATricksWon] = useState(0);
@@ -34,7 +34,6 @@ export const GameStateProvider = ({ children }) => {
 
   const updateFromResponse = (response) => {
     if ('players' in response) setPlayers(response.players);
-    if ('kitty' in response) setKitty(response.kitty);
     if ('currentTurnIndex' in response) setCurrentTurnIndex(response.currentTurnIndex);
     if ('phase' in response) setPhase(response.phase);
     if ('trumpSuit' in response) setTrumpSuit(response.trumpSuit);
@@ -53,7 +52,7 @@ export const GameStateProvider = ({ children }) => {
     if ('completedTricks' in response) setCompletedTricks(response.completedTricks);
     if ('teamAScore' in response) setTeamAScore(response.teamAScore);
     if ('teamBScore' in response) setTeamBScore(response.teamBScore);
-    if ('teamATricksWon'in response) setTeamATricksWon(response.teamATricksWon);
+    if ('teamATricksWon' in response) setTeamATricksWon(response.teamATricksWon);
     if ('teamBTricksWon' in response) setTeamBTricksWon(response.teamBTricksWon);
     if ('finalScore' in response) setFinalScore(response.finalScore)
   };

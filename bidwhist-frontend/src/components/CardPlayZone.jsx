@@ -16,7 +16,9 @@ import BidTypePanel from './BidTypePanel.jsx';
 
 export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef, onCardPlayed }) {
     const {
+        setHandFor,
         setShowHands,
+        setKitty,
         setShowBidding,
         deckPosition,
         setDeckPosition,
@@ -34,6 +36,7 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
     } = useUIDisplay();
 
     const {
+        debugLog: positionLog,
         playerName,
         viewerPosition,
         backendPositions,
@@ -45,6 +48,7 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
         players,
         bids,
         winningPlayerName,
+        setWinningBid,
         bidWinnerPos,
     } = useGameState();
 
@@ -104,7 +108,7 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
                         setBidPhase
                     );
                 }, 50);
-            }
+            };
 
             if (animation.type === 'PLAY') {
                 const { card, player } = animation;
@@ -187,8 +191,42 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
             if (animation.type === 'CLEAR') {
                 setTeamATricks(0);
                 setTeamBTricks(0);
-                setShowBidding(true);
+                setWinningBid(null);
 
+            }
+
+            // Update players' displayed hand
+            if (animation.type === 'UPDATE_CARDS') {
+                try {
+                    const res = await fetch(`${API}/api/game/update-cards`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ gameId: gameId, player: viewerPosition }),
+                    });
+
+                    const data = await res.json();
+
+                    if (!res.ok || !data.players || !data.kitty) {
+                        console.error("[CardPlayZone] Invalid update response:", data);
+                        return;
+                    }
+
+                    data.players.forEach(({ position, hand }) => {
+                        const direction = positionToDirection[position];
+                        console.log(`[UPDATE_CARDS] setting hand for ${direction}:`, hand);
+                        setHandFor(direction, hand); // manually triggers card updates
+                    });
+
+                    setKitty(data.kitty);
+
+                } catch (err) {
+                    console.error('[CardPlayZone] Error updating card data:', err)
+                }
+            }
+
+            // Open bidding panel
+            if (animation.type === 'SHOW_WINNER') {
+                // insert instructions to open winner panel;
             }
 
             // Notify backend that animation has completed

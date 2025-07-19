@@ -9,25 +9,19 @@ import { useUIDisplay } from '../context/UIDisplayContext.jsx';
 export default function BiddingPanel({ closeBidding, onBidPlaced }) {
 
     const { debugLog: logPosition, viewerPosition } = usePositionContext();
-    const { debugLog: logGameState, gameId, bids, setBids, currentTurnIndex, setCurrentTurnIndex, setFirstBidder, setPhase } = useGameState();
+    const { debugLog: logGameState, gameId, bids, setBids, bidTurnIndex, setCurrentTurnIndex, setFirstBidder, setPhase } = useGameState();
     const { debugLog: logUI, bidPhase, setBidPhase, showBidding, setShowBidding, setShowFinalizeBid } = useUIDisplay();
 
     const [bidValue, setBidValue] = useState('');
     const [isNo, setIsNo] = useState(false);
 
     useEffect(() => {
-        if (!bidPhase || !viewerPosition || currentTurnIndex == null) return;
+        if (!bidPhase || !viewerPosition || bidTurnIndex == null) return;
 
-        const turnPlayerPos = ['P1', 'P2', 'P3', 'P4'][currentTurnIndex];
+        const turnPlayerPos = ['P1', 'P2', 'P3', 'P4'][bidTurnIndexx];
         const isMyTurn = viewerPosition === turnPlayerPos;
 
         setShowBidding(bidPhase && isMyTurn);
-        console.log(`BidPhase? ${bidPhase} MyTurn?: ${isMyTurn}`);
-
-        console.log('[BiddingPanel Log]');
-        logGameState();
-        logUI();
-
     }, [bids, bidPhase, currentTurnIndex, viewerPosition]);
 
     if (!showBidding) return null;

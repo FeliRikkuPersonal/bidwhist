@@ -4,7 +4,7 @@ import { usePositionContext } from "../context/PositionContext.jsx";
 
 export default function Scoreboard() {
     const { teamAScore, teamBScore, winningBid } = useGameState();
-    const { viewerPosition } = usePositionContext();
+    const { viewerPosition, playerTeam } = usePositionContext();
 
     const [myTeam, setMyTeam] = useState(0);
     const [theirTeam, setTheirTeam] = useState(0);
@@ -28,8 +28,9 @@ export default function Scoreboard() {
             const suit = winningBid.suit ?? "";
             const type = winningBid.type ?? "";
             const value = winningBid.value ?? "";
+            const team = playerTeam[winningBid.player];
 
-            setFormattedBid(`${value}${isNo} ${type} ${suit}`.trim());
+            setFormattedBid(`Team ${team} / ${value}${isNo} ${type} ${suit}`.trim());
         } else {
             setFormattedBid("");
         }
