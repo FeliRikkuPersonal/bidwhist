@@ -5,16 +5,13 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
-import java.util.UUID;
 
+import com.bidwhist.bidding.BidType;
 import com.bidwhist.bidding.FinalBid;
 import com.bidwhist.bidding.InitialBid;
 import com.bidwhist.dto.Animation;
-import com.bidwhist.bidding.BidType;
-import com.bidwhist.utils.PlayerUtils;
 import com.bidwhist.service.DeckService;
-import com.bidwhist.model.GameRoom;
+import com.bidwhist.utils.PlayerUtils;
 
 public class GameState {
 
@@ -29,15 +26,16 @@ public class GameState {
     private int bidTurnIndex;
     private InitialBid highestBid;
     private BidType trumpType;
-    private Map<PlayerPos, FinalBid> finalBidCache = new HashMap<>();
+    private final Map<PlayerPos, FinalBid> finalBidCache = new HashMap<>();
     private FinalBid winningBid;
     private String winningPlayerName; // <-- NEW FIELD
     private List<Card> shuffledDeck;
     private PlayerPos firstBidder;
     private Difficulty difficulty;
-    private GameRoom room;
+    private final GameRoom room;
     private Map<PlayerPos, List<Animation>> animationList = new EnumMap<>(PlayerPos.class);
     private PlayerPos bidWinnderPos;
+    private final List<Card> playedCards = new ArrayList<>();
 
     private List<PlayedCard> currentTrick = new ArrayList<>();
     private List<Book> completedTricks = new ArrayList<>();
@@ -72,8 +70,9 @@ public class GameState {
     }
 
     public void addAnimation(Animation animation) {
-        if (animationList == null)
+        if (animationList == null) {
             return;
+        }
 
         for (List<Animation> queue : animationList.values()) {
             queue.add(animation);
@@ -93,8 +92,8 @@ public class GameState {
         boolean removed = animations.removeIf(animation -> {
             String currentId = animation.getId();
             System.out.println("   → Comparing against animation ID: " + currentId);
-            return animationId != null && currentId != null &&
-                    animationId.trim().equalsIgnoreCase(currentId.trim());
+            return animationId != null && currentId != null
+                    && animationId.trim().equalsIgnoreCase(currentId.trim());
         });
 
         if (removed) {
@@ -279,6 +278,24 @@ public class GameState {
         this.completedTricks = completedTricks;
     }
 
+    public List<Card> getCompletedCards() {
+        List<Card> completed = new ArrayList<>();
+        for (Book book : completedTricks) {
+            for (PlayedCard pc : book.getPlayedCards()) {
+                if (pc.getCard() != null) {
+                    completed.add(pc.getCard());
+                }
+            }
+        }
+        return completed;
+    }
+
+    public void addPlayedCard(Card card) {
+        if (card != null) {
+            playedCards.add(card);
+        }
+    }
+
     public int getCurrentPlayerIndex() {
         return currentPlayerIndex;
     }
@@ -349,6 +366,10 @@ public class GameState {
 
     public void setBidWinnerPos(PlayerPos winnerPos) {
         this.bidWinnderPos = winnerPos;
+    }
+
+    public List<Card> getPlayedCards() {
+        return playedCards;
     }
 
 }

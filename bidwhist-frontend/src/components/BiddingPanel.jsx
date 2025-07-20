@@ -32,13 +32,13 @@ export default function BiddingPanel({ closeBidding, onBidPlaced }) {
   const [isNo, setIsNo] = useState(false);
 
   useEffect(() => {
-    if (!bidPhase || !viewerPosition || currentTurnIndex == null) return;
+    if (!bidPhase || !viewerPosition || bidTurnIndex == null) return;
 
-    const turnPlayerPos = ["P1", "P2", "P3", "P4"][currentTurnIndex];
+    const turnPlayerPos = ["P1", "P2", "P3", "P4"][bidTurnIndex];
     const isMyTurn = viewerPosition === turnPlayerPos;
 
         setShowBidding(bidPhase && isMyTurn);
-    }, [bids, bidPhase, currentTurnIndex, viewerPosition]);
+    }, [bids, bidPhase, bidTurnIndex, viewerPosition]);
 
   if (!showBidding) return null;
 

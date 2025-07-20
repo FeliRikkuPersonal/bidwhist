@@ -1,27 +1,25 @@
 package com.bidwhist.model;
 
-import com.bidwhist.dto.CardOwner;
 import com.bidwhist.dto.CardVisibility;
 import com.bidwhist.utils.JokerUtils;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-@JsonPropertyOrder({ "rank", "suit" })
-public class Card implements Comparable<Card> {
+@JsonPropertyOrder({"rank", "suit"})
+public final class Card implements Comparable<Card> {
 
     /* Track card location across game */
     public enum CardLocation {
         DECK, HAND, KITTY, PLAY, BOOK, DISCARDED
     }
 
-    private Rank rank;
+    private final Rank rank;
     private Suit suit;
-    private String cardImage;
     private CardVisibility visibility;
 
     public Card(Suit suit, Rank rank) {
         this.rank = rank;
         this.suit = suit;
-        this.cardImage = this.getCardImage();
+        this.getCardImage();
 
         this.visibility = CardVisibility.HIDDEN;
     }
@@ -45,21 +43,33 @@ public class Card implements Comparable<Card> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
+        }
         Card card = (Card) o;
         return rank == card.rank && suit == card.suit;
     }
 
     @Override
+    public int hashCode() {
+        int result = rank != null ? rank.hashCode() : 0;
+        result = 31 * result + (suit != null ? suit.hashCode() : 0);
+        return result;
+    }
+
+    @Override
     public int compareTo(Card other) {
         // Handle suit nulls (Jokers)
-        if (this.suit == null && other.suit != null)
+        if (this.suit == null && other.suit != null) {
             return 1; // Jokers go after normal cards
-        if (this.suit != null && other.suit == null)
+
+        }
+        if (this.suit != null && other.suit == null) {
             return -1;
+        }
         if (this.suit == null && other.suit == null) {
             // Compare by rank only (optional: treat JokerLow < JokerHigh)
             return this.rank.compareTo(other.rank);
@@ -77,6 +87,14 @@ public class Card implements Comparable<Card> {
 
     public Rank getRank() {
         return rank;
+    }
+
+    public boolean isJoker() {
+        return JokerUtils.isJokerRank(this.rank);
+    }
+
+    public void setSuit(Suit suit) {
+        this.suit = suit;
     }
 
     public CardVisibility getVisibility() {
