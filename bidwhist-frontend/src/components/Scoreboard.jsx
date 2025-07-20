@@ -1,20 +1,32 @@
-import { useState, useEffect } from "react";
-import { useGameState } from "../context/GameStateContext.jsx";
-import { usePositionContext } from "../context/PositionContext.jsx";
-import BidZone from "./BidZone.jsx";
-import "../css/ScoreBoard.css";
+// src/components/Scoreboard.jsx
 
+import { useState, useEffect } from 'react';
+import { useGameState } from '../context/GameStateContext.jsx';
+import { usePositionContext } from '../context/PositionContext.jsx';
+import BidZone from './BidZone.jsx';
+import '../css/ScoreBoard.css';
+
+/**
+ * Displays the score for both teams and the current winning bid.
+ * Also conditionally renders the BidZone if a bidType is active.
+ *
+ * @param {string} bidType - The type of bidding phase (used to show BidZone)
+ * @returns {JSX.Element} Scoreboard UI
+ */
 export default function Scoreboard({ bidType }) {
   const { teamAScore, teamBScore, winningBid } = useGameState();
   const { viewerPosition, playerTeam } = usePositionContext();
 
   const [myTeam, setMyTeam] = useState(0);
   const [theirTeam, setTheirTeam] = useState(0);
-  const [formattedBid, setFormattedBid] = useState("");
+  const [formattedBid, setFormattedBid] = useState('');
 
-  // Who's on which team
+  /**
+   * Determine which team the viewer is on based on their position.
+   * P1/P3 are always Team A; P2/P4 are Team B.
+   */
   useEffect(() => {
-    if (viewerPosition === "P1" || viewerPosition === "P3") {
+    if (viewerPosition === 'P1' || viewerPosition === 'P3') {
       setMyTeam(teamAScore);
       setTheirTeam(teamBScore);
     } else {
@@ -23,20 +35,22 @@ export default function Scoreboard({ bidType }) {
     }
   }, [viewerPosition, teamAScore, teamBScore]);
 
-    // Format bid when it changes
-    useEffect(() => {
-        if (winningBid) {
-            const isNo = winningBid.isNo ? "-No" : "";
-            const suit = winningBid.suit ?? "";
-            const type = winningBid.type ?? "";
-            const value = winningBid.value ?? "";
-            const team = playerTeam[winningBid.player];
+  /**
+   * Builds a readable version of the winning bid for display.
+   */
+  useEffect(() => {
+    if (winningBid) {
+      const isNo = winningBid.isNo ? '-No' : '';
+      const suit = winningBid.suit ?? '';
+      const type = winningBid.type ?? '';
+      const value = winningBid.value ?? '';
+      const team = playerTeam[winningBid.player];
 
-            setFormattedBid(`Team ${team} / ${value}${isNo} ${type} ${suit}`.trim());
-        } else {
-            setFormattedBid("");
-        }
-    }, [winningBid]);
+      setFormattedBid(`Team ${team} / ${value}${isNo} ${type} ${suit}`.trim());
+    } else {
+      setFormattedBid('');
+    }
+  }, [winningBid]);
 
   return (
     <div className="scoreboard">

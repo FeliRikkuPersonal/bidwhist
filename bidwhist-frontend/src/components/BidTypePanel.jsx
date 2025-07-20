@@ -1,13 +1,23 @@
-import "../css/BiddingPanel.css";
-import "../css/index.css";
-import "../css/GameScreen.css";
-import { useState } from "react";
-import { usePositionContext } from "../context/PositionContext.jsx";
-import { useGameState } from "../context/GameStateContext.jsx";
-import { useUIDisplay } from "../context/UIDisplayContext.jsx";
+// src/components/BidTypePanel.jsx
 
+import '../css/BiddingPanel.css';
+import '../css/index.css';
+import '../css/GameScreen.css';
+import { useState } from 'react';
+import { usePositionContext } from '../context/PositionContext.jsx';
+import { useGameState } from '../context/GameStateContext.jsx';
+import { useUIDisplay } from '../context/UIDisplayContext.jsx';
+
+/*
+*
+* BidTypePanel handles the final bid confirmation UI.
+* It allows the winning player to select bid direction and suit (if applicable),
+* and sends the finalized bid to the backend to transition the game phase.
+*
+*/
 export default function BidTypePanel({ closeBidTypePanel }) {
   const { viewerPosition } = usePositionContext();
+
   const {
     gameId,
     setBids,
@@ -18,29 +28,38 @@ export default function BidTypePanel({ closeBidTypePanel }) {
     setCurrentTurnIndex,
     setWinningPlayerName,
   } = useGameState();
+
   const { showFinalizeBid, setAwardKitty } = useUIDisplay();
 
-  const [direction, setDirection] = useState("UPTOWN");
-  const [suit, setSuit] = useState("HEARTS");
+  const [direction, setDirection] = useState('UPTOWN');
+  const [suit, setSuit] = useState('HEARTS');
 
+  /* check if No Trump */
   const isNoTrump = highestBid?.no;
 
+  /* return null if panel should not show */
   if (!showFinalizeBid) return null;
 
+  /*
+  *
+  * finalizeBid sends the selected direction and suit (if not No Trump)
+  * to the server, updates global game state, and closes the panel.
+  *
+  */
   const finalizeBid = async () => {
     const payload = {
       gameId: gameId,
       player: viewerPosition,
-      type: direction, // UPTOWN or DOWNTOWN
-      suit: isNoTrump ? null : suit, // Only send suit if not No Trump
+      type: direction,
+      suit: isNoTrump ? null : suit,
     };
 
     const API = import.meta.env.VITE_API_URL;
 
     try {
       const res = await fetch(`${API}/game/finalizeBid`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
 
@@ -50,19 +69,25 @@ export default function BidTypePanel({ closeBidTypePanel }) {
         setTrumpSuit(data.trumpSuit);
         setBidType(data.bidType);
         setCurrentTurnIndex(data.currentTurnIndex);
-        setPhase(data.phase); // update to KITTY or next phase
+        setPhase(data.phase);
         setWinningPlayerName(data.winningPlayerName);
         setBids([]);
         setAwardKitty(true);
         closeBidTypePanel?.();
       } else {
-        console.error("Finalize Bid failed:", data);
+        console.error('Finalize Bid failed:', data);
       }
     } catch (error) {
-      console.error("Network error:", error);
+      console.error('Network error:', error);
     }
   };
 
+  /*
+  *
+  * Render the bid direction and (conditionally) suit selector.
+  * Shows Confirm and Cancel buttons to finalize or abort.
+  *
+  */
   return (
     <div className="bidding-overlay">
       <div className="bidding-panel">
@@ -79,8 +104,9 @@ export default function BidTypePanel({ closeBidTypePanel }) {
             <option value="DOWNTOWN">Downtown</option>
           </select>
         </label>
+
         {!isNoTrump && (
-          <label style={{ display: "block", marginBottom: "10px" }}>
+          <label style={{ display: 'block', marginBottom: '10px' }}>
             Suit:
             <select
               value={suit}
@@ -94,17 +120,12 @@ export default function BidTypePanel({ closeBidTypePanel }) {
             </select>
           </label>
         )}
+
         <div className="settings-actions">
-          <button
-            className="index-button settings-button"
-            onClick={finalizeBid}
-          >
+          <button className="index-button settings-button" onClick={finalizeBid}>
             Confirm
           </button>
-          <button
-            className="index-button settings-button"
-            onClick={closeBidTypePanel}
-          >
+          <button className="index-button settings-button" onClick={closeBidTypePanel}>
             Cancel
           </button>
         </div>

@@ -1,6 +1,15 @@
+// src/utils/CardAnimations.js
+
 import { useZoneRefs } from '../context/RefContext';
 
-
+/**
+ * Computes the start and end center positions of a card animation path.
+ *
+ * @param {string} fromKey - The ref key for the source zone
+ * @param {string} toKey - The ref key for the target zone
+ * @returns {{from: {x: number, y: number}, to: {x: number, y: number}} | null}
+ *          Coordinates for the animation path or null if either ref is missing
+ */
 export function getAnimationPath(fromKey, toKey) {
   const { get } = useZoneRefs();
 

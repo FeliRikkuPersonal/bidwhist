@@ -1,28 +1,31 @@
 // src/components/GameScreen.jsx
+
 import { useRef, useEffect } from 'react';
 import '../css/GameScreen.css';
 import '../css/Card.css';
 import '../css/PlayerZone.css';
+
 import CardPlayZone from './CardPlayZone';
 import PlayerZone from './PlayerZone';
-import BidZone from './BidZone.jsx';
+
 import { useGameState } from '../context/GameStateContext.jsx';
 import { usePositionContext } from '../context/PositionContext.jsx';
 import { useUIDisplay } from '../context/UIDisplayContext.jsx';
 import { useZoneRefs } from '../context/RefContext.jsx';
-import { useAlert } from '../context/AlertContext.jsx'
+import { useAlert } from '../context/AlertContext.jsx';
 
-
-// --- GameScreen Component ---
-/* The GameScreen component manages the main game interface, including player zones, card play zones, 
-   bid zone, and handling discard actions. It uses various context providers to manage state and interactions. */
+/**
+ * Main game interface layout and logic. Displays all player zones, trick piles, and
+ * handles the discard submission phase. Utilizes context state to drive all layout logic.
+ *
+ * @returns {JSX.Element} The full game screen layout
+ */
 export default function GameScreen() {
   const { gameId, updateFromResponse, players } = useGameState();
-
   const { positionToDirection, viewerPosition } = usePositionContext();
 
   const {
-        handMap,
+    handMap,
     awardKitty,
     setAwardKitty,
     discardPile,
@@ -31,87 +34,83 @@ export default function GameScreen() {
     teamBTricks,
   } = useUIDisplay();
 
-    const { showAlert } = useAlert();
-    const dropZoneRef = useRef();
-    const yourTrickRef = useRef();
-    const theirTrickRef = useRef();
-    const southZoneRef = useRef();
-    const { register } = useZoneRefs();
+  const { showAlert } = useAlert();
+  const { register } = useZoneRefs();
 
+  const dropZoneRef = useRef();
+  const yourTrickRef = useRef();
+  const theirTrickRef = useRef();
+  const southZoneRef = useRef();
 
-  // --- getPlayerProps Function ---
-  /* Retrieves the player properties (name, cards, etc.) for a given direction (north, south, east, west). 
-       This function checks the current positions and assigns the corresponding player data. */
+  /**
+   * Retrieves player props for a given direction (e.g., north, south).
+   * Includes player name, position, and hand.
+   */
   const getPlayerProps = (direction) => {
     if (!positionToDirection) {
-      console.warn("Missing positionToDirection");
-      return { direction, name: "", cards: [], showHand: false };
+      console.warn('Missing positionToDirection');
+      return { direction, name: '', cards: [], showHand: false };
     }
 
-    const entry = Object.entries(positionToDirection).find(
-      ([_, dir]) => dir === direction
-    );
-
+    const entry = Object.entries(positionToDirection).find(([_, dir]) => dir === direction);
     if (!entry) {
-      console.warn(
-        `No position found for direction: ${direction}`,
-        positionToDirection
-      );
-      return { direction, name: "", cards: [], showHand: false };
+      console.warn(`No position found for direction: ${direction}`, positionToDirection);
+      return { direction, name: '', cards: [], showHand: false };
     }
 
     const [position] = entry;
     const player = players.find((p) => p.position === position);
 
-        // Return player properties for this direction
-        return {
-            key: position,
-            props: {
-                direction,
-                position,
-                name: player?.name || direction.toUpperCase(),
-                cards: handMap[direction] || [],
-                revealHand: direction === 'south',
-            }
-        };
+    return {
+      key: position,
+      props: {
+        direction,
+        position,
+        name: player?.name || direction.toUpperCase(),
+        cards: handMap[direction] || [],
+        revealHand: direction === 'south',
+      },
     };
+  };
 
+  const playerProps = {
+    north: getPlayerProps('north'),
+    west: getPlayerProps('west'),
+    east: getPlayerProps('east'),
+    south: getPlayerProps('south'),
+  };
 
-    const playerProps = {
-        north: getPlayerProps("north"),
-        west: getPlayerProps("west"),
-        east: getPlayerProps("east"),
-        south: getPlayerProps("south"),
-    };
+  /**
+   * Registers the south zone ref for animation positioning.
+   */
+  useEffect(() => {
+    if (southZoneRef.current) {
+      register('zone-south', southZoneRef);
+    }
+  }, [southZoneRef]);
 
-    // Register zone for displaying upated hand
-    useEffect(() => {
-        if (southZoneRef.current) {
-            register('zone-south', southZoneRef);
-        }
-    }, [southZoneRef]);
-
-  // --- discard Function ---
-  /* Handles the discard action, ensuring exactly 6 cards are selected before submitting. */
+  /**
+   * Submits selected cards as discards (must be 6).
+   * POSTs to /game/kitty and updates game state.
+   */
   const discard = async () => {
-    if (discardPile.length != 6) {
-      showAlert("You must discard exactly 6 cards.");
+    if (discardPile.length !== 6) {
+      showAlert('You must discard exactly 6 cards.');
       return;
     }
 
     const payload = {
-      gameId: gameId,
+      gameId,
       player: viewerPosition,
       discards: discardPile,
     };
 
     const API = import.meta.env.VITE_API_URL;
 
-    // Make API call to submit the discard pile
     try {
       const res = await fetch(`${API}/game/kitty`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
 
@@ -122,15 +121,16 @@ export default function GameScreen() {
         setDiscardPile([]);
         setAwardKitty(false);
       } else {
-        console.error("Discard failed:", data);
+        console.error('Discard failed:', data);
       }
     } catch (error) {
-      console.error("Network error:", error);
+      console.error('Network error:', error);
     }
   };
 
-  // --- JSX Rendering ---
-  /* The rendering of the game screen, with the appropriate layout for player zones, cards, and bid zones. */
+  /**
+   * Renders the full 3x3 grid of the game table with player zones and trick placeholders.
+   */
   return (
     <div className="game-screen-container">
       <div className="game-grid">
@@ -144,11 +144,11 @@ export default function GameScreen() {
                 alt="Card Back"
                 className="card-img"
                 style={{
-                  position: "absolute",
-                  left: `calc(50% + ${i * -15}px)`, // start at center and go left
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  zIndex: i, // stack visually
+                  position: 'absolute',
+                  left: `calc(50% + ${i * -15}px)`,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  zIndex: i,
                 }}
               />
             ))}
@@ -158,7 +158,8 @@ export default function GameScreen() {
         <div className="grid-item top-center">
           <PlayerZone {...playerProps.north.props} />
         </div>
-        <div className="grid-item top-right"></div>
+
+        <div className="grid-item top-right" />
 
         {/* Middle row */}
         <div className="grid-item middle-left">
@@ -170,7 +171,7 @@ export default function GameScreen() {
             dropZoneRef={dropZoneRef}
             yourTrickRef={yourTrickRef}
             theirTrickRef={theirTrickRef}
-            onCardPlayed={(card) => console.log("Played:", card)}
+            onCardPlayed={(card) => console.log('Played:', card)}
           />
         </div>
 
@@ -183,17 +184,14 @@ export default function GameScreen() {
           <div className="placeholder-zone">Kitty & Discard</div>
         </div>
 
-                <div className="grid-item bottom-center">
-                    <PlayerZone
-                        ref={southZoneRef}
-                        dropZoneRef={dropZoneRef}
-                        {...playerProps.south.props} />
-                    {awardKitty && (
-                        <button className="index-button settings-button" onClick={discard}>
-                            Submit
-                        </button>
-                    )}
-                </div>
+        <div className="grid-item bottom-center">
+          <PlayerZone ref={southZoneRef} dropZoneRef={dropZoneRef} {...playerProps.south.props} />
+          {awardKitty && (
+            <button className="index-button settings-button" onClick={discard}>
+              Submit
+            </button>
+          )}
+        </div>
 
         <div className="grid-item bottom-right">
           <div className="placeholder-zone" ref={yourTrickRef}>
@@ -204,11 +202,11 @@ export default function GameScreen() {
                 alt="Card Back"
                 className="card-img"
                 style={{
-                  position: "absolute",
-                  left: `calc(50% + ${i * -15}px)`, // start at center and go left
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  zIndex: i, // stack visually
+                  position: 'absolute',
+                  left: `calc(50% + ${i * -15}px)`,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  zIndex: i,
                 }}
               />
             ))}

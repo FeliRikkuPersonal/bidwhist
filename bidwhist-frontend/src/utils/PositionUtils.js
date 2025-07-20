@@ -1,8 +1,12 @@
 // src/utils/PositionUtils.js
 
 /**
- * Given an ordered list of players and the current viewer's position,
- * assign directions: south (you), then clockwise.
+ * Maps player backend positions (e.g., 'P1', 'P2') to table directions
+ * relative to the viewer ('south', 'west', 'north', 'east'), rotating clockwise.
+ *
+ * @param {Object} backendPositions - Map of backend positions to player names
+ * @param {string} viewerPosition - The backend position of the current viewer (e.g., 'P2')
+ * @returns {Object} Map of backend positions to relative directions
  */
 export function getPositionMap(backendPositions, viewerPosition) {
   const directions = ['south', 'west', 'north', 'east'];
