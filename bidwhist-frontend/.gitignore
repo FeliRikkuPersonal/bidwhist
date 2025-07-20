@@ -1,4 +1,12 @@
-# Logs
+# === Dependency Directories ===
+node_modules/
+
+# === Build Output ===
+dist/
+dist-ssr/
+*.local
+
+# === Logs ===
 logs
 *.log
 npm-debug.log*
@@ -7,20 +15,11 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+# === Environment ===
 .env
-# Editor directories and files
-.vscode/*
+
+# === Editor Settings ===
+.vscode/
 !.vscode/extensions.json
 .idea
 .DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-/bidwhist-backend/target/
-git m

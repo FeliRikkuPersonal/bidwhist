@@ -1,0 +1,30 @@
+# === Editor and Tool Settings ===
+.vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+
+# === System / IDE Caches ===
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+.nb-gradle/
+nbproject/private/
+nbbuild/
+nbdist/
+
+# === Java Tooling ===
+.mvn/wrapper/maven-wrapper.jar
+HELP.md
+google-java-format.jar
