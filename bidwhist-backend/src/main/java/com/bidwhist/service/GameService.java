@@ -1,14 +1,6 @@
+// src/main/java/com/bidwhist/service/GameService.java
+
 package com.bidwhist.service;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-
-import org.springframework.stereotype.Service;
 
 import com.bidwhist.bidding.BidType;
 import com.bidwhist.bidding.FinalBid;
@@ -44,1103 +36,964 @@ import com.bidwhist.model.Team;
 import com.bidwhist.utils.CardUtils;
 import com.bidwhist.utils.JokerUtils;
 import com.bidwhist.utils.PlayerUtils;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+import org.springframework.stereotype.Service;
 
 @Service
 public class GameService {
 
-    private final Map<String, GameState> games = new ConcurrentHashMap<>();
+  private final Map<String, GameState> games = new ConcurrentHashMap<>();
 
-    public GameService(DeckService deckService) {
+  /* Constructor for GameService (DeckService currently unused) */
+  public GameService(DeckService deckService) {}
+
+  /*
+  * Starts a solo game with one human player and three AIs.
+  * Initializes player positions, shuffles the deck, assigns cards, and updates state.
+  */
+  public GameStateResponse startSoloGame(StartGameRequest request) {
+    String playerName = request.getPlayerName();
+    GameState game = new GameState(request.getGameId());
+
+    game.setFirstBidder(PlayerPos.P1);
+    game.setDifficulty(request.getDifficulty());
+
+    System.out.println("Staring new game for player: " + playerName);
+
+    PlayerPos[] positions = PlayerPos.values();
+    List<Player> players = new ArrayList<>();
+
+    Player humanPlayer = new Player(playerName, false, positions[0], Team.A);
+    players.add(humanPlayer);
+
+    players.add(new Player("AI 1", true, positions[1], Team.B));
+    players.add(new Player("AI 2", true, positions[2], Team.A));
+    players.add(new Player("AI 3", true, positions[3], Team.B));
+
+    for (Player p : players) {
+      System.out.println("Created player: " + p.getName() + " (" + p.getPosition() + ")");
     }
 
-    // Start New Game, add players and shuffled deck
-    public GameStateResponse startSoloGame(StartGameRequest request) {
-        String playerName = request.getPlayerName();
+    game.getDeck().shuffle();
+    game.setShuffledDeck(game.getDeck().getCards());
 
-        GameState game = new GameState(request.getGameId());
+    game.getPlayers().addAll(players);
+    game.setPhase(GamePhase.SHUFFLE);
 
-        game.setFirstBidder(PlayerPos.P1);
-        game.setDifficulty(request.getDifficulty());
+    GameStateResponse response = getGameStateForPlayer(game, PlayerPos.P1);
+    response.setPlayerPosition(PlayerUtils.getPositionByName(playerName, players));
+    response.setViewerName(playerName);
 
-        // debug log
-        System.out.println("Staring new game for player: " + playerName);
+    System.out.println("Current phase: " + game.getPhase());
 
-        // Define all positions
-        PlayerPos[] positions = PlayerPos.values();
-        List<Player> players = new ArrayList<>();
+    games.put(game.getGameId(), game);
+    System.out.println(game.getGameId());
+    dealToPlayers(game);
 
-        // one human, three AIs
-        Player humanPlayer = new Player(playerName, false, positions[0], Team.A);
-        players.add(humanPlayer);
+    return response;
+  }
 
-        // Fill the rest with AI
-        players.add(new Player("AI 1", true, positions[1], Team.B));
-        players.add(new Player("AI 2", true, positions[2], Team.A));
-        players.add(new Player("AI 3", true, positions[3], Team.B));
+  /*
+  * Starts a multiplayer game and registers the first player.
+  * Sets game status to waiting for additional players.
+  */
+  public GameStateResponse createMutliplayerGame(StartGameRequest request) {
+    System.out.println("Staring new game for player: " + request.getPlayerName());
 
-        for (Player p : players) {
-            System.out.println("Created player: " + p.getName() + " (" + p.getPosition() + ")");
-        }
+    GameState game = new GameState(request.getGameId());
 
-        game.getDeck().shuffle();
-        game.setShuffledDeck(game.getDeck().getCards());
+    Player player = new Player(request.getPlayerName(), false, PlayerPos.values()[0], Team.A);
+    game.getRoom().addPlayer(player);
+    game.getPlayers().add(player);
 
-        game.getPlayers().addAll(players);
-        game.setPhase(GamePhase.SHUFFLE);
+    game.getDeck().shuffle();
+    game.setShuffledDeck(game.getDeck().getCards());
 
-        GameStateResponse response = getGameStateForPlayer(game, PlayerPos.P1);
+    game.getRoom().setStatus(RoomStatus.WAITING_FOR_PLAYERS);
+    game.setPhase(GamePhase.INITIATED);
 
-        response.setPlayerPosition(PlayerUtils.getPositionByName(playerName, players));
-        response.setViewerName(playerName);
+    games.putIfAbsent(request.getGameId(), game);
+    games.putIfAbsent(game.getGameId(), game);
 
-        // debug log
-        System.out.println("Current phase: " + game.getPhase());
+    GameStateResponse response = getGameStateForPlayer(game, player.getPosition());
+    response.setPlayerPosition(player.getPosition());
+    response.setViewerName(player.getName());
+    response.setLobbySize(game.getRoom().getPlayers().size());
 
-        games.put(game.getGameId(), game);
-        System.out.println(game.getGameId());
-        dealToPlayers(game);
+    System.out.println("Current phase: " + game.getPhase());
 
-        return response;
+    return response;
+  }
+
+  /*
+  * Allows a player to join an existing game.
+  * If room is ready, triggers shuffle and deals cards.
+  */
+  public GameStateResponse joinGame(JoinGameRequest request) {
+    GameState game = getGameById(request.getGameId());
+    game.getRoom().addPlayer(request.getPlayerName());
+
+    List<Player> roomPlayers = game.getRoom().getPlayers();
+    Player thisPlayer = roomPlayers.get(roomPlayers.size() - 1);
+    game.getPlayers().add(thisPlayer);
+
+    PlayerPos position = game.getRoom().getPlayerPositionByName(request.getPlayerName());
+
+    if (game.getRoom().getStatus() == RoomStatus.READY) {
+      game.setPhase(GamePhase.SHUFFLE);
+      System.out.println("Current phase: " + game.getPhase());
+      dealToPlayers(game);
+      game.getRoom().setStatus(RoomStatus.IN_PROGRESS);
     }
 
-    // Start New Game, add players and shuffled deck
-    public GameStateResponse createMutliplayerGame(StartGameRequest request) {
-        // debug log
-        System.out.println("Staring new game for player: " + request.getPlayerName());
+    GameStateResponse response = getGameStateForPlayer(game, position);
+    response.setPlayerPosition(position);
+    response.setViewerName(request.getPlayerName());
+    response.setLobbySize(game.getRoom().getPlayers().size());
 
-        GameState game = new GameState(request.getGameId());
+    return response;
+  }
 
-        Player player = new Player(request.getPlayerName(), false, PlayerPos.values()[0], Team.A);
-        game.getRoom().addPlayer(player);
-        game.getPlayers().add(player);
+  /*
+  * Returns a GameStateResponse customized for a single player.
+  * Includes masked hands, phase info, team, and all visible public game state.
+  */
+  public GameStateResponse getGameStateForPlayer(GameState game, PlayerPos playerPosition) {
+    List<PlayerView> playerViews = getMyPlayerViews(game, playerPosition);
+    List<Card> myKittyView = getMyKittyView(game, playerPosition);
+    List<Player> players = game.getPlayers();
+    Team myTeam = game.getTeamByPlayerPos(players, playerPosition);
 
-        game.getDeck().shuffle();
-        game.setShuffledDeck(game.getDeck().getCards());
+    GameStateResponse response =
+        new GameStateResponse(
+            game.getAnimationList().getOrDefault(playerPosition, new ArrayList<>()),
+            playerViews,
+            myKittyView,
+            game.getCurrentTurnIndex(),
+            game.getPhase(),
+            game.getShuffledDeck(),
+            playerPosition,
+            game.getFirstBidder(),
+            game.getBidTurnIndex());
 
-        game.getRoom().setStatus(RoomStatus.WAITING_FOR_PLAYERS);
-        game.setPhase(GamePhase.INITIATED);
+    response.setWinningPlayerName(game.getWinningPlayerName());
+    response.setHighestBid(game.getHighestBid());
+    response.setPlayerPosition(playerPosition);
+    response.setLobbySize(game.getRoom().getPlayers().size());
+    response.setTrumpSuit(game.getTrumpSuit());
+    response.setBidType(game.getFinalBidType());
+    response.setBids(game.getBids());
+    response.setWinningBid(game.getWinningBid());
+    response.setPlayerTeam(myTeam);
+    response.setBidWinnerPos(game.getBidWinnerPos());
+    response.setTeamAScore(game.getTeamAScore());
+    response.setTeamBScore(game.getTeamBScore());
 
-        games.putIfAbsent(request.getGameId(), game);
+    return response;
+  }
+  /*
+  * Deals cards to players after shuffling and sets game phase to BID.
+  * Also triggers card animations and assigns the kitty.
+  * If the next bidder is AI, initiates AI bid processing.
+  */
+  public void dealToPlayers(GameState game) {
+    System.out.println("[dealToPlayers]");
 
-        games.putIfAbsent(game.getGameId(), game);
-
-        GameStateResponse response = getGameStateForPlayer(game, player.getPosition());
-        response.setPlayerPosition(player.getPosition());
-        response.setViewerName(player.getName());
-        response.setLobbySize(game.getRoom().getPlayers().size());
-
-        // debug log
-        System.out.println("Current phase: " + game.getPhase());
-
-        return response;
+    if (game == null) {
+      throw new IllegalStateException("Game not started.");
     }
 
-    // Join a game in progress
-    public GameStateResponse joinGame(JoinGameRequest request) {
-        GameState game = getGameById(request.getGameId());
-        game.getRoom().addPlayer(request.getPlayerName());
-
-        List<Player> roomPlayers = game.getRoom().getPlayers();
-        Player thisPlayer = roomPlayers.get(roomPlayers.size() - 1);
-        game.getPlayers().add(thisPlayer);
-        PlayerPos position = game.getRoom().getPlayerPositionByName(request.getPlayerName());
-        if (game.getRoom().getStatus() == RoomStatus.READY) {
-            game.setPhase(GamePhase.SHUFFLE);
-            System.out.println("Current phase: " + game.getPhase());
-            dealToPlayers(game);
-            game.getRoom().setStatus(RoomStatus.IN_PROGRESS);
-        }
-        GameStateResponse response = getGameStateForPlayer(game, position);
-        response.setPlayerPosition(position);
-        response.setViewerName(request.getPlayerName());
-        response.setLobbySize(game.getRoom().getPlayers().size());
-        return response;
-
+    if (game.getPhase() != GamePhase.SHUFFLE) {
+      throw new IllegalStateException("Can only deal after shuffle.");
     }
 
-    // Return GameState for specific player with dummy cards for other players
-    public GameStateResponse getGameStateForPlayer(GameState game, PlayerPos playerPosition) {
-        List<PlayerView> playerViews = getMyPlayerViews(game, playerPosition);
+    game.getDeck().deal(game.getPlayers());
+    game.addAnimation(new Animation(game.getShuffledDeck()));
+    game.setKitty(game.getDeck().getKitty().getCards());
+    game.setPhase(GamePhase.BID);
+    System.out.println("Current phase: " + game.getPhase());
+    game.addAnimation(new Animation(AnimationType.UPDATE_CARDS));
 
-        List<Card> myKittyView = getMyKittyView(game, playerPosition);
+    Player nextBidder = game.getPlayers().get(game.getBidTurnIndex());
+    if (nextBidder.isAI()) {
+      processAllBids(game);
+    }
+  }
 
-        List<Player> players = game.getPlayers();
-        Team myTeam = game.getTeamByPlayerPos(players, playerPosition);
+  /*
+  * Resets all game state to prepare for a new hand.
+  * Clears trick counts, kitty, and all tracked state.
+  * Shuffles and re-deals cards for new round.
+  */
+  public void startNewHand(GameState game) {
+    System.out.println("[startNewHand]");
 
-        GameStateResponse response = new GameStateResponse(
-                game.getAnimationList().getOrDefault(playerPosition, new ArrayList<>()),
-                playerViews,
-                myKittyView,
-                game.getCurrentTurnIndex(),
-                game.getPhase(),
-                game.getShuffledDeck(),
-                playerPosition,
-                game.getFirstBidder(),
-                game.getBidTurnIndex());
+    game.getKitty().clear();
+    game.getDeck().clearKitty();
+    game.setWinningBid(null);
+    game.setBidWinnerPos(null);
+    game.setTeamATricksWon(0);
+    game.setTeamBTricksWon(0);
+    game.setPhase(GamePhase.SHUFFLE);
+    game.getBids().clear();
+    game.getCompletedTricks().clear();
+    game.getCurrentTrick().clear();
+    game.setHighestBid(null);
+    game.setWinningPlayerName(null);
+    game.setTrumpType(null);
+    game.getTeamTrickCounts().clear();
+    game.getDeck().resetJokerSuits();
+    game.getFinalBidCache().clear();
 
-        response.setWinningPlayerName(game.getWinningPlayerName());
-        response.setHighestBid(game.getHighestBid());
-        response.setPlayerPosition(playerPosition);
-        response.setLobbySize(game.getRoom().getPlayers().size());
-        response.setTrumpSuit(game.getTrumpSuit());
-        response.setBidType(game.getFinalBidType());
-        response.setBids(game.getBids());
-        response.setWinningBid(game.getWinningBid());
-        response.setPlayerTeam(myTeam);
-        response.setBidWinnerPos(game.getBidWinnerPos());
-        response.setTeamAScore(game.getTeamAScore());
-        response.setTeamBScore(game.getTeamBScore());
-        return response;
+    game.getDeck().shuffle();
+    game.setShuffledDeck(game.getDeck().getCards());
+
+    dealToPlayers(game);
+  }
+
+  /*
+  * Submits a bid from a human player.
+  * Also triggers AI bidding logic and resolves winner if 4 bids exist.
+  */
+  public GameStateResponse submitBid(BidRequest request) {
+    GameState game = getGameById(request.getGameId());
+
+    if (game == null) {
+      throw new IllegalStateException("Game has not been started. Call /start first.");
     }
 
-    public void dealToPlayers(GameState game) {
-        System.out.println("[dealToPlayers]");
+    Player bidder =
+        game.getPlayers().stream()
+            .filter(p -> p.getPosition().equals(request.getPlayer()))
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("Player not found"));
 
-        if (game == null) {
-            throw new IllegalStateException("Game not started.");
-        }
+    InitialBid bid = BidRequest.fromRequest(request, bidder);
+    game.addBid(bid);
 
-        if (game.getPhase() != GamePhase.SHUFFLE) {
-            throw new IllegalStateException("Can only deal after shuffle.");
-        }
-
-        game.getDeck().deal(game.getPlayers()); // Perform actual dealing
-
-        // Animation signal : DEAL
-        game.addAnimation(new Animation(game.getShuffledDeck()));
-        game.setKitty(game.getDeck().getKitty().getCards()); // Move kitty over
-        game.setPhase(GamePhase.BID); // Advance phase
-        System.out.println("Current phase: " + game.getPhase());
-        game.addAnimation(new Animation(AnimationType.UPDATE_CARDS));
-
-        Player nextBidder = game.getPlayers().get(game.getBidTurnIndex());
-        if (nextBidder.isAI()) {
-            processAllBids(game);
-        }
-
+    if (!bid.isPassed()
+        && (game.getHighestBid() == null || bid.getValue() > game.getHighestBid().getValue())) {
+      game.setHighestBid(bid);
     }
 
-    public void startNewHand(GameState game) {
-        System.out.println("[startNewHand]");
+    int nextIndex = (game.getBidTurnIndex() + 1) % game.getPlayers().size();
+    game.setBidTurnIndex(nextIndex);
 
-        game.getKitty().clear();
-        game.getDeck().clearKitty();
-        game.setWinningBid(null);
-        game.setBidWinnerPos(null);
-        game.setTeamATricksWon(0);
-        game.setTeamBTricksWon(0);
-        game.setPhase(GamePhase.SHUFFLE);
-        game.getBids().clear();
-        game.getCompletedTricks().clear();
-        game.getCurrentTrick().clear();
-        game.setHighestBid(null);
-        game.setWinningPlayerName(null);
-        game.setTrumpType(null);
-        game.getTeamTrickCounts().clear();
-        game.getDeck().resetJokerSuits();
-        game.getFinalBidCache().clear();
-        game.setBidTurnIndex(game.getFirstBidder().ordinal());
+    processAllBids(game);
 
-        game.getDeck().shuffle();
-        game.setShuffledDeck(game.getDeck().getCards());
+    if (game.getBids().size() >= 4) {
+      PlayerPos winnerPos = game.getHighestBid().getPlayer();
+      Player winner =
+          game.getPlayers().stream()
+              .filter(p -> p.getPosition().equals(winnerPos))
+              .findFirst()
+              .orElseThrow(() -> new IllegalStateException("Winner not found"));
 
-        dealToPlayers(game);
-    }
+      game.setBidWinnerPos(winnerPos);
 
-    // Collects bid from players and generates AI Bids
-    public GameStateResponse submitBid(BidRequest request) {
-        GameState game = getGameById(request.getGameId());
-
-        if (game == null) {
-            throw new IllegalStateException("Game has not been started. Call /start first.");
+      if (winner.isAI()) {
+        FinalBid finalBid = game.getFinalBidCache().get(winnerPos);
+        if (finalBid == null) {
+          throw new IllegalStateException("AI Final bid missing for: " + winnerPos);
         }
-
-        // Find current human bidder and add their bid
-        Player bidder = game.getPlayers().stream()
-                .filter(p -> p.getPosition().equals(request.getPlayer()))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Player not found"));
-
-        InitialBid bid = BidRequest.fromRequest(request, bidder);
-        game.addBid(bid);
-
-        if (!bid.isPassed()
-                && (game.getHighestBid() == null
-                || bid.getValue() > game.getHighestBid().getValue())) {
-            game.setHighestBid(bid);
-        }
-
-        // Advance to next bidder
-        int nextIndex = (game.getBidTurnIndex() + 1) % game.getPlayers().size();
-        game.setBidTurnIndex(nextIndex);
-
-        processAllBids(game);
-
-        // Once all 4 bids are in, set phase and finalize AI if needed
-        if (game.getBids().size() >= 4) {
-            PlayerPos winnerPos = game.getHighestBid().getPlayer();
-            Player winner = game.getPlayers().stream()
-                    .filter(p -> p.getPosition().equals(winnerPos))
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalStateException("Winner not found"));
-
-            game.setBidWinnerPos(winnerPos);
-
-            if (winner.isAI()) {
-                FinalBid finalBid = game.getFinalBidCache().get(winnerPos);
-                if (finalBid == null) {
-                    throw new IllegalStateException("AI Final bid missing for: " + winnerPos);
-                }
-                game.setWinningBidStats(finalBid);
-                game.getDeck().assignTrumpSuitToJokers(finalBid.getSuit());
-
-                // Assign trump suit to jokers already dealt to players
-                for (Player p : game.getPlayers()) {
-                    for (Card c : p.getHand().getCards()) {
-                        if (c != null && c.isJoker()) {
-                            c.setSuit(finalBid.getSuit());
-                        }
-                    }
-                }
-                applyAIAutoKitty(game, winner);
-            }
-
-            int nextTurn = (game.getBidTurnIndex() + 1) % 4;
-            game.setBidTurnIndex(nextTurn);
-            game.setFirstBidder(PlayerPos.values()[nextTurn]);
-            if (winner.isAI()) {
-                game.setPhase(GamePhase.PLAY);
-            } else {
-                game.setPhase(GamePhase.KITTY);
-            }
-        }
-
-        return getGameStateForPlayer(game, request.getPlayer());
-    }
-
-    private void processAllBids(GameState game) {
-        // If no bids and final bidder is AI, evaluate force bid.
-        while (game.getBids().size() < 4) {
-            Player nextBidder = game.getPlayers().get(game.getBidTurnIndex());
-
-            if (!nextBidder.isAI()) {
-                break;
-            }
-
-            List<InitialBid> currentBids = game.getBids();
-            boolean isFinalBidder = currentBids.size() == 3;
-            long passedCount = currentBids.stream().filter(InitialBid::isPassed).count();
-
-            InitialBid aiBid;
-            FinalBid aiFinalBid;
-
-            if (isFinalBidder && passedCount == 3) {
-                // Force minimum legal bid (e.g., 4, not a No Trump)
-                HandEvaluator aiHandEval = new HandEvaluator(nextBidder);
-
-                aiFinalBid = aiHandEval.getForcedMinimumBid(nextBidder.getPosition());
-                aiBid = aiFinalBid.getInitialBid();
-
-                game.getFinalBidCache().put(nextBidder.getPosition(), aiFinalBid);
-
-            } else {
-                aiBid = generateAIBid(game, nextBidder);
-                System.out.println("DEBUG: " + nextBidder.getName() + " (AI) bids "
-                        + aiBid.getValue() + " is No?: " + aiBid.isNo());
-            }
-
-            game.addBid(aiBid);
-
-            if (!aiBid.isPassed()
-                    && (game.getHighestBid() == null
-                    || aiBid.getValue() > game.getHighestBid().getValue())) {
-                game.setHighestBid(aiBid);
-            }
-
-            game.setBidTurnIndex((game.getBidTurnIndex() + 1) % game.getPlayers().size());
-        }
-
-    }
-
-    // Evaluates AI player's hand to provide an appropriate bid
-    private InitialBid generateAIBid(GameState game, Player ai) {
-        HandEvaluator evaluator = new HandEvaluator(ai);
-        evaluator.evaluateHand();
-
-        List<FinalBid> bidOptions = evaluator.evaluateAll(ai.getPosition());
-        InitialBid currentHigh = game.getHighestBid();
-
-        // Filter for stronger bids only
-        List<FinalBid> strongerBids = bidOptions.stream()
-                .filter(bid -> currentHigh == null || bid.getValue() > currentHigh.getValue())
-                .toList();
-
-        if (strongerBids.isEmpty()) {
-            // No valid bids better than current — pass
-            return InitialBid.pass(ai.getPosition());
-        }
-
-        FinalBid bestBid = (strongerBids.stream()
-                .max(Comparator.comparingInt(FinalBid::getValue))
-                .orElse(null));
-
-        game.getFinalBidCache().put(ai.getPosition(), bestBid);
-
-        // Return the strongest bid (highest value)
-        return bestBid.getInitialBid();
-    }
-
-    // Get full winning bid
-    public GameStateResponse getFinalBid(FinalBidRequest request) {
-        GameState game = getGameById(request.getGameId());
-
-        PlayerPos winnerPos = request.getPlayer();
-        Player winner = game.getPlayers().stream()
-                .filter(p -> p.getPosition().equals(winnerPos))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Player not found: " + winnerPos));
-
-        if (winner.isAI()) {
-            throw new IllegalStateException("AI players do not need to finalize a bid.");
-        }
-
-        FinalBid finalBid = new FinalBid(
-                game.getHighestBid(),
-                request.getType(),
-                request.getSuit());
-
-        game.getFinalBidCache().put(winnerPos, finalBid);
-        game.setWinningBid(finalBid);
         game.setWinningBidStats(finalBid);
-        game.getBids().clear();
-        game.setTrumpType(request.getType());
-        game.setTrumpSuit(request.getSuit());
-        game.getDeck().assignTrumpSuitToJokers(request.getSuit());
+        game.getDeck().assignTrumpSuitToJokers(finalBid.getSuit());
+        applyAIAutoKitty(game, winner);
+      }
 
-        GameStateResponse response = getGameStateForPlayer(game, winnerPos);
-        response.setKitty(game.getKitty());
-        winner.getHand().getCards().addAll(game.getKitty());
-        game.addAnimation(new Animation(AnimationType.UPDATE_CARDS));
+      int nextTurn = (game.getBidTurnIndex() + 1) % 4;
+      game.setBidTurnIndex(nextTurn);
+      game.setFirstBidder(PlayerPos.values()[nextTurn]);
 
-        return response;
-    }
-
-    // Provides Kitty to winner and discards cards - May need to divide function
-    // into 2
-    public GameStateResponse applyKittyAndDiscards(KittyRequest request) {
-        GameState game = getGameById(request.getGameId());
-
-        if (game == null || game.getPhase() != GamePhase.KITTY) {
-            throw new IllegalStateException("Game is not in KITTY phase.");
-        }
-
-        if (!request.getPlayer().equals(game.getWinningPlayerPos())) {
-            throw new IllegalArgumentException("Only the winning player may apply the kitty.");
-        }
-
-        Player winner = game.getPlayers().stream()
-                .filter(p -> p.getName()
-                .equals(PlayerUtils.getNameByPosition(request.getPlayer(), game.getPlayers())))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Winning player not found."));
-
-        if (request.getDiscards().size() != 6) {
-            throw new IllegalArgumentException("You must discard exactly 6 cards.");
-        }
-
-        for (Card discard : request.getDiscards()) {
-            boolean removed = winner.getHand().getCards()
-                    .removeIf(c -> CardUtils.cardsMatch(c, discard));
-            if (!removed) {
-                throw new IllegalArgumentException(
-                        "Discard card not found in hand: " + discard.getRank() + " of " + discard.getSuit());
-            }
-        }
-
-        game.addAnimation(new Animation(AnimationType.UPDATE_CARDS));
-        PlayerPos winnerPos = game.getHighestBid().getPlayer();
-
-        FinalBid winningBid;
-        if (game.getFinalBidCache().containsKey(winnerPos)) {
-            winningBid = game.getFinalBidCache().get(winnerPos);
-        } else {
-            throw new IllegalStateException("Winning bid must be finalized by human before taking the kitty.");
-        }
-
-        game.setTrumpSuit(winningBid.getSuit());
-        game.getKitty().clear();
-        game.getDeck().assignTrumpSuitToJokers(winningBid.getSuit());
+      if (winner.isAI()) {
         game.setPhase(GamePhase.PLAY);
-        game.setCurrentTurnIndex(winnerPos.ordinal());
+      } else {
+        game.setPhase(GamePhase.KITTY);
+      }
+    }
 
+    return getGameStateForPlayer(game, request.getPlayer());
+  }
+
+  /*
+  * Executes AI bids until it’s the human player’s turn or all bids are completed.
+  */
+  private void processAllBids(GameState game) {
+    while (game.getBids().size() < 4) {
+      Player nextBidder = game.getPlayers().get(game.getBidTurnIndex());
+
+      if (!nextBidder.isAI()) {
+        break;
+      }
+
+      List<InitialBid> currentBids = game.getBids();
+      boolean isFinalBidder = currentBids.size() == 3;
+      long passedCount = currentBids.stream().filter(InitialBid::isPassed).count();
+
+      InitialBid aiBid;
+      FinalBid aiFinalBid;
+
+      if (isFinalBidder && passedCount == 3) {
+        HandEvaluator aiHandEval = new HandEvaluator(nextBidder);
+        aiFinalBid = aiHandEval.getForcedMinimumBid(nextBidder.getPosition());
+        aiBid = aiFinalBid.getInitialBid();
+        game.getFinalBidCache().put(nextBidder.getPosition(), aiFinalBid);
+      } else {
+        aiBid = generateAIBid(game, nextBidder);
+        System.out.println(
+            "DEBUG: "
+                + nextBidder.getName()
+                + " (AI) bids "
+                + aiBid.getValue()
+                + " is No?: "
+                + aiBid.isNo());
+      }
+
+      game.addBid(aiBid);
+
+      if (!aiBid.isPassed()
+          && (game.getHighestBid() == null || aiBid.getValue() > game.getHighestBid().getValue())) {
+        game.setHighestBid(aiBid);
+      }
+
+      game.setBidTurnIndex((game.getBidTurnIndex() + 1) % game.getPlayers().size());
+    }
+  }
+
+  /*
+  * Evaluates a given AI player's hand and returns the strongest valid bid.
+  * Saves final bid to cache for later reference.
+  */
+  private InitialBid generateAIBid(GameState game, Player ai) {
+    HandEvaluator evaluator = new HandEvaluator(ai);
+    evaluator.evaluateHand();
+
+    List<FinalBid> bidOptions = evaluator.evaluateAll(ai.getPosition());
+    InitialBid currentHigh = game.getHighestBid();
+
+    List<FinalBid> strongerBids =
+        bidOptions.stream()
+            .filter(bid -> currentHigh == null || bid.getValue() > currentHigh.getValue())
+            .toList();
+
+    if (strongerBids.isEmpty()) {
+      return InitialBid.pass(ai.getPosition());
+    }
+
+    FinalBid bestBid =
+        strongerBids.stream().max(Comparator.comparingInt(FinalBid::getValue)).orElse(null);
+
+    game.getFinalBidCache().put(ai.getPosition(), bestBid);
+
+    return bestBid.getInitialBid();
+  }
+
+  /*
+  * Finalizes the winning bid by the human player.
+  * Assigns trump suit and updates game state and kitty visibility.
+  */
+  public GameStateResponse getFinalBid(FinalBidRequest request) {
+    GameState game = getGameById(request.getGameId());
+
+    PlayerPos winnerPos = request.getPlayer();
+    Player winner =
+        game.getPlayers().stream()
+            .filter(p -> p.getPosition().equals(winnerPos))
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("Player not found: " + winnerPos));
+
+    if (winner.isAI()) {
+      throw new IllegalStateException("AI players do not need to finalize a bid.");
+    }
+
+    FinalBid finalBid = new FinalBid(game.getHighestBid(), request.getType(), request.getSuit());
+
+    game.getFinalBidCache().put(winnerPos, finalBid);
+    game.setWinningBid(finalBid);
+    game.setWinningBidStats(finalBid);
+    game.getBids().clear();
+    game.setTrumpType(request.getType());
+    game.setTrumpSuit(request.getSuit());
+    game.getDeck().assignTrumpSuitToJokers(request.getSuit());
+
+    GameStateResponse response = getGameStateForPlayer(game, winnerPos);
+    response.setKitty(game.getKitty());
+    winner.getHand().getCards().addAll(game.getKitty());
+    game.addAnimation(new Animation(AnimationType.UPDATE_CARDS));
+
+    return response;
+  }
+
+  /*
+  * Applies the kitty and discards to the winner’s hand.
+  * Advances game to PLAY phase once done.
+  */
+  public GameStateResponse applyKittyAndDiscards(KittyRequest request) {
+    GameState game = getGameById(request.getGameId());
+
+    if (game == null || game.getPhase() != GamePhase.KITTY) {
+      throw new IllegalStateException("Game is not in KITTY phase.");
+    }
+
+    if (!request.getPlayer().equals(game.getWinningPlayerPos())) {
+      throw new IllegalArgumentException("Only the winning player may apply the kitty.");
+    }
+
+    Player winner =
+        game.getPlayers().stream()
+            .filter(
+                p ->
+                    p.getName()
+                        .equals(
+                            PlayerUtils.getNameByPosition(request.getPlayer(), game.getPlayers())))
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("Winning player not found."));
+
+    if (request.getDiscards().size() != 6) {
+      throw new IllegalArgumentException("You must discard exactly 6 cards.");
+    }
+
+    for (Card discard : request.getDiscards()) {
+      boolean removed = winner.getHand().getCards().removeIf(c -> CardUtils.cardsMatch(c, discard));
+      if (!removed) {
+        throw new IllegalArgumentException(
+            "Discard card not found in hand: " + discard.getRank() + " of " + discard.getSuit());
+      }
+    }
+
+    game.addAnimation(new Animation(AnimationType.UPDATE_CARDS));
+    PlayerPos winnerPos = game.getHighestBid().getPlayer();
+
+    FinalBid winningBid;
+    if (game.getFinalBidCache().containsKey(winnerPos)) {
+      winningBid = game.getFinalBidCache().get(winnerPos);
+    } else {
+      throw new IllegalStateException(
+          "Winning bid must be finalized by human before taking the kitty.");
+    }
+
+    game.setTrumpSuit(winningBid.getSuit());
+    game.getKitty().clear();
+    game.getDeck().assignTrumpSuitToJokers(winningBid.getSuit());
+    game.setPhase(GamePhase.PLAY);
+    game.setCurrentTurnIndex(winnerPos.ordinal());
+
+    return getGameStateForPlayer(game, request.getPlayer());
+  }
+
+  /*
+  * Plays a card from a player and evaluates the trick.
+  * Validates legality, triggers animations, and handles trick scoring.
+  */
+  public GameStateResponse playCard(PlayRequest request) {
+    System.out.println("[playCard]");
+
+    GameState game = getGameById(request.getGameId());
+
+    if (game.getPhase() != GamePhase.PLAY) {
+      throw new IllegalStateException("Not in PLAY phase");
+    }
+
+    Player currentPlayer = PlayerUtils.getPlayerByPosition(request.getPlayer(), game.getPlayers());
+    System.out.println(
+        "DEBUG: Current turn is player index "
+            + game.getCurrentTurnIndex()
+            + " ("
+            + currentPlayer.getName()
+            + ")");
+    System.out.println(
+        "DEBUG: Player "
+            + request.getPlayer()
+            + " playing: "
+            + request.getCard().getRank()
+            + " of "
+            + request.getCard().getSuit());
+
+    if (game.getCurrentTurnIndex() != request.getPlayer().ordinal()) {
+      throw new IllegalStateException("It's not " + request.getPlayer() + "'s turn");
+    }
+
+    Card cardToPlay = request.getCard();
+    if (!currentPlayer.getHand().getCards().contains(cardToPlay)) {
+      throw new IllegalArgumentException(
+          "Player does not have the specified card "
+              + cardToPlay.getRank()
+              + " of "
+              + cardToPlay.getSuit());
+    }
+
+    List<PlayedCard> currentTrick = game.getCurrentTrick();
+    if (!currentTrick.isEmpty()) {
+      Suit leadSuit = currentTrick.get(0).getCard().getSuit();
+      boolean hasLeadSuit =
+          currentPlayer.getHand().getCards().stream().anyMatch(c -> c.getSuit() == leadSuit);
+      if (hasLeadSuit && cardToPlay.getSuit() != leadSuit) {
+        throw new IllegalArgumentException("Must follow suit if possible");
+      }
+    }
+
+    PlayedCard validPlayedCard = new PlayedCard(request.getPlayer(), cardToPlay);
+
+    currentPlayer.getHand().getCards().remove(cardToPlay);
+    currentTrick.add(validPlayedCard);
+
+    game.addAnimation(new Animation(validPlayedCard));
+    game.setCurrentTurnIndex((game.getCurrentTurnIndex() + 1) % 4);
+
+    if (currentTrick.size() == 4) {
+      PlayedCard winningPlay = determineTrickWinner(game, currentTrick);
+      Player winner = PlayerUtils.getPlayerByPosition(winningPlay.getPlayer(), game.getPlayers());
+      Team winnerTeam = winner.getTeam();
+      System.out.println("DEBUG: Trick won by " + winner.getName() + " (Team " + winnerTeam + ")");
+
+      game.getTeamTrickCounts().putIfAbsent(winnerTeam, 0);
+      game.getTeamTrickCounts().put(winnerTeam, game.getTeamTrickCounts().get(winnerTeam) + 1);
+      System.out.println("DEBUG: Team trick counts: " + game.getTeamTrickCounts());
+
+      Book currentBook = new Book(currentTrick, winnerTeam);
+      game.getCompletedTricks().add(currentBook);
+
+      game.addAnimation(new Animation(currentBook));
+      game.addAnimation(new Animation(AnimationType.UPDATE_CARDS));
+
+      currentTrick.clear();
+      game.setCurrentTurnIndex(winner.getPosition().ordinal());
+
+      if (game.getCompletedTricks().size() == 12) {
+        scoreHand(game);
+        if (game.getTeamAScore() >= 7 || game.getTeamBScore() <= -7) {
+          game.addAnimation(new Animation(AnimationType.SHOW_WINNER));
+          game.setPhase(GamePhase.END);
+        } else {
+          game.addAnimation(new Animation(AnimationType.CLEAR));
+          startNewHand(game);
+        }
         return getGameStateForPlayer(game, request.getPlayer());
-
+      }
     }
 
-    public GameStateResponse playCard(PlayRequest request) {
-        System.out.println("[playCard]");
-
-        GameState game = getGameById(request.getGameId());
-
-        if (game.getPhase() != GamePhase.PLAY) {
-            throw new IllegalStateException("Not in PLAY phase");
-        }
-
-        Player currentPlayer = PlayerUtils.getPlayerByPosition(request.getPlayer(), game.getPlayers());
-        System.out.println("DEBUG: Current turn is player index " + game.getCurrentTurnIndex()
-                + " (" + currentPlayer.getName() + ")");
-        System.out.println("DEBUG: Player " + request.getPlayer() + " playing: "
-                + request.getCard().getRank() + " of " + request.getCard().getSuit());
-
-        if (game.getCurrentTurnIndex() != request.getPlayer().ordinal()) {
-            throw new IllegalStateException("It's not " + request.getPlayer() + "'s turn");
-        }
-
-        Card cardToPlay = request.getCard();
-        if (!currentPlayer.getHand().getCards().contains(cardToPlay)) {
-            throw new IllegalArgumentException("Player does not have the specified card "
-                    + cardToPlay.getRank() + " of " + cardToPlay.getSuit());
-        }
-
-        List<PlayedCard> currentTrick = game.getCurrentTrick();
-        if (!currentTrick.isEmpty()) {
-            Suit leadSuit = currentTrick.get(0).getCard().getSuit();
-            boolean hasLeadSuit = currentPlayer.getHand().getCards().stream()
-                    .anyMatch(c -> c.getSuit() == leadSuit);
-            if (hasLeadSuit && cardToPlay.getSuit() != leadSuit) {
-                throw new IllegalArgumentException("Must follow suit if possible");
-            }
-        }
-
-        PlayedCard validPlayedCard = new PlayedCard(request.getPlayer(), cardToPlay);
-
-        currentPlayer.getHand().getCards().remove(cardToPlay);
-        currentTrick.add(validPlayedCard);
-
-        // Track played card for memory-based AI
-        game.addPlayedCard(cardToPlay);
-
-        // Animation Signal : PLAY
-        game.addAnimation(new Animation(validPlayedCard));
-
-        // Advance turn
-        game.setCurrentTurnIndex((game.getCurrentTurnIndex() + 1) % 4);
-
-        if (currentTrick.size() == 4) {
-            PlayedCard winningPlay = determineTrickWinner(game, currentTrick);
-            Player winner = PlayerUtils.getPlayerByPosition(winningPlay.getPlayer(), game.getPlayers());
-            Team winnerTeam = winner.getTeam();
-            System.out.println("DEBUG: Trick won by " + winner.getName() + " (Team " + winnerTeam + ")");
-
-            game.getTeamTrickCounts().putIfAbsent(winnerTeam, 0);
-            game.getTeamTrickCounts().put(
-                    winnerTeam,
-                    game.getTeamTrickCounts().get(winnerTeam) + 1);
-            System.out.println("DEBUG: Team trick counts: " + game.getTeamTrickCounts());
-
-            Book currentBook = new Book(currentTrick, winnerTeam);
-
-            game.getCompletedTricks().add(currentBook);
-
-            // Animation signal - COLLECT
-            game.addAnimation(new Animation(currentBook));
-            game.addAnimation(new Animation(AnimationType.UPDATE_CARDS));
-
-            currentTrick.clear();
-            game.setCurrentTurnIndex(winner.getPosition().ordinal());
-
-            if (game.getCompletedTricks().size() == 12) {
-                scoreHand(game);
-                if (game.getTeamAScore() >= 7 || game.getTeamBScore() <= -7) {
-                    game.addAnimation(new Animation(AnimationType.SHOW_WINNER));
-                    game.setPhase(GamePhase.END);
-                } else {
-                    // Animation signal : CLEAR
-                    game.addAnimation(new Animation(AnimationType.CLEAR));
-                    startNewHand(game);
-                }
-                return getGameStateForPlayer(game, request.getPlayer());
-            }
-        }
-
-        if (PlayerUtils.getPlayerByPosition(PlayerPos.values()[game.getCurrentTurnIndex()], game.getPlayers()).isAI()) {
-            // Let AI play its turn
-            autoPlayAITurns(game);
-        }
-
-        return getGameStateForPlayer(game, request.getPlayer());
+    if (PlayerUtils.getPlayerByPosition(
+            PlayerPos.values()[game.getCurrentTurnIndex()], game.getPlayers())
+        .isAI()) {
+      autoPlayAITurns(game);
     }
 
-    private PlayedCard determineTrickWinner(GameState game, List<PlayedCard> trick) {
-        if (trick == null || trick.isEmpty()) {
-            throw new IllegalArgumentException("Cannot determine trick winner: trick is empty.");
-        }
+    return getGameStateForPlayer(game, request.getPlayer());
+  }
 
-        Suit leadSuit = trick.get(0).getCard().getSuit();
-        Suit trumpSuit = game.getTrumpSuit();
-        BidType bidType = game.getTrumpType();
-
-        // If bid type is NO_TRUMP, only lead suit cards can win
-        if (bidType == BidType.NO_TRUMP) {
-            return trick.stream()
-                    .filter(pc -> pc.getCard().getSuit() == leadSuit)
-                    .max(Comparator.comparing(pc -> pc.getCard().getRank().getValue()))
-                    .orElseThrow(() -> new IllegalStateException("No cards of lead suit found in NO_TRUMP bid"));
-        }
-
-        // For DOWNTOWN, invert rank values for non-joker/ACE cards
-        if (bidType == BidType.DOWNTOWN) {
-            return trick.stream().max(Comparator.comparing(pc -> {
-                Card c = pc.getCard();
-                boolean isTrump = trumpSuit != null && c.getSuit() == trumpSuit;
-                boolean isLead = c.getSuit() == leadSuit;
-                Rank rank = c.getRank();
-                int rankValue;
-
-                // JOKER_B, JOKER_S, ACE keep their high values
-                if (rank == Rank.JOKER_B || rank == Rank.JOKER_S || rank == Rank.ACE) {
-                    rankValue = rank.getValue();
-                } else {
-                    // Invert non-joker/ACE ranks: TWO (2) becomes highest (13), THREE (3) becomes
-                    // (12), etc.
-                    rankValue = 15 - rank.getValue(); // Max non-joker/ACE value is 13 (KING), so 15 - 13 = 2 for KING
-                }
-
-                return (isTrump ? 1000 : (isLead ? 100 : 0)) + rankValue;
-            })).orElseThrow();
-        }
-
-        // UPTOWN or other cases: use standard rank values
-        return trick.stream().max(Comparator.comparing(pc -> {
-            Card c = pc.getCard();
-            boolean isTrump = trumpSuit != null && c.getSuit() == trumpSuit;
-            boolean isLead = c.getSuit() == leadSuit;
-            int rankValue = c.getRank().getValue();
-            return (isTrump ? 1000 : (isLead ? 100 : 0)) + rankValue;
-        })).orElseThrow();
+  /*
+  * Determines the winner of the current trick.
+  * Applies different logic for NO_TRUMP, DOWNTOWN, and UPTOWN bids.
+  */
+  private PlayedCard determineTrickWinner(GameState game, List<PlayedCard> trick) {
+    if (trick == null || trick.isEmpty()) {
+      throw new IllegalArgumentException("Cannot determine trick winner: trick is empty.");
     }
 
-    private void autoPlayAITurns(GameState game) {
-        while (true) {
-            Player current = game.getPlayers().get(game.getCurrentTurnIndex());
-            if (!current.isAI()) {
-                break;
-            }
+    Suit leadSuit = trick.get(0).getCard().getSuit();
+    Suit trumpSuit = game.getTrumpSuit();
+    BidType bidType = game.getTrumpType();
 
-            Card chosenCard = chooseCardForAI(game, current, game.getCurrentTrick());
-            System.out.println(
-                    "DEBUG: " + current.getName() + " played card: " + chosenCard + " " + game.getCurrentTurnIndex());
+    /* NO_TRUMP: highest lead suit wins */
+    if (bidType == BidType.NO_TRUMP) {
+      return trick.stream()
+          .filter(pc -> pc.getCard().getSuit() == leadSuit)
+          .max(Comparator.comparing(pc -> pc.getCard().getRank().getValue()))
+          .orElseThrow(
+              () -> new IllegalStateException("No cards of lead suit found in NO_TRUMP bid"));
+    }
 
-            current.getHand().getCards().remove(chosenCard);
+    /* DOWNTOWN: inverted rank values except ACE and JOKERs */
+    if (bidType == BidType.DOWNTOWN) {
+      return trick.stream()
+          .max(
+              Comparator.comparing(
+                  pc -> {
+                    Card c = pc.getCard();
+                    boolean isTrump = trumpSuit != null && c.getSuit() == trumpSuit;
+                    boolean isLead = c.getSuit() == leadSuit;
+                    Rank rank = c.getRank();
+                    int rankValue;
 
-            PlayedCard validPlayedCard = new PlayedCard(current.getPosition(), chosenCard);
-
-            game.getCurrentTrick().add(validPlayedCard);
-
-            // Animation Signal : PLAY
-            game.addAnimation(new Animation(validPlayedCard));
-
-            game.setCurrentTurnIndex((game.getCurrentTurnIndex() + 1) % 4);
-
-            if (game.getCurrentTrick().size() == 4) {
-                System.out.println("DEBUG: Trick complete. Evaluating winner...");
-                PlayedCard winner = determineTrickWinner(game, game.getCurrentTrick());
-
-                Player winnerPlayer = PlayerUtils.getPlayerByPosition(winner.getPlayer(), game.getPlayers());
-                Team winnerTeam = winnerPlayer.getTeam();
-                System.out.println("DEBUG: Trick won by " + winnerPlayer.getName() + " (Team " + winnerTeam + ")");
-                List<PlayedCard> currentTrick = game.getCurrentTrick();
-                Book currentBook = new Book(currentTrick, winnerTeam);
-
-                // Animation signal - COLLECT
-                game.addAnimation(new Animation(currentBook));
-                game.addAnimation(new Animation(AnimationType.UPDATE_CARDS));
-
-                game.getTeamTrickCounts().putIfAbsent(winnerTeam, 0);
-                game.getTeamTrickCounts().put(winnerTeam, game.getTeamTrickCounts().get(winnerTeam) + 1);
-                System.out.println("DEBUG: Team trick counts: " + game.getTeamTrickCounts());
-
-                game.getCompletedTricks().add(currentBook);
-
-                game.getCurrentTrick().clear();
-                game.setCurrentTurnIndex(winnerPlayer.getPosition().ordinal());
-
-                if (game.getCompletedTricks().size() == 12) {
-                    scoreHand(game);
-                    if (game.getTeamAScore() >= 7 || game.getTeamBScore() >= 7) {
-                        game.addAnimation(new Animation(AnimationType.SHOW_WINNER));
-                        game.setPhase(GamePhase.END);
+                    if (rank == Rank.JOKER_B || rank == Rank.JOKER_S || rank == Rank.ACE) {
+                      rankValue = rank.getValue();
                     } else {
-                        // Animation signal : CLEAR
-                        game.addAnimation(new Animation(AnimationType.CLEAR));
-                        startNewHand(game);
-                    }
-                    return;
-                }
-
-                // Recursively call autoPlayAITurns if winner is also AI
-                if (winnerPlayer.isAI()) {
-                    autoPlayAITurns(game);
-                }
-
-                return; // End loop for current trick
-            }
-        }
-    }
-
-    private Card chooseCardForAI(GameState game, Player aiPlayer, List<PlayedCard> currentTrick) {
-        List<Card> hand = aiPlayer.getHand().getCards();
-        Difficulty difficulty = game.getDifficulty();
-        Suit trumpSuit = getTrumpSuitFromBidType(game);
-
-        if (difficulty == Difficulty.EASY) {
-            return getLowestLegalCard(hand, currentTrick);
-        }
-
-        if (difficulty == Difficulty.MEDIUM) {
-            if (currentTrick.isEmpty()) {
-                return hand.stream()
-                        .filter(c -> c.getSuit() != null && (trumpSuit == null || !c.getSuit().equals(trumpSuit)))
-                        .max(Comparator.comparingInt(c -> c.getRank().getValue()))
-                        .orElse(hand.get(0));
-            }
-
-            Suit leadSuit = currentTrick.get(0).getCard() != null ? currentTrick.get(0).getCard().getSuit() : null;
-            List<Card> sameSuit = hand.stream()
-                    .filter(c -> c.getSuit() != null && c.getSuit().equals(leadSuit))
-                    .collect(Collectors.toList());
-
-            if (!sameSuit.isEmpty()) {
-                return sameSuit.stream()
-                        .min(Comparator.comparingInt(c -> c.getRank().getValue()))
-                        .orElse(sameSuit.get(0));
-            }
-
-            return hand.stream()
-                    .min(Comparator.comparingInt(c -> c.getRank().getValue()))
-                    .orElse(hand.get(0));
-        }
-
-        if (difficulty == Difficulty.HARD) {
-            int trickIndex = currentTrick.size();
-            Suit leadSuit = currentTrick.isEmpty() ? null
-                    : (currentTrick.get(0).getCard() != null ? currentTrick.get(0).getCard().getSuit() : null);
-            PlayedCard winningCard = trickIndex > 0 ? getWinningCard(currentTrick, trumpSuit) : null;
-            Card currentWinning = winningCard != null ? winningCard.getCard() : null;
-
-            if (leadSuit != null && hand.stream().anyMatch(c -> c.getSuit() != null && c.getSuit().equals(leadSuit))) {
-                // Ensure at least one card of leadSuit is played
-                List<Card> legalFollowSuit = hand.stream()
-                        .filter(c -> c.getSuit() != null && c.getSuit().equals(leadSuit))
-                        .collect(Collectors.toList());
-
-                return legalFollowSuit.stream()
-                        .min(Comparator.comparingInt(c -> c.getRank().getValue()))
-                        .orElse(hand.get(0));
-            }
-
-            if (trickIndex == 0) {
-                Optional<Card> safeLead = hand.stream()
-                        .filter(c -> !JokerUtils.isJokerRank(c.getRank())) // Avoid jokers
-                        .filter(c -> c.getSuit() == null || !c.getSuit().equals(trumpSuit)
-                        || CardUtils.allHigherTrumpCardsPlayed(c, game.getCompletedCards(), trumpSuit))
-                        .max(Comparator.comparingInt(c -> c.getRank().getValue()));
-
-                if (safeLead.isPresent()) {
-                    return safeLead.get();
-                }
-
-                Map<Suit, List<Card>> bySuit = hand.stream()
-                        .filter(c -> c.getSuit() != null)
-                        .collect(Collectors.groupingBy(Card::getSuit));
-
-                Optional<Card> lead = bySuit.entrySet().stream()
-                        .filter(e -> e.getValue().size() >= 2)
-                        .flatMap(e -> e.getValue().stream())
-                        .max(Comparator.comparingInt(c -> c.getRank().getValue()));
-                if (lead.isPresent()) {
-                    return lead.get();
-                }
-
-                return hand.stream()
-                        .filter(c -> c.getSuit() != null && (trumpSuit == null || !c.getSuit().equals(trumpSuit)))
-                        .max(Comparator.comparingInt(c -> c.getRank().getValue()))
-                        .orElse(hand.get(0));
-            }
-
-            if (trickIndex == 3 && winningCard != null && currentWinning != null) {
-                PlayerPos partner = aiPlayer.getPosition().getPartner();
-                boolean partnerWinning = winningCard.getPlayer() != null && winningCard.getPlayer().equals(partner);
-
-                if (partnerWinning) {
-                    List<Card> follow = hand.stream()
-                            .filter(c -> c.getSuit() != null && c.getSuit().equals(leadSuit))
-                            .collect(Collectors.toList());
-                    if (!follow.isEmpty()) {
-                        return follow.stream()
-                                .min(Comparator.comparingInt(c -> c.getRank().getValue()))
-                                .orElse(follow.get(0));
+                      rankValue = 15 - rank.getValue();
                     }
 
-                    List<Card> trumps = hand.stream()
-                            .filter(c -> c.getSuit() != null && c.getSuit().equals(trumpSuit))
-                            .collect(Collectors.toList());
-                    if (!trumps.isEmpty()) {
-                        return trumps.stream()
-                                .min(Comparator.comparingInt(c -> c.getRank().getValue()))
-                                .orElse(trumps.get(0));
-                    }
-
-                    Optional<Card> safeHigh = hand.stream()
-                            .filter(c -> c.getRank().getValue() >= Rank.QUEEN.getValue())
-                            .filter(c -> c.getSuit() == null || !c.getSuit().equals(trumpSuit)
-                            || CardUtils.allHigherTrumpCardsPlayed(c, game.getCompletedCards(), trumpSuit))
-                            .findFirst();
-                    if (safeHigh.isPresent()) {
-                        return safeHigh.get();
-                    }
-
-                    return hand.stream()
-                            .min(Comparator.comparingInt(c -> c.getRank().getValue()))
-                            .orElse(hand.get(0));
-                }
-
-                List<Card> winningCards = hand.stream()
-                        .filter(c -> c != null && canBeat(c, currentWinning, trumpSuit, leadSuit))
-                        .sorted(Comparator.comparingInt(c -> c.getRank().getValue()))
-                        .collect(Collectors.toList());
-
-                if (!winningCards.isEmpty()) {
-                    return winningCards.get(0);
-                }
-
-                Optional<Card> safeHigh = hand.stream()
-                        .filter(c -> c.getRank().getValue() >= Rank.QUEEN.getValue())
-                        .filter(c -> c.getSuit() == null || !c.getSuit().equals(trumpSuit)
-                        || CardUtils.allHigherTrumpCardsPlayed(c, game.getCompletedCards(), trumpSuit))
-                        .findFirst();
-                if (safeHigh.isPresent()) {
-                    return safeHigh.get();
-                }
-
-                return hand.stream()
-                        .min(Comparator.comparingInt(c -> c.getRank().getValue()))
-                        .orElse(hand.get(0));
-            }
-
-            List<Card> followSuit = hand.stream()
-                    .filter(c -> c.getSuit() != null)
-                    .filter(c -> leadSuit != null && c.getSuit().equals(leadSuit))
-                    .collect(Collectors.toList());
-
-            if (!followSuit.isEmpty()) {
-                if (currentWinning != null) {
-                    Optional<Card> beatCard = followSuit.stream()
-                            .filter(c -> canBeat(c, currentWinning, trumpSuit, leadSuit))
-                            .min(Comparator.comparingInt(c -> c.getRank().getValue()));
-                    if (beatCard.isPresent()) {
-                        return beatCard.get();
-                    }
-
-                    Optional<Card> safeBurn = followSuit.stream()
-                            .filter(c -> c.getSuit() == null || !c.getSuit().equals(trumpSuit)
-                            || CardUtils.allHigherTrumpCardsPlayed(c, game.getCompletedCards(), trumpSuit))
-                            .max(Comparator.comparingInt(c -> c.getRank().getValue()));
-                    if (safeBurn.isPresent()) {
-                        return safeBurn.get();
-                    }
-                }
-
-                // Fallback if can't beat or burn: play lowest legal card in lead suit
-                return followSuit.stream()
-                        .min(Comparator.comparingInt(c -> c.getRank().getValue()))
-                        .orElse(followSuit.get(0));
-            }
-
-            List<Card> trumpCards = hand.stream()
-                    .filter(c -> c.getSuit() != null && c.getSuit().equals(trumpSuit))
-                    .collect(Collectors.toList());
-
-            if (!trumpCards.isEmpty() && currentWinning != null) {
-                Optional<Card> winningTrump = trumpCards.stream()
-                        .filter(c -> canBeat(c, currentWinning, trumpSuit, leadSuit))
-                        .min(Comparator.comparingInt(c -> c.getRank().getValue()));
-                if (winningTrump.isPresent()) {
-                    return winningTrump.get();
-                }
-            }
-
-            Optional<Card> safeHigh = hand.stream()
-                    .filter(c -> c.getRank().getValue() >= Rank.QUEEN.getValue())
-                    .filter(c -> c.getSuit() == null || !c.getSuit().equals(trumpSuit)
-                    || CardUtils.allHigherTrumpCardsPlayed(c, game.getCompletedCards(), trumpSuit))
-                    .findFirst();
-            if (safeHigh.isPresent()) {
-                return safeHigh.get();
-            }
-
-            return hand.stream()
-                    .min(Comparator.comparingInt(c -> c.getRank().getValue()))
-                    .orElse(hand.get(0));
-        }
-
-        return hand.get(0); // fallback
+                    return (isTrump ? 1000 : (isLead ? 100 : 0)) + rankValue;
+                  }))
+          .orElseThrow();
     }
 
-    private PlayedCard getWinningCard(List<PlayedCard> trick, Suit trumpSuit) {
-        if (trick.isEmpty()) {
-            return null;
-        }
+    /* UPTOWN or standard: normal rank values with trump > lead > others */
+    return trick.stream()
+        .max(
+            Comparator.comparing(
+                pc -> {
+                  Card c = pc.getCard();
+                  boolean isTrump = trumpSuit != null && c.getSuit() == trumpSuit;
+                  boolean isLead = c.getSuit() == leadSuit;
+                  int rankValue = c.getRank().getValue();
+                  return (isTrump ? 1000 : (isLead ? 100 : 0)) + rankValue;
+                }))
+        .orElseThrow();
+  }
 
-        PlayedCard winning = trick.get(0);
-        Suit leadSuit = winning.getCard().getSuit();
+  /*
+  * Main AI play loop. AI players will continue playing until a human's turn.
+  * Handles animations, trick resolution, and transitions to scoring or new hand.
+  */
+  private void autoPlayAITurns(GameState game) {
+    while (true) {
+      Player current = game.getPlayers().get(game.getCurrentTurnIndex());
+      if (!current.isAI()) {
+        break;
+      }
 
-        for (PlayedCard pc : trick) {
-            Card card = pc.getCard();
-            Suit suit = card.getSuit();
+      Card chosenCard = chooseCardForAI(game, current, game.getCurrentTrick());
+      System.out.println(
+          "DEBUG: "
+              + current.getName()
+              + " played card: "
+              + chosenCard
+              + " "
+              + game.getCurrentTurnIndex());
 
-            boolean isTrump = trumpSuit != null && trumpSuit.equals(suit);
-            boolean winningIsTrump = trumpSuit != null && trumpSuit.equals(winning.getCard().getSuit());
+      current.getHand().getCards().remove(chosenCard);
 
-            if (isTrump && !winningIsTrump) {
-                winning = pc;
-            } else if (isTrump == winningIsTrump && suit == leadSuit) {
-                int currentVal = card.getRank().getValue();
-                int winningVal = winning.getCard().getRank().getValue();
-                if (currentVal > winningVal) {
-                    winning = pc;
-                }
-            }
-        }
+      PlayedCard validPlayedCard = new PlayedCard(current.getPosition(), chosenCard);
 
-        return winning;
-    }
+      game.getCurrentTrick().add(validPlayedCard);
 
-    @SuppressWarnings("unused")
-    private boolean isPartnerWinning(List<PlayedCard> trick, PlayerPos aiPos, Suit trumpSuit) {
-        if (trick.size() < 2) {
-            return false; // Partner hasn't played yet
-        }
-        PlayerPos partner = aiPos.getPartner();
+      game.addAnimation(new Animation(validPlayedCard));
+      game.setCurrentTurnIndex((game.getCurrentTurnIndex() + 1) % 4);
 
-        // Find the winning card in the current trick
-        PlayedCard winningCard = getWinningCard(trick, trumpSuit);
-        if (winningCard == null) {
-            return false;
-        }
+      if (game.getCurrentTrick().size() == 4) {
+        System.out.println("DEBUG: Trick complete. Evaluating winner...");
+        PlayedCard winner = determineTrickWinner(game, game.getCurrentTrick());
 
-        return winningCard.getPlayer().equals(partner);
-    }
+        Player winnerPlayer =
+            PlayerUtils.getPlayerByPosition(winner.getPlayer(), game.getPlayers());
+        Team winnerTeam = winnerPlayer.getTeam();
+        System.out.println(
+            "DEBUG: Trick won by " + winnerPlayer.getName() + " (Team " + winnerTeam + ")");
 
-    private boolean canBeat(Card challenger, Card currentWinning, Suit trumpSuit, Suit leadSuit) {
-        Suit challengerSuit = challenger.getSuit();
-        Suit winningSuit = currentWinning.getSuit();
+        Book currentBook = new Book(game.getCurrentTrick(), winnerTeam);
 
-        boolean challengerIsTrump = trumpSuit != null && trumpSuit.equals(challengerSuit);
-        boolean winningIsTrump = trumpSuit != null && trumpSuit.equals(winningSuit);
+        game.addAnimation(new Animation(currentBook));
+        game.addAnimation(new Animation(AnimationType.UPDATE_CARDS));
 
-        // Trump beats non-trump
-        if (challengerIsTrump && !winningIsTrump) {
-            return true;
-        }
-        if (!challengerIsTrump && winningIsTrump) {
-            return false;
-        }
+        game.getTeamTrickCounts().putIfAbsent(winnerTeam, 0);
+        game.getTeamTrickCounts().put(winnerTeam, game.getTeamTrickCounts().get(winnerTeam) + 1);
+        System.out.println("DEBUG: Team trick counts: " + game.getTeamTrickCounts());
 
-        // Same suit: compare values
-        if (challengerSuit == winningSuit) {
-            return challenger.getRank().getValue() > currentWinning.getRank().getValue();
-        }
+        game.getCompletedTricks().add(currentBook);
+        game.getCurrentTrick().clear();
+        game.setCurrentTurnIndex(winnerPlayer.getPosition().ordinal());
 
-        // Lead suit but different from winning (no trump involved)
-        if (!challengerIsTrump && !winningIsTrump && challengerSuit == leadSuit && winningSuit == leadSuit) {
-            return challenger.getRank().getValue() > currentWinning.getRank().getValue();
-        }
-
-        return false;
-    }
-
-    private Card getLowestLegalCard(List<Card> hand, List<PlayedCard> trick) {
-        if (trick.isEmpty()) {
-            return hand.stream().min(Comparator.comparingInt(c -> c.getRank().getValue())).orElse(hand.get(0));
-        }
-
-        Suit leadSuit = trick.get(0).getCard().getSuit();
-        List<Card> sameSuit = hand.stream().filter(c -> c.getSuit() == leadSuit).collect(Collectors.toList());
-        if (!sameSuit.isEmpty()) {
-            return sameSuit.stream().min(Comparator.comparingInt(c -> c.getRank().getValue())).orElse(sameSuit.get(0));
-        }
-
-        return hand.stream().min(Comparator.comparingInt(c -> c.getRank().getValue())).orElse(hand.get(0));
-    }
-
-    private void applyAIAutoKitty(GameState game, Player winner) {
-        // Add kitty to hand
-        winner.getHand().getCards().addAll(game.getKitty());
-
-        // Auto-discard the lowest 6 cards (simple logic)
-        List<Card> sorted = new ArrayList<>(winner.getHand().getCards());
-        sorted.sort(Comparator.comparingInt(c -> c.getRank().getValue()));
-        List<Card> toDiscard = sorted.subList(0, 6);
-
-        for (Card card : toDiscard) {
-            winner.getHand().getCards().remove(card);
-        }
-
-        game.setKitty(new ArrayList<>());
-
-        // Set trump from the bid
-        PlayerPos winnerPos = game.getHighestBid().getPlayer();
-        FinalBid winningBid = game.getFinalBidCache().get(winnerPos);
-        game.setTrumpType(winningBid.getType());
-        game.setPhase(GamePhase.PLAY);
-        game.setCurrentTurnIndex(winnerPos.ordinal());
-        System.out.println("DEBUG: First trick will be led by " + winner.getName());
-        autoPlayAITurns(game);
-    }
-
-    private void scoreHand(GameState game) {
-        FinalBid winningBid = game.getWinningBid();
-        Team biddingTeam = game.getPlayers().stream()
-                .filter(p -> p.getPosition().equals(winningBid.getPlayer()))
-                .findFirst()
-                .map(Player::getTeam)
-                .orElseThrow();
-
-        int tricksWon = game.getTeamTrickCounts().getOrDefault(biddingTeam, 0);
-        int requiredTricks = winningBid.getValue() + 5;
-
-        int deltaScore;
-        if (tricksWon >= requiredTricks) {
-            // Team succeeded: total tricks - 5 base tricks
-            deltaScore = tricksWon - 5;
-        } else {
-            // Team failed: lose bid value
-            deltaScore = -winningBid.getValue();
-        }
-
-        int newScore = game.getTeamScores().getOrDefault(biddingTeam, 0) + deltaScore;
-        game.getTeamScores().put(biddingTeam, newScore);
-
-        if (biddingTeam == Team.A) {
-            game.setTeamAScore(newScore);
-        } else {
-            game.setTeamBScore(newScore);
-        }
-
-        // Game end condition: either team reaches ≥ 7 or ≤ -7
-        int teamAScore = game.getTeamAScore();
-        int teamBScore = game.getTeamBScore();
-
-        // Win condition logic
-        if (teamAScore >= 7 || teamBScore <= -7) {
-            System.out.println("DEBUG: Team A WON (Score A: " + teamAScore + ", Score B: " + teamBScore + ")");
+        if (game.getCompletedTricks().size() == 12) {
+          scoreHand(game);
+          if (game.getTeamAScore() >= 7 || game.getTeamBScore() >= 7) {
+            game.addAnimation(new Animation(AnimationType.SHOW_WINNER));
             game.setPhase(GamePhase.END);
-        } else if (teamBScore >= 7 || teamAScore <= -7) {
-            System.out.println("DEBUG: Team B WON (Score B: " + teamBScore + ", Score A: " + teamAScore + ")");
-            game.setPhase(GamePhase.END);
-        }
-    }
-
-    private Suit getTrumpSuitFromBidType(GameState game) {
-        return switch (game.getTrumpType()) {
-            case UPTOWN ->
-                Suit.SPADES;
-            case DOWNTOWN ->
-                Suit.CLUBS;
-            case NO_TRUMP ->
-                null;
-            default ->
-                null; // handles any future or unexpected BidType values
-        };
-    }
-
-    public void popAnimation(PopAnimationRequest request) {
-        GameState game = getGameById(request.getGameId());
-        PlayerPos playerPosition = request.getPlayer();
-        String animationId = request.getAnimationId();
-
-        game.removeAnimationById(playerPosition, animationId);
-    }
-
-    public GameStateResponse updateState(PollRequest request) {
-        PlayerPos playerPosition = request.getPlayer();
-        GameState game = getGameById(request.getGameId());
-
-        return getGameStateForPlayer(game, playerPosition);
-    }
-
-    public GameState getGameById(String gameId) {
-        if (gameId == null) {
-            throw new IllegalArgumentException("Game ID cannot be null");
+          } else {
+            game.addAnimation(new Animation(AnimationType.CLEAR));
+            startNewHand(game);
+          }
+          return;
         }
 
-        GameState game = games.get(gameId);
-        if (game == null) {
-            throw new IllegalStateException("No game found with ID: " + gameId);
+        if (winnerPlayer.isAI()) {
+          autoPlayAITurns(game);
         }
-        return game;
+
+        return;
+      }
+    }
+  }
+
+  /*
+  * Selects the card that AI should play based on difficulty and trick state.
+  */
+  private Card chooseCardForAI(GameState game, Player aiPlayer, List<PlayedCard> currentTrick) {
+    List<Card> hand = aiPlayer.getHand().getCards();
+    Difficulty difficulty = game.getDifficulty();
+    Suit trumpSuit = getTrumpSuitFromBidType(game);
+
+    if (difficulty == Difficulty.EASY) {
+      return getLowestLegalCard(hand, currentTrick);
     }
 
-    public HandResponse provideUpdatedCards(HandRequest request) {
-        GameState game = getGameById(request.getGameId());
-        PlayerPos playerPosition = request.getPlayer();
+    if (difficulty == Difficulty.MEDIUM) {
+      if (currentTrick.isEmpty()) {
+        return hand.stream()
+            .filter(c -> trumpSuit == null || !c.getSuit().equals(trumpSuit))
+            .max(Comparator.comparingInt(c -> c.getRank().getValue()))
+            .orElse(hand.get(0));
+      }
 
-        List<PlayerView> views = getMyPlayerViews(game, playerPosition);
-        List<Card> kitty = getMyKittyView(game, playerPosition);
+      Suit leadSuit = currentTrick.get(0).getCard().getSuit();
+      List<Card> sameSuit =
+          hand.stream().filter(c -> c.getSuit() == leadSuit).collect(Collectors.toList());
+      if (!sameSuit.isEmpty()) {
+        return sameSuit.stream()
+            .min(Comparator.comparingInt(c -> c.getRank().getValue()))
+            .orElse(sameSuit.get(0));
+      }
 
-        HandResponse response = new HandResponse(views, kitty);
-
-        return response;
+      return hand.stream()
+          .min(Comparator.comparingInt(c -> c.getRank().getValue()))
+          .orElse(hand.get(0));
     }
 
-    public List<PlayerView> getMyPlayerViews(GameState game, PlayerPos playerPosition) {
-        List<PlayerView> playerViews = new ArrayList<>();
+    if (difficulty == Difficulty.HARD) {
+      if (currentTrick.isEmpty()) {
+        return hand.stream()
+            .filter(c -> trumpSuit == null || !c.getSuit().equals(trumpSuit))
+            .max(Comparator.comparingInt(c -> c.getRank().getValue()))
+            .orElse(hand.get(0));
+      }
 
-        for (Player p : game.getPlayers()) {
-            List<Card> visibleHand;
+      Suit leadSuit = currentTrick.get(0).getCard().getSuit();
+      List<Card> followSuitCards =
+          hand.stream().filter(c -> c.getSuit() == leadSuit).collect(Collectors.toList());
 
-            if (p.getPosition().equals(playerPosition)) {
-                visibleHand = p.getHand().getCards();
-            } else {
-                int hiddenCount = p.getHand().getCards().size();
-                visibleHand = new ArrayList<>();
-                for (int i = 0; i < hiddenCount; i++) {
-                    Card hiddenCard = new Card(null, null);
-                    hiddenCard.setVisibility(CardVisibility.HIDDEN); // optional enum
-                    visibleHand.add(hiddenCard);
-                }
-            }
+      if (!followSuitCards.isEmpty()) {
+        return followSuitCards.stream()
+            .max(Comparator.comparingInt(c -> c.getRank().getValue()))
+            .orElse(followSuitCards.get(0));
+      }
 
-            playerViews.add(new PlayerView(
-                    p.getName(),
-                    p.getPosition(),
-                    p.getTeam(),
-                    p.isAI(),
-                    visibleHand));
+      return hand.stream()
+          .filter(c -> trumpSuit == null || !c.getSuit().equals(trumpSuit))
+          .min(Comparator.comparingInt(c -> c.getRank().getValue()))
+          .orElse(hand.get(0));
+    }
 
+    return hand.get(0);
+  }
+
+// src/main/java/com/bidwhist/service/GameService.java
+
+  /*
+  * Selects the lowest legal card to play.
+  * Prefers matching lead suit if available.
+  */
+  private Card getLowestLegalCard(List<Card> hand, List<PlayedCard> trick) {
+    if (trick.isEmpty()) {
+      return hand.stream()
+          .min(Comparator.comparingInt(c -> c.getRank().getValue()))
+          .orElse(hand.get(0));
+    }
+
+    Suit leadSuit = trick.get(0).getCard().getSuit();
+    List<Card> sameSuit =
+        hand.stream().filter(c -> c.getSuit() == leadSuit).collect(Collectors.toList());
+
+    if (!sameSuit.isEmpty()) {
+      return sameSuit.stream()
+          .min(Comparator.comparingInt(c -> c.getRank().getValue()))
+          .orElse(sameSuit.get(0));
+    }
+
+    return hand.stream()
+        .min(Comparator.comparingInt(c -> c.getRank().getValue()))
+        .orElse(hand.get(0));
+  }
+
+  /*
+  * Auto-applies kitty and discards for AI winners.
+  * Chooses 6 lowest cards to discard and starts the AI's first play.
+  */
+  private void applyAIAutoKitty(GameState game, Player winner) {
+    winner.getHand().getCards().addAll(game.getKitty());
+
+    List<Card> sorted = new ArrayList<>(winner.getHand().getCards());
+    sorted.sort(Comparator.comparingInt(c -> c.getRank().getValue()));
+    List<Card> toDiscard = sorted.subList(0, 6);
+
+    for (Card card : toDiscard) {
+      winner.getHand().getCards().remove(card);
+    }
+
+    game.setKitty(new ArrayList<>());
+
+    PlayerPos winnerPos = game.getHighestBid().getPlayer();
+    FinalBid winningBid = game.getFinalBidCache().get(winnerPos);
+    game.setTrumpType(winningBid.getType());
+    game.setPhase(GamePhase.PLAY);
+    game.setCurrentTurnIndex(winnerPos.ordinal());
+
+    System.out.println("DEBUG: First trick will be led by " + winner.getName());
+
+    autoPlayAITurns(game);
+  }
+
+  /*
+  * Scores the current hand based on bid success and trick count.
+  * Updates team scores accordingly.
+  */
+  private void scoreHand(GameState game) {
+    FinalBid winningBid = game.getWinningBid();
+    Team winningTeam =
+        game.getPlayers().stream()
+            .filter(p -> p.getPosition().equals(winningBid.getPlayer()))
+            .findFirst()
+            .map(Player::getTeam)
+            .orElseThrow();
+
+    int tricksWon = game.getTeamTrickCounts().getOrDefault(winningTeam, 0);
+    int tricksMin = winningBid.getValue() + 5;
+    boolean success = tricksWon >= tricksMin;
+    int points = success ? tricksWon - 5 : tricksWon - tricksMin;
+
+    System.out.println("DEBUG: Calculated points for " + winningTeam + ": " + points);
+
+    int currentScore = game.getTeamScores().getOrDefault(winningTeam, 0);
+    int newScore = currentScore + points;
+    game.getTeamScores().put(winningTeam, newScore);
+
+    if (winningTeam == Team.A) {
+      game.setTeamAScore(newScore);
+    } else {
+      game.setTeamBScore(newScore);
+    }
+
+    System.out.println(
+        "DEBUG: Bidding team: "
+            + winningTeam
+            + ", Bid: "
+            + winningBid.getValue()
+            + ", Tricks won: "
+            + tricksWon
+            + ", Success: "
+            + success);
+    System.out.println(
+        "DEBUG: Team scores - Team A: "
+            + game.getTeamAScore()
+            + ", Team B: "
+            + game.getTeamBScore());
+  }
+
+  /*
+  * Gets the implied trump suit based on bid type.
+  */
+  private Suit getTrumpSuitFromBidType(GameState game) {
+    return switch (game.getTrumpType()) {
+      case UPTOWN -> Suit.SPADES;
+      case DOWNTOWN -> Suit.CLUBS;
+      case NO_TRUMP -> null;
+      default -> null;
+    };
+  }
+
+  /*
+  * Removes a single animation (by ID) from a player's animation queue.
+  */
+  public void popAnimation(PopAnimationRequest request) {
+    GameState game = getGameById(request.getGameId());
+    PlayerPos playerPosition = request.getPlayer();
+    String animationId = request.getAnimationId();
+
+    game.removeAnimationById(playerPosition, animationId);
+  }
+
+  /*
+  * Returns the latest game state for polling updates.
+  */
+  public GameStateResponse updateState(PollRequest request) {
+    PlayerPos playerPosition = request.getPlayer();
+    GameState game = getGameById(request.getGameId());
+
+    return getGameStateForPlayer(game, playerPosition);
+  }
+
+  /*
+  * Retrieves a game instance from memory by its ID.
+  */
+  public GameState getGameById(String gameId) {
+    if (gameId == null) {
+      throw new IllegalArgumentException("Game ID cannot be null");
+    }
+
+    GameState game = games.get(gameId);
+    if (game == null) {
+      throw new IllegalStateException("No game found with ID: " + gameId);
+    }
+
+    return game;
+  }
+
+  /*
+  * Returns a HandResponse including player views and kitty for UI refresh.
+  */
+  public HandResponse provideUpdatedCards(HandRequest request) {
+    GameState game = getGameById(request.getGameId());
+    PlayerPos playerPosition = request.getPlayer();
+
+    List<PlayerView> views = getMyPlayerViews(game, playerPosition);
+    List<Card> kitty = getMyKittyView(game, playerPosition);
+
+    return new HandResponse(views, kitty);
+  }
+
+  /*
+  * Builds list of PlayerView objects for the requesting player.
+  * Hides other hands with placeholder cards.
+  */
+  public List<PlayerView> getMyPlayerViews(GameState game, PlayerPos playerPosition) {
+    List<PlayerView> playerViews = new ArrayList<>();
+
+    for (Player p : game.getPlayers()) {
+      List<Card> visibleHand;
+
+      if (p.getPosition().equals(playerPosition)) {
+        visibleHand = p.getHand().getCards();
+      } else {
+        int hiddenCount = p.getHand().getCards().size();
+        visibleHand = new ArrayList<>();
+        for (int i = 0; i < hiddenCount; i++) {
+          Card hiddenCard = new Card(null, null);
+          hiddenCard.setVisibility(CardVisibility.HIDDEN);
+          visibleHand.add(hiddenCard);
         }
-        return playerViews;
+      }
+
+      playerViews.add(
+          new PlayerView(p.getName(), p.getPosition(), p.getTeam(), p.isAI(), visibleHand));
     }
 
-    public List<Card> getMyKittyView(GameState game, PlayerPos playerPosition) {
+    return playerViews;
+  }
 
-        List<Card> myKittyView = new ArrayList<>(game.getKitty());
+  /*
+  * Returns the correct kitty view for the player.
+  * Winning player sees the actual cards, others see hidden placeholders.
+  */
+  public List<Card> getMyKittyView(GameState game, PlayerPos playerPosition) {
+    List<Card> myKittyView = new ArrayList<>(game.getKitty());
 
-        if (!myKittyView.isEmpty()) {
-            if (PlayerUtils.getNameByPosition(playerPosition, game.getPlayers())
-                    .equals(game.getWinningPlayerName())) {
-                for (Card card : myKittyView) {
-                    card.setVisibility(CardVisibility.VISIBLE_TO_SELF);
-                }
-            } else {
+    if (!myKittyView.isEmpty()) {
+      String viewerName = PlayerUtils.getNameByPosition(playerPosition, game.getPlayers());
 
-                for (int i = 0; i < myKittyView.size(); i++) {
-                    myKittyView.set(i, new Card(null, null));
-                    myKittyView.get(i).setVisibility(CardVisibility.HIDDEN);
-                }
-            }
+      if (viewerName.equals(game.getWinningPlayerName())) {
+        for (Card card : myKittyView) {
+          card.setVisibility(CardVisibility.VISIBLE_TO_SELF);
         }
-        return myKittyView;
+      } else {
+        for (int i = 0; i < myKittyView.size(); i++) {
+          myKittyView.set(i, new Card(null, null));
+          myKittyView.get(i).setVisibility(CardVisibility.HIDDEN);
+        }
+      }
     }
+
+    return myKittyView;
+  }
 }
