@@ -1,3 +1,5 @@
+// src/main/java/com/bidwhist/model/PlayerPos.java
+
 package com.bidwhist.model;
 
 public enum PlayerPos {

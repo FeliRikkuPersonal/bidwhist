@@ -1,20 +1,25 @@
+// src/main/java/com/bidwhist/dto/JoinGameRequest.java
+
 package com.bidwhist.dto;
 
+/*
+ * Represents a request to join an existing game room.
+ * Contains the player's name and the target game ID.
+ */
 public class JoinGameRequest {
-    
-    private String playerName;
-    private String gameId;
 
-    public String getPlayerName() {
-        return playerName;
-    }
+  private String playerName;
+  private String gameId;
 
-    public void setPlayerName(String playerName) {
-        this.playerName = playerName;
-    }
+  public String getPlayerName() {
+    return playerName;
+  }
 
-    public String getGameId() {
-        return gameId;
-    }
+  public void setPlayerName(String playerName) {
+    this.playerName = playerName;
+  }
 
+  public String getGameId() {
+    return gameId;
+  }
 }

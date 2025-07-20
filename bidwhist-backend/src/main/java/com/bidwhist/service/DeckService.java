@@ -1,15 +1,19 @@
+// src/main/java/com/bidwhist/service/DeckService.java
+
 package com.bidwhist.service;
 
-
-import org.springframework.stereotype.Service;
-
 import com.bidwhist.model.Deck;
+import org.springframework.stereotype.Service;
 
 @Service
 public class DeckService {
-    public static Deck createNewDeck() {
-        Deck deck = new Deck();
-        deck.shuffle();
-        return deck;
-    }
+
+  /*
+  * Creates a new shuffled deck and returns it.
+  */
+  public static Deck createNewDeck() {
+    Deck deck = new Deck();
+    deck.shuffle();
+    return deck;
+  }
 }

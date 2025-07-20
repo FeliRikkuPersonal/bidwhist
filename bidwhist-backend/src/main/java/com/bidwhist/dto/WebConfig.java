@@ -1,3 +1,5 @@
+// src/main/java/com/bidwhist/dto/WebConfig.java
+
 package com.bidwhist.dto;
 
 import org.springframework.beans.factory.annotation.Value;

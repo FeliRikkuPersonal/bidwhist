@@ -1,33 +1,43 @@
+// src/main/java/com/bidwhist/dto/PopAnimationRequest.java
+
 package com.bidwhist.dto;
 
 import com.bidwhist.model.PlayerPos;
 
+/**
+ * DTO for animation removal requests.
+ *
+ * Sent from the frontend when an animation has finished playing on a specific client.
+ * This request tells the server to pop the animation from the corresponding player's queue.
+ *
+ * Used in real-time play zones to keep animation state synced across players.
+ */
 public class PopAnimationRequest {
-    private String gameId;
-    private String animationId;
-    private PlayerPos player;
+  private String gameId;
+  private String animationId;
+  private PlayerPos player;
 
-    public String getGameId() {
-        return gameId;
-    }
+  public String getGameId() {
+    return gameId;
+  }
 
-    public String getAnimationId() {
-        return animationId;
-    }
+  public String getAnimationId() {
+    return animationId;
+  }
 
-    public PlayerPos getPlayer() {
-        return player;
-    }
+  public PlayerPos getPlayer() {
+    return player;
+  }
 
-    public void setGameId(String id) {
-        this.gameId = id;
-    }
+  public void setGameId(String id) {
+    this.gameId = id;
+  }
 
-    public void setAnimationId(String id) {
-        this.animationId = id;
-    }
+  public void setAnimationId(String id) {
+    this.animationId = id;
+  }
 
-    public void setPlayer(PlayerPos player) {
-        this.player = player;
-    }
+  public void setPlayer(PlayerPos player) {
+    this.player = player;
+  }
 }

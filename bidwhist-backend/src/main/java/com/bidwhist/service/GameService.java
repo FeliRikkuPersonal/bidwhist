@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
@@ -50,12 +51,14 @@ public class GameService {
   private final Map<String, GameState> games = new ConcurrentHashMap<>();
 
   /* Constructor for GameService (DeckService currently unused) */
-  public GameService(DeckService deckService) {}
+  public GameService(DeckService deckService) {
+  }
 
   /*
-  * Starts a solo game with one human player and three AIs.
-  * Initializes player positions, shuffles the deck, assigns cards, and updates state.
-  */
+   * Starts a solo game with one human player and three AIs.
+   * Initializes player positions, shuffles the deck, assigns cards, and updates
+   * state.
+   */
   public GameStateResponse startSoloGame(StartGameRequest request) {
     String playerName = request.getPlayerName();
     GameState game = new GameState(request.getGameId());
@@ -99,9 +102,9 @@ public class GameService {
   }
 
   /*
-  * Starts a multiplayer game and registers the first player.
-  * Sets game status to waiting for additional players.
-  */
+   * Starts a multiplayer game and registers the first player.
+   * Sets game status to waiting for additional players.
+   */
   public GameStateResponse createMutliplayerGame(StartGameRequest request) {
     System.out.println("Staring new game for player: " + request.getPlayerName());
 
@@ -131,9 +134,9 @@ public class GameService {
   }
 
   /*
-  * Allows a player to join an existing game.
-  * If room is ready, triggers shuffle and deals cards.
-  */
+   * Allows a player to join an existing game.
+   * If room is ready, triggers shuffle and deals cards.
+   */
   public GameStateResponse joinGame(JoinGameRequest request) {
     GameState game = getGameById(request.getGameId());
     game.getRoom().addPlayer(request.getPlayerName());
@@ -160,26 +163,25 @@ public class GameService {
   }
 
   /*
-  * Returns a GameStateResponse customized for a single player.
-  * Includes masked hands, phase info, team, and all visible public game state.
-  */
+   * Returns a GameStateResponse customized for a single player.
+   * Includes masked hands, phase info, team, and all visible public game state.
+   */
   public GameStateResponse getGameStateForPlayer(GameState game, PlayerPos playerPosition) {
     List<PlayerView> playerViews = getMyPlayerViews(game, playerPosition);
     List<Card> myKittyView = getMyKittyView(game, playerPosition);
     List<Player> players = game.getPlayers();
     Team myTeam = game.getTeamByPlayerPos(players, playerPosition);
 
-    GameStateResponse response =
-        new GameStateResponse(
-            game.getAnimationList().getOrDefault(playerPosition, new ArrayList<>()),
-            playerViews,
-            myKittyView,
-            game.getCurrentTurnIndex(),
-            game.getPhase(),
-            game.getShuffledDeck(),
-            playerPosition,
-            game.getFirstBidder(),
-            game.getBidTurnIndex());
+    GameStateResponse response = new GameStateResponse(
+        game.getAnimationList().getOrDefault(playerPosition, new ArrayList<>()),
+        playerViews,
+        myKittyView,
+        game.getCurrentTurnIndex(),
+        game.getPhase(),
+        game.getShuffledDeck(),
+        playerPosition,
+        game.getFirstBidder(),
+        game.getBidTurnIndex());
 
     response.setWinningPlayerName(game.getWinningPlayerName());
     response.setHighestBid(game.getHighestBid());
@@ -196,11 +198,12 @@ public class GameService {
 
     return response;
   }
+
   /*
-  * Deals cards to players after shuffling and sets game phase to BID.
-  * Also triggers card animations and assigns the kitty.
-  * If the next bidder is AI, initiates AI bid processing.
-  */
+   * Deals cards to players after shuffling and sets game phase to BID.
+   * Also triggers card animations and assigns the kitty.
+   * If the next bidder is AI, initiates AI bid processing.
+   */
   public void dealToPlayers(GameState game) {
     System.out.println("[dealToPlayers]");
 
@@ -226,10 +229,10 @@ public class GameService {
   }
 
   /*
-  * Resets all game state to prepare for a new hand.
-  * Clears trick counts, kitty, and all tracked state.
-  * Shuffles and re-deals cards for new round.
-  */
+   * Resets all game state to prepare for a new hand.
+   * Clears trick counts, kitty, and all tracked state.
+   * Shuffles and re-deals cards for new round.
+   */
   public void startNewHand(GameState game) {
     System.out.println("[startNewHand]");
 
@@ -249,6 +252,7 @@ public class GameService {
     game.getTeamTrickCounts().clear();
     game.getDeck().resetJokerSuits();
     game.getFinalBidCache().clear();
+    game.setBidTurnIndex(game.getFirstBidder().ordinal());
 
     game.getDeck().shuffle();
     game.setShuffledDeck(game.getDeck().getCards());
@@ -257,9 +261,9 @@ public class GameService {
   }
 
   /*
-  * Submits a bid from a human player.
-  * Also triggers AI bidding logic and resolves winner if 4 bids exist.
-  */
+   * Submits a bid from a human player.
+   * Also triggers AI bidding logic and resolves winner if 4 bids exist.
+   */
   public GameStateResponse submitBid(BidRequest request) {
     GameState game = getGameById(request.getGameId());
 
@@ -267,11 +271,10 @@ public class GameService {
       throw new IllegalStateException("Game has not been started. Call /start first.");
     }
 
-    Player bidder =
-        game.getPlayers().stream()
-            .filter(p -> p.getPosition().equals(request.getPlayer()))
-            .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException("Player not found"));
+    Player bidder = game.getPlayers().stream()
+        .filter(p -> p.getPosition().equals(request.getPlayer()))
+        .findFirst()
+        .orElseThrow(() -> new IllegalArgumentException("Player not found"));
 
     InitialBid bid = BidRequest.fromRequest(request, bidder);
     game.addBid(bid);
@@ -288,11 +291,10 @@ public class GameService {
 
     if (game.getBids().size() >= 4) {
       PlayerPos winnerPos = game.getHighestBid().getPlayer();
-      Player winner =
-          game.getPlayers().stream()
-              .filter(p -> p.getPosition().equals(winnerPos))
-              .findFirst()
-              .orElseThrow(() -> new IllegalStateException("Winner not found"));
+      Player winner = game.getPlayers().stream()
+          .filter(p -> p.getPosition().equals(winnerPos))
+          .findFirst()
+          .orElseThrow(() -> new IllegalStateException("Winner not found"));
 
       game.setBidWinnerPos(winnerPos);
 
@@ -321,8 +323,9 @@ public class GameService {
   }
 
   /*
-  * Executes AI bids until it’s the human player’s turn or all bids are completed.
-  */
+   * Executes AI bids until it’s the human player’s turn or all bids are
+   * completed.
+   */
   private void processAllBids(GameState game) {
     while (game.getBids().size() < 4) {
       Player nextBidder = game.getPlayers().get(game.getBidTurnIndex());
@@ -366,9 +369,9 @@ public class GameService {
   }
 
   /*
-  * Evaluates a given AI player's hand and returns the strongest valid bid.
-  * Saves final bid to cache for later reference.
-  */
+   * Evaluates a given AI player's hand and returns the strongest valid bid.
+   * Saves final bid to cache for later reference.
+   */
   private InitialBid generateAIBid(GameState game, Player ai) {
     HandEvaluator evaluator = new HandEvaluator(ai);
     evaluator.evaluateHand();
@@ -376,17 +379,15 @@ public class GameService {
     List<FinalBid> bidOptions = evaluator.evaluateAll(ai.getPosition());
     InitialBid currentHigh = game.getHighestBid();
 
-    List<FinalBid> strongerBids =
-        bidOptions.stream()
-            .filter(bid -> currentHigh == null || bid.getValue() > currentHigh.getValue())
-            .toList();
+    List<FinalBid> strongerBids = bidOptions.stream()
+        .filter(bid -> currentHigh == null || bid.getValue() > currentHigh.getValue())
+        .toList();
 
     if (strongerBids.isEmpty()) {
       return InitialBid.pass(ai.getPosition());
     }
 
-    FinalBid bestBid =
-        strongerBids.stream().max(Comparator.comparingInt(FinalBid::getValue)).orElse(null);
+    FinalBid bestBid = strongerBids.stream().max(Comparator.comparingInt(FinalBid::getValue)).orElse(null);
 
     game.getFinalBidCache().put(ai.getPosition(), bestBid);
 
@@ -394,18 +395,17 @@ public class GameService {
   }
 
   /*
-  * Finalizes the winning bid by the human player.
-  * Assigns trump suit and updates game state and kitty visibility.
-  */
+   * Finalizes the winning bid by the human player.
+   * Assigns trump suit and updates game state and kitty visibility.
+   */
   public GameStateResponse getFinalBid(FinalBidRequest request) {
     GameState game = getGameById(request.getGameId());
 
     PlayerPos winnerPos = request.getPlayer();
-    Player winner =
-        game.getPlayers().stream()
-            .filter(p -> p.getPosition().equals(winnerPos))
-            .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException("Player not found: " + winnerPos));
+    Player winner = game.getPlayers().stream()
+        .filter(p -> p.getPosition().equals(winnerPos))
+        .findFirst()
+        .orElseThrow(() -> new IllegalArgumentException("Player not found: " + winnerPos));
 
     if (winner.isAI()) {
       throw new IllegalStateException("AI players do not need to finalize a bid.");
@@ -430,9 +430,9 @@ public class GameService {
   }
 
   /*
-  * Applies the kitty and discards to the winner’s hand.
-  * Advances game to PLAY phase once done.
-  */
+   * Applies the kitty and discards to the winner’s hand.
+   * Advances game to PLAY phase once done.
+   */
   public GameStateResponse applyKittyAndDiscards(KittyRequest request) {
     GameState game = getGameById(request.getGameId());
 
@@ -444,15 +444,13 @@ public class GameService {
       throw new IllegalArgumentException("Only the winning player may apply the kitty.");
     }
 
-    Player winner =
-        game.getPlayers().stream()
-            .filter(
-                p ->
-                    p.getName()
-                        .equals(
-                            PlayerUtils.getNameByPosition(request.getPlayer(), game.getPlayers())))
-            .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException("Winning player not found."));
+    Player winner = game.getPlayers().stream()
+        .filter(
+            p -> p.getName()
+                .equals(
+                    PlayerUtils.getNameByPosition(request.getPlayer(), game.getPlayers())))
+        .findFirst()
+        .orElseThrow(() -> new IllegalArgumentException("Winning player not found."));
 
     if (request.getDiscards().size() != 6) {
       throw new IllegalArgumentException("You must discard exactly 6 cards.");
@@ -487,9 +485,9 @@ public class GameService {
   }
 
   /*
-  * Plays a card from a player and evaluates the trick.
-  * Validates legality, triggers animations, and handles trick scoring.
-  */
+   * Plays a card from a player and evaluates the trick.
+   * Validates legality, triggers animations, and handles trick scoring.
+   */
   public GameStateResponse playCard(PlayRequest request) {
     System.out.println("[playCard]");
 
@@ -530,8 +528,7 @@ public class GameService {
     List<PlayedCard> currentTrick = game.getCurrentTrick();
     if (!currentTrick.isEmpty()) {
       Suit leadSuit = currentTrick.get(0).getCard().getSuit();
-      boolean hasLeadSuit =
-          currentPlayer.getHand().getCards().stream().anyMatch(c -> c.getSuit() == leadSuit);
+      boolean hasLeadSuit = currentPlayer.getHand().getCards().stream().anyMatch(c -> c.getSuit() == leadSuit);
       if (hasLeadSuit && cardToPlay.getSuit() != leadSuit) {
         throw new IllegalArgumentException("Must follow suit if possible");
       }
@@ -541,6 +538,7 @@ public class GameService {
 
     currentPlayer.getHand().getCards().remove(cardToPlay);
     currentTrick.add(validPlayedCard);
+    game.addPlayedCard(cardToPlay);
 
     game.addAnimation(new Animation(validPlayedCard));
     game.setCurrentTurnIndex((game.getCurrentTurnIndex() + 1) % 4);
@@ -578,7 +576,7 @@ public class GameService {
     }
 
     if (PlayerUtils.getPlayerByPosition(
-            PlayerPos.values()[game.getCurrentTurnIndex()], game.getPlayers())
+        PlayerPos.values()[game.getCurrentTurnIndex()], game.getPlayers())
         .isAI()) {
       autoPlayAITurns(game);
     }
@@ -587,9 +585,9 @@ public class GameService {
   }
 
   /*
-  * Determines the winner of the current trick.
-  * Applies different logic for NO_TRUMP, DOWNTOWN, and UPTOWN bids.
-  */
+   * Determines the winner of the current trick.
+   * Applies different logic for NO_TRUMP, DOWNTOWN, and UPTOWN bids.
+   */
   private PlayedCard determineTrickWinner(GameState game, List<PlayedCard> trick) {
     if (trick == null || trick.isEmpty()) {
       throw new IllegalArgumentException("Cannot determine trick winner: trick is empty.");
@@ -646,9 +644,9 @@ public class GameService {
   }
 
   /*
-  * Main AI play loop. AI players will continue playing until a human's turn.
-  * Handles animations, trick resolution, and transitions to scoring or new hand.
-  */
+   * Main AI play loop. AI players will continue playing until a human's turn.
+   * Handles animations, trick resolution, and transitions to scoring or new hand.
+   */
   private void autoPlayAITurns(GameState game) {
     while (true) {
       Player current = game.getPlayers().get(game.getCurrentTurnIndex());
@@ -678,8 +676,7 @@ public class GameService {
         System.out.println("DEBUG: Trick complete. Evaluating winner...");
         PlayedCard winner = determineTrickWinner(game, game.getCurrentTrick());
 
-        Player winnerPlayer =
-            PlayerUtils.getPlayerByPosition(winner.getPlayer(), game.getPlayers());
+        Player winnerPlayer = PlayerUtils.getPlayerByPosition(winner.getPlayer(), game.getPlayers());
         Team winnerTeam = winnerPlayer.getTeam();
         System.out.println(
             "DEBUG: Trick won by " + winnerPlayer.getName() + " (Team " + winnerTeam + ")");
@@ -718,13 +715,27 @@ public class GameService {
     }
   }
 
-  /*
-  * Selects the card that AI should play based on difficulty and trick state.
-  */
+  /**
+   * Selects the best card for the AI to play based on difficulty level.
+   *
+   * - EASY: Plays the lowest legal card to keep logic simple.
+   * - MEDIUM: Leads with the highest non-trump card or follows suit with the
+   * lowest.
+   * - HARD: Evaluates trump, lead suit, partner position, and past tricks to
+   * choose:
+   * - A safe high card if leading
+   * - A defensive low card if partner is winning
+   * - The weakest card that can beat the current winner
+   * - A fallback lowest card when no better play is found
+   *
+   * Decision logic adjusts dynamically based on trick position, trump usage, and
+   * potential to preserve strong cards for later rounds.
+   */
+
   private Card chooseCardForAI(GameState game, Player aiPlayer, List<PlayedCard> currentTrick) {
     List<Card> hand = aiPlayer.getHand().getCards();
     Difficulty difficulty = game.getDifficulty();
-    Suit trumpSuit = getTrumpSuitFromBidType(game);
+    Suit trumpSuit = game.getTrumpSuit();
 
     if (difficulty == Difficulty.EASY) {
       return getLowestLegalCard(hand, currentTrick);
@@ -733,14 +744,16 @@ public class GameService {
     if (difficulty == Difficulty.MEDIUM) {
       if (currentTrick.isEmpty()) {
         return hand.stream()
-            .filter(c -> trumpSuit == null || !c.getSuit().equals(trumpSuit))
+            .filter(c -> c.getSuit() != null && (trumpSuit == null || !c.getSuit().equals(trumpSuit)))
             .max(Comparator.comparingInt(c -> c.getRank().getValue()))
             .orElse(hand.get(0));
       }
 
-      Suit leadSuit = currentTrick.get(0).getCard().getSuit();
-      List<Card> sameSuit =
-          hand.stream().filter(c -> c.getSuit() == leadSuit).collect(Collectors.toList());
+      Suit leadSuit = currentTrick.get(0).getCard() != null ? currentTrick.get(0).getCard().getSuit() : null;
+      List<Card> sameSuit = hand.stream()
+          .filter(c -> c.getSuit() != null && c.getSuit().equals(leadSuit))
+          .collect(Collectors.toList());
+
       if (!sameSuit.isEmpty()) {
         return sameSuit.stream()
             .min(Comparator.comparingInt(c -> c.getRank().getValue()))
@@ -753,38 +766,267 @@ public class GameService {
     }
 
     if (difficulty == Difficulty.HARD) {
-      if (currentTrick.isEmpty()) {
+      int trickIndex = currentTrick.size();
+      Suit leadSuit = currentTrick.isEmpty() ? null
+          : (currentTrick.get(0).getCard() != null ? currentTrick.get(0).getCard().getSuit() : null);
+      PlayedCard winningCard = trickIndex > 0 ? getWinningCard(currentTrick, trumpSuit) : null;
+      Card currentWinning = winningCard != null ? winningCard.getCard() : null;
+
+      if (leadSuit != null && hand.stream().anyMatch(c -> c.getSuit() != null && c.getSuit().equals(leadSuit))) {
+        // Ensure at least one card of leadSuit is played
+        List<Card> legalFollowSuit = hand.stream()
+            .filter(c -> c.getSuit() != null && c.getSuit().equals(leadSuit))
+            .collect(Collectors.toList());
+
+        return legalFollowSuit.stream()
+            .min(Comparator.comparingInt(c -> c.getRank().getValue()))
+            .orElse(hand.get(0));
+      }
+
+      if (trickIndex == 0) {
+        Optional<Card> safeLead = hand.stream()
+            .filter(c -> !JokerUtils.isJokerRank(c.getRank())) // Avoid jokers
+            .filter(c -> c.getSuit() == null || !c.getSuit().equals(trumpSuit)
+                || CardUtils.allHigherTrumpCardsPlayed(c, game.getCompletedCards(), trumpSuit))
+            .max(Comparator.comparingInt(c -> c.getRank().getValue()));
+
+        if (safeLead.isPresent()) {
+          return safeLead.get();
+        }
+
+        Map<Suit, List<Card>> bySuit = hand.stream()
+            .filter(c -> c.getSuit() != null)
+            .collect(Collectors.groupingBy(Card::getSuit));
+
+        Optional<Card> lead = bySuit.entrySet().stream()
+            .filter(e -> e.getValue().size() >= 2)
+            .flatMap(e -> e.getValue().stream())
+            .max(Comparator.comparingInt(c -> c.getRank().getValue()));
+        if (lead.isPresent()) {
+          return lead.get();
+        }
+
         return hand.stream()
-            .filter(c -> trumpSuit == null || !c.getSuit().equals(trumpSuit))
+            .filter(c -> c.getSuit() != null && (trumpSuit == null || !c.getSuit().equals(trumpSuit)))
             .max(Comparator.comparingInt(c -> c.getRank().getValue()))
             .orElse(hand.get(0));
       }
 
-      Suit leadSuit = currentTrick.get(0).getCard().getSuit();
-      List<Card> followSuitCards =
-          hand.stream().filter(c -> c.getSuit() == leadSuit).collect(Collectors.toList());
+      if (trickIndex == 3 && winningCard != null && currentWinning != null) {
+        PlayerPos partner = aiPlayer.getPosition().getPartner();
+        boolean partnerWinning = winningCard.getPlayer() != null && winningCard.getPlayer().equals(partner);
 
-      if (!followSuitCards.isEmpty()) {
-        return followSuitCards.stream()
-            .max(Comparator.comparingInt(c -> c.getRank().getValue()))
-            .orElse(followSuitCards.get(0));
+        if (partnerWinning) {
+          List<Card> follow = hand.stream()
+              .filter(c -> c.getSuit() != null && c.getSuit().equals(leadSuit))
+              .collect(Collectors.toList());
+          if (!follow.isEmpty()) {
+            return follow.stream()
+                .min(Comparator.comparingInt(c -> c.getRank().getValue()))
+                .orElse(follow.get(0));
+          }
+
+          List<Card> trumps = hand.stream()
+              .filter(c -> c.getSuit() != null && c.getSuit().equals(trumpSuit))
+              .collect(Collectors.toList());
+          if (!trumps.isEmpty()) {
+            return trumps.stream()
+                .min(Comparator.comparingInt(c -> c.getRank().getValue()))
+                .orElse(trumps.get(0));
+          }
+
+          Optional<Card> safeHigh = hand.stream()
+              .filter(c -> c.getRank().getValue() >= Rank.QUEEN.getValue())
+              .filter(c -> c.getSuit() == null || !c.getSuit().equals(trumpSuit)
+                  || CardUtils.allHigherTrumpCardsPlayed(c, game.getCompletedCards(), trumpSuit))
+              .findFirst();
+          if (safeHigh.isPresent()) {
+            return safeHigh.get();
+          }
+
+          return hand.stream()
+              .min(Comparator.comparingInt(c -> c.getRank().getValue()))
+              .orElse(hand.get(0));
+        }
+
+        List<Card> winningCards = hand.stream()
+            .filter(c -> c != null && canBeat(c, currentWinning, trumpSuit, leadSuit))
+            .sorted(Comparator.comparingInt(c -> c.getRank().getValue()))
+            .collect(Collectors.toList());
+
+        if (!winningCards.isEmpty()) {
+          return winningCards.get(0);
+        }
+
+        Optional<Card> safeHigh = hand.stream()
+            .filter(c -> c.getRank().getValue() >= Rank.QUEEN.getValue())
+            .filter(c -> c.getSuit() == null || !c.getSuit().equals(trumpSuit)
+                || CardUtils.allHigherTrumpCardsPlayed(c, game.getCompletedCards(), trumpSuit))
+            .findFirst();
+        if (safeHigh.isPresent()) {
+          return safeHigh.get();
+        }
+
+        return hand.stream()
+            .min(Comparator.comparingInt(c -> c.getRank().getValue()))
+            .orElse(hand.get(0));
+      }
+
+      List<Card> followSuit = hand.stream()
+          .filter(c -> c.getSuit() != null)
+          .filter(c -> leadSuit != null && c.getSuit().equals(leadSuit))
+          .collect(Collectors.toList());
+
+      if (!followSuit.isEmpty()) {
+        if (currentWinning != null) {
+          Optional<Card> beatCard = followSuit.stream()
+              .filter(c -> canBeat(c, currentWinning, trumpSuit, leadSuit))
+              .min(Comparator.comparingInt(c -> c.getRank().getValue()));
+          if (beatCard.isPresent()) {
+            return beatCard.get();
+          }
+
+          Optional<Card> safeBurn = followSuit.stream()
+              .filter(c -> c.getSuit() == null || !c.getSuit().equals(trumpSuit)
+                  || CardUtils.allHigherTrumpCardsPlayed(c, game.getCompletedCards(), trumpSuit))
+              .max(Comparator.comparingInt(c -> c.getRank().getValue()));
+          if (safeBurn.isPresent()) {
+            return safeBurn.get();
+          }
+        }
+
+        // Fallback if can't beat or burn: play lowest legal card in lead suit
+        return followSuit.stream()
+            .min(Comparator.comparingInt(c -> c.getRank().getValue()))
+            .orElse(followSuit.get(0));
+      }
+
+      List<Card> trumpCards = hand.stream()
+          .filter(c -> c.getSuit() != null && c.getSuit().equals(trumpSuit))
+          .collect(Collectors.toList());
+
+      if (!trumpCards.isEmpty() && currentWinning != null) {
+        Optional<Card> winningTrump = trumpCards.stream()
+            .filter(c -> canBeat(c, currentWinning, trumpSuit, leadSuit))
+            .min(Comparator.comparingInt(c -> c.getRank().getValue()));
+        if (winningTrump.isPresent()) {
+          return winningTrump.get();
+        }
+      }
+
+      Optional<Card> safeHigh = hand.stream()
+          .filter(c -> c.getRank().getValue() >= Rank.QUEEN.getValue())
+          .filter(c -> c.getSuit() == null || !c.getSuit().equals(trumpSuit)
+              || CardUtils.allHigherTrumpCardsPlayed(c, game.getCompletedCards(), trumpSuit))
+          .findFirst();
+      if (safeHigh.isPresent()) {
+        return safeHigh.get();
       }
 
       return hand.stream()
-          .filter(c -> trumpSuit == null || !c.getSuit().equals(trumpSuit))
           .min(Comparator.comparingInt(c -> c.getRank().getValue()))
           .orElse(hand.get(0));
     }
 
-    return hand.get(0);
+    return hand.get(0); // fallback
   }
 
-// src/main/java/com/bidwhist/service/GameService.java
+  /**
+   * Determines which card is currently winning a trick.
+   * 
+   * It checks each card in the trick. Trump cards beat non-trump cards.
+   * If both are trump or both are the lead suit, the higher rank wins.
+   */
+  private PlayedCard getWinningCard(List<PlayedCard> trick, Suit trumpSuit) {
+    if (trick.isEmpty()) {
+      return null;
+    }
+
+    PlayedCard winning = trick.get(0);
+    Suit leadSuit = winning.getCard().getSuit();
+
+    for (PlayedCard pc : trick) {
+      Card card = pc.getCard();
+      Suit suit = card.getSuit();
+
+      boolean isTrump = trumpSuit != null && trumpSuit.equals(suit);
+      boolean winningIsTrump = trumpSuit != null && trumpSuit.equals(winning.getCard().getSuit());
+
+      if (isTrump && !winningIsTrump) {
+        winning = pc;
+      } else if (isTrump == winningIsTrump && suit == leadSuit) {
+        int currentVal = card.getRank().getValue();
+        int winningVal = winning.getCard().getRank().getValue();
+        if (currentVal > winningVal) {
+          winning = pc;
+        }
+      }
+    }
+
+    return winning;
+  }
+
+  /**
+   * Checks if the AI's partner is currently winning the trick.
+   * 
+   * Finds the current winning card and compares its player to the AI’s partner.
+   */
+
+  @SuppressWarnings("unused")
+  private boolean isPartnerWinning(List<PlayedCard> trick, PlayerPos aiPos, Suit trumpSuit) {
+    if (trick.size() < 2) {
+      return false; // Partner hasn't played yet
+    }
+    PlayerPos partner = aiPos.getPartner();
+
+    // Find the winning card in the current trick
+    PlayedCard winningCard = getWinningCard(trick, trumpSuit);
+    if (winningCard == null) {
+      return false;
+    }
+
+    return winningCard.getPlayer().equals(partner);
+  }
+
+  /**
+   * Checks if the challenger card can beat the current winning card.
+   * 
+   * Trump beats non-trump. Otherwise, the higher card of the same suit wins.
+   * If suits differ and neither is trump, the lead suit may still win if higher.
+   */
+
+  private boolean canBeat(Card challenger, Card currentWinning, Suit trumpSuit, Suit leadSuit) {
+    Suit challengerSuit = challenger.getSuit();
+    Suit winningSuit = currentWinning.getSuit();
+
+    boolean challengerIsTrump = trumpSuit != null && trumpSuit.equals(challengerSuit);
+    boolean winningIsTrump = trumpSuit != null && trumpSuit.equals(winningSuit);
+
+    // Trump beats non-trump
+    if (challengerIsTrump && !winningIsTrump) {
+      return true;
+    }
+    if (!challengerIsTrump && winningIsTrump) {
+      return false;
+    }
+
+    // Same suit: compare values
+    if (challengerSuit == winningSuit) {
+      return challenger.getRank().getValue() > currentWinning.getRank().getValue();
+    }
+
+    // Lead suit but different from winning (no trump involved)
+    if (!challengerIsTrump && !winningIsTrump && challengerSuit == leadSuit && winningSuit == leadSuit) {
+      return challenger.getRank().getValue() > currentWinning.getRank().getValue();
+    }
+
+    return false;
+  }
 
   /*
-  * Selects the lowest legal card to play.
-  * Prefers matching lead suit if available.
-  */
+   * Selects the lowest legal card to play.
+   * Prefers matching lead suit if available.
+   */
   private Card getLowestLegalCard(List<Card> hand, List<PlayedCard> trick) {
     if (trick.isEmpty()) {
       return hand.stream()
@@ -793,8 +1035,7 @@ public class GameService {
     }
 
     Suit leadSuit = trick.get(0).getCard().getSuit();
-    List<Card> sameSuit =
-        hand.stream().filter(c -> c.getSuit() == leadSuit).collect(Collectors.toList());
+    List<Card> sameSuit = hand.stream().filter(c -> c.getSuit() == leadSuit).collect(Collectors.toList());
 
     if (!sameSuit.isEmpty()) {
       return sameSuit.stream()
@@ -808,9 +1049,9 @@ public class GameService {
   }
 
   /*
-  * Auto-applies kitty and discards for AI winners.
-  * Chooses 6 lowest cards to discard and starts the AI's first play.
-  */
+   * Auto-applies kitty and discards for AI winners.
+   * Chooses 6 lowest cards to discard and starts the AI's first play.
+   */
   private void applyAIAutoKitty(GameState game, Player winner) {
     winner.getHand().getCards().addAll(game.getKitty());
 
@@ -836,66 +1077,55 @@ public class GameService {
   }
 
   /*
-  * Scores the current hand based on bid success and trick count.
-  * Updates team scores accordingly.
-  */
+   * Scores the current hand based on bid success and trick count.
+   * Updates team scores accordingly.
+   */
   private void scoreHand(GameState game) {
     FinalBid winningBid = game.getWinningBid();
-    Team winningTeam =
-        game.getPlayers().stream()
-            .filter(p -> p.getPosition().equals(winningBid.getPlayer()))
-            .findFirst()
-            .map(Player::getTeam)
-            .orElseThrow();
+    Team biddingTeam = game.getPlayers().stream()
+        .filter(p -> p.getPosition().equals(winningBid.getPlayer()))
+        .findFirst()
+        .map(Player::getTeam)
+        .orElseThrow();
 
-    int tricksWon = game.getTeamTrickCounts().getOrDefault(winningTeam, 0);
-    int tricksMin = winningBid.getValue() + 5;
-    boolean success = tricksWon >= tricksMin;
-    int points = success ? tricksWon - 5 : tricksWon - tricksMin;
+    int tricksWon = game.getTeamTrickCounts().getOrDefault(biddingTeam, 0);
+    int requiredTricks = winningBid.getValue() + 5;
 
-    System.out.println("DEBUG: Calculated points for " + winningTeam + ": " + points);
+    int deltaScore;
+    if (tricksWon >= requiredTricks) {
+      // Team succeeded: total tricks - 5 base tricks
+      deltaScore = tricksWon - 5;
+    } else {
+      // Team failed: lose bid value
+      deltaScore = -winningBid.getValue();
+    }
 
-    int currentScore = game.getTeamScores().getOrDefault(winningTeam, 0);
-    int newScore = currentScore + points;
-    game.getTeamScores().put(winningTeam, newScore);
+    int newScore = game.getTeamScores().getOrDefault(biddingTeam, 0) + deltaScore;
+    game.getTeamScores().put(biddingTeam, newScore);
 
-    if (winningTeam == Team.A) {
+    if (biddingTeam == Team.A) {
       game.setTeamAScore(newScore);
     } else {
       game.setTeamBScore(newScore);
     }
 
-    System.out.println(
-        "DEBUG: Bidding team: "
-            + winningTeam
-            + ", Bid: "
-            + winningBid.getValue()
-            + ", Tricks won: "
-            + tricksWon
-            + ", Success: "
-            + success);
-    System.out.println(
-        "DEBUG: Team scores - Team A: "
-            + game.getTeamAScore()
-            + ", Team B: "
-            + game.getTeamBScore());
+    // Game end condition: either team reaches ≥ 7 or ≤ -7
+    int teamAScore = game.getTeamAScore();
+    int teamBScore = game.getTeamBScore();
+
+    // Win condition logic
+    if (teamAScore >= 7 || teamBScore <= -7) {
+      System.out.println("DEBUG: Team A WON (Score A: " + teamAScore + ", Score B: " + teamBScore + ")");
+      game.setPhase(GamePhase.END);
+    } else if (teamBScore >= 7 || teamAScore <= -7) {
+      System.out.println("DEBUG: Team B WON (Score B: " + teamBScore + ", Score A: " + teamAScore + ")");
+      game.setPhase(GamePhase.END);
+    }
   }
 
   /*
-  * Gets the implied trump suit based on bid type.
-  */
-  private Suit getTrumpSuitFromBidType(GameState game) {
-    return switch (game.getTrumpType()) {
-      case UPTOWN -> Suit.SPADES;
-      case DOWNTOWN -> Suit.CLUBS;
-      case NO_TRUMP -> null;
-      default -> null;
-    };
-  }
-
-  /*
-  * Removes a single animation (by ID) from a player's animation queue.
-  */
+   * Removes a single animation (by ID) from a player's animation queue.
+   */
   public void popAnimation(PopAnimationRequest request) {
     GameState game = getGameById(request.getGameId());
     PlayerPos playerPosition = request.getPlayer();
@@ -905,8 +1135,8 @@ public class GameService {
   }
 
   /*
-  * Returns the latest game state for polling updates.
-  */
+   * Returns the latest game state for polling updates.
+   */
   public GameStateResponse updateState(PollRequest request) {
     PlayerPos playerPosition = request.getPlayer();
     GameState game = getGameById(request.getGameId());
@@ -915,8 +1145,8 @@ public class GameService {
   }
 
   /*
-  * Retrieves a game instance from memory by its ID.
-  */
+   * Retrieves a game instance from memory by its ID.
+   */
   public GameState getGameById(String gameId) {
     if (gameId == null) {
       throw new IllegalArgumentException("Game ID cannot be null");
@@ -931,8 +1161,8 @@ public class GameService {
   }
 
   /*
-  * Returns a HandResponse including player views and kitty for UI refresh.
-  */
+   * Returns a HandResponse including player views and kitty for UI refresh.
+   */
   public HandResponse provideUpdatedCards(HandRequest request) {
     GameState game = getGameById(request.getGameId());
     PlayerPos playerPosition = request.getPlayer();
@@ -944,9 +1174,9 @@ public class GameService {
   }
 
   /*
-  * Builds list of PlayerView objects for the requesting player.
-  * Hides other hands with placeholder cards.
-  */
+   * Builds list of PlayerView objects for the requesting player.
+   * Hides other hands with placeholder cards.
+   */
   public List<PlayerView> getMyPlayerViews(GameState game, PlayerPos playerPosition) {
     List<PlayerView> playerViews = new ArrayList<>();
 
@@ -973,9 +1203,9 @@ public class GameService {
   }
 
   /*
-  * Returns the correct kitty view for the player.
-  * Winning player sees the actual cards, others see hidden placeholders.
-  */
+   * Returns the correct kitty view for the player.
+   * Winning player sees the actual cards, others see hidden placeholders.
+   */
   public List<Card> getMyKittyView(GameState game, PlayerPos playerPosition) {
     List<Card> myKittyView = new ArrayList<>(game.getKitty());
 

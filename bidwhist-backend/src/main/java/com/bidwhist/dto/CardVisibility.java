@@ -1,3 +1,5 @@
+// src/main/java/com/bidwhist/dto/CardVisibility.java
+
 package com.bidwhist.dto;
 
 public enum CardVisibility {

@@ -1,56 +1,59 @@
+// src/main/java/com/bidwhist/dto/GameStateResponse.java
+
 package com.bidwhist.dto;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-
+import com.bidwhist.bidding.BidType;
+import com.bidwhist.bidding.FinalBid;
 import com.bidwhist.bidding.InitialBid;
 import com.bidwhist.model.Card;
 import com.bidwhist.model.GamePhase;
 import com.bidwhist.model.PlayerPos;
-import com.bidwhist.model.Team;
 import com.bidwhist.model.Suit;
+import com.bidwhist.model.Team;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.bidwhist.bidding.BidType;
-import com.bidwhist.bidding.FinalBid;
+import java.util.List;
 
+/*
+ * DTO representing the full game state sent to a player after polling or initialization.
+ * This includes cards, current phase, bids, trick scores, animations, and metadata
+ * like viewer position, team, and player identity.
+ */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class GameStateResponse {
-    private List<PlayerView> players;
-    private List<Card> kitty;
-    private int currentTurnIndex;
-    private GamePhase phase;
-    private Suit trumpSuit;
-    private BidType bidType;
-    private String winningPlayerName; // NEW FIELD
-    private InitialBid highestBid; // NEW FIELD
-    private List<Card> shuffledDeck;
-    private PlayerPos playerPosition;
-    private Team playerTeam;
-    private String viewerName;
-    private PlayerPos firstBidder;
-    private int bidTurnIndex;
-    private List<InitialBid> bids;
-    private FinalBid winningFinalBid;
-    private int lobbySize;
-    List<Animation> animationQueue;
-    private PlayerPos bidWinnerPos;
-    private int teamAScore = 0;
-    private int teamBScore = 0;
-    private int teamATricksWon = 0;
-    private int teamBTricksWon = 0;
+  private List<PlayerView> players;
+  private List<Card> kitty;
+  private int currentTurnIndex;
+  private GamePhase phase;
+  private Suit trumpSuit;
+  private BidType bidType;
+  private String winningPlayerName;
+  private InitialBid highestBid;
+  private List<Card> shuffledDeck;
+  private PlayerPos playerPosition;
+  private Team playerTeam;
+  private String viewerName;
+  private PlayerPos firstBidder;
+  private int bidTurnIndex;
+  private List<InitialBid> bids;
+  private FinalBid winningFinalBid;
+  private int lobbySize;
+  List<Animation> animationQueue;
+  private PlayerPos bidWinnerPos;
+  private int teamAScore = 0;
+  private int teamBScore = 0;
+  private int teamATricksWon = 0;
+  private int teamBTricksWon = 0;
 
-public GameStateResponse(
-        List<Animation> animationQueue,
-        List<PlayerView> players,
-        List<Card> kitty,
-        int currentTurnIndex,
-        GamePhase phase,
-        List<Card> shuffledDeck,
-        PlayerPos playerPosition,
-        PlayerPos firstBidder,
-        int bidTurnIndex
-) {
+  public GameStateResponse(
+      List<Animation> animationQueue,
+      List<PlayerView> players,
+      List<Card> kitty,
+      int currentTurnIndex,
+      GamePhase phase,
+      List<Card> shuffledDeck,
+      PlayerPos playerPosition,
+      PlayerPos firstBidder,
+      int bidTurnIndex) {
     this.animationQueue = animationQueue;
     this.players = players;
     this.kitty = kitty;
@@ -60,185 +63,185 @@ public GameStateResponse(
     this.playerPosition = playerPosition;
     this.firstBidder = firstBidder;
     this.bidTurnIndex = bidTurnIndex;
-}
+  }
 
-    public void setShuffledDeck(List<Card> shuffledDeck) {
-        this.shuffledDeck = shuffledDeck;
-    }
+  public void setShuffledDeck(List<Card> shuffledDeck) {
+    this.shuffledDeck = shuffledDeck;
+  }
 
-    public List<PlayerView> getPlayers() {
-        return players;
-    }
+  public List<PlayerView> getPlayers() {
+    return players;
+  }
 
-    public PlayerPos getPlayerPosition() {
-        return playerPosition;
-    }
+  public PlayerPos getPlayerPosition() {
+    return playerPosition;
+  }
 
-    public Team getPlayerTeam() {
-        return playerTeam;
-    }
+  public Team getPlayerTeam() {
+    return playerTeam;
+  }
 
-    public String getViewerName() {
-        return viewerName;
-    }
+  public String getViewerName() {
+    return viewerName;
+  }
 
-    public List<Card> getKitty() {
-        return kitty;
-    }
+  public List<Card> getKitty() {
+    return kitty;
+  }
 
-    public List<Card> getShuffledDeck() {
-        return shuffledDeck;
-    }
+  public List<Card> getShuffledDeck() {
+    return shuffledDeck;
+  }
 
-    public int getCurrentTurnIndex() {
-        return currentTurnIndex;
-    }
+  public int getCurrentTurnIndex() {
+    return currentTurnIndex;
+  }
 
-    public GamePhase getPhase() {
-        return phase;
-    }
-       
-    public int getTeamAScore() {
-        return teamAScore;
-    }
+  public GamePhase getPhase() {
+    return phase;
+  }
 
-    public int getTeamBScore() {
-        return teamBScore;
-    }
+  public int getTeamAScore() {
+    return teamAScore;
+  }
 
-    public int getTeamATricksWon() {
-        return teamATricksWon;
-    }
+  public int getTeamBScore() {
+    return teamBScore;
+  }
 
-    public int getTeamBTricksWon() {
-        return teamBTricksWon;
-    }
+  public int getTeamATricksWon() {
+    return teamATricksWon;
+  }
 
-    public void setTeamAScore(int score) {
-        this.teamAScore = score;
-    }
+  public int getTeamBTricksWon() {
+    return teamBTricksWon;
+  }
 
-    public void setTeamBScore(int score) {
-        this.teamBScore = score;
-    }
+  public void setTeamAScore(int score) {
+    this.teamAScore = score;
+  }
 
-    public void setTeamATricksWon(int tricks) {
-        this.teamATricksWon = tricks;
-    }
+  public void setTeamBScore(int score) {
+    this.teamBScore = score;
+  }
 
-    public void setTeamBTricksWon(int tricks) {
-        this.teamBTricksWon = tricks;
-    }
+  public void setTeamATricksWon(int tricks) {
+    this.teamATricksWon = tricks;
+  }
 
-    public void setBids(List<InitialBid> bids) {
-        this.bids = bids;
-    }
+  public void setTeamBTricksWon(int tricks) {
+    this.teamBTricksWon = tricks;
+  }
 
-    public Suit getTrumpSuit() {
-        return trumpSuit;
-    }
+  public void setBids(List<InitialBid> bids) {
+    this.bids = bids;
+  }
 
-    public PlayerPos getFirstBidder() {
-        return firstBidder;
-    }
+  public Suit getTrumpSuit() {
+    return trumpSuit;
+  }
 
-    public int getBidTurnIndex() {
-        return bidTurnIndex;
-    }
+  public PlayerPos getFirstBidder() {
+    return firstBidder;
+  }
 
-    public List<InitialBid> getBids() {
-        return bids;
-    }
+  public int getBidTurnIndex() {
+    return bidTurnIndex;
+  }
 
-    public String getWinningPlayerName() {
-        return winningPlayerName;
-    }
+  public List<InitialBid> getBids() {
+    return bids;
+  }
 
-    public FinalBid getWinningBid() {
-        return winningFinalBid;
-    }
+  public String getWinningPlayerName() {
+    return winningPlayerName;
+  }
 
-    public void setWinningPlayerName(String winningPlayerName) {
-        this.winningPlayerName = winningPlayerName;
-    }
+  public FinalBid getWinningBid() {
+    return winningFinalBid;
+  }
 
-    public InitialBid getHighestBid() {
-        return highestBid;
-    }
+  public void setWinningPlayerName(String winningPlayerName) {
+    this.winningPlayerName = winningPlayerName;
+  }
 
-    public BidType getBidType() {
-        return bidType;
-    }
+  public InitialBid getHighestBid() {
+    return highestBid;
+  }
 
-    public int getLobbySize() {
-        return lobbySize;
-    }
+  public BidType getBidType() {
+    return bidType;
+  }
 
-    public List<Animation> getAnimationQueue() {
-        return animationQueue;
-    }
+  public int getLobbySize() {
+    return lobbySize;
+  }
 
-    public void setHighestBid(InitialBid highestBid) {
-        this.highestBid = highestBid;
-    }
+  public List<Animation> getAnimationQueue() {
+    return animationQueue;
+  }
 
-    public void setPlayers(List<PlayerView> players) {
-        this.players = players;
-    }
+  public void setHighestBid(InitialBid highestBid) {
+    this.highestBid = highestBid;
+  }
 
-    public void setPlayerName(String name) {
-        this.viewerName = name;
-    }
+  public void setPlayers(List<PlayerView> players) {
+    this.players = players;
+  }
 
-    public void setPlayerPosition(PlayerPos playerPosition) {
-        this.playerPosition = playerPosition;
-    }
+  public void setPlayerName(String name) {
+    this.viewerName = name;
+  }
 
-    public void setPlayerTeam(Team team) {
-        this.playerTeam = team;
-    }
+  public void setPlayerPosition(PlayerPos playerPosition) {
+    this.playerPosition = playerPosition;
+  }
 
-    public void setViewerName(String viewerName) {
-        this.viewerName = viewerName;
-    }
+  public void setPlayerTeam(Team team) {
+    this.playerTeam = team;
+  }
 
-    public void setKitty(List<Card> kitty) {
-        this.kitty = kitty;
-    }
+  public void setViewerName(String viewerName) {
+    this.viewerName = viewerName;
+  }
 
-    public void setCurrentTurnIndex(int currentTurnIndex) {
-        this.currentTurnIndex = currentTurnIndex;
-    }
+  public void setKitty(List<Card> kitty) {
+    this.kitty = kitty;
+  }
 
-    public void setPhase(GamePhase phase) {
-        this.phase = phase;
-    }
+  public void setCurrentTurnIndex(int currentTurnIndex) {
+    this.currentTurnIndex = currentTurnIndex;
+  }
 
-    public void setTrumpSuit(Suit trumpSuit) {
-        this.trumpSuit = trumpSuit;
-    }
+  public void setPhase(GamePhase phase) {
+    this.phase = phase;
+  }
 
-    public void setBidType(BidType newBidType) {
-        bidType = newBidType;
-    }
-    
-    public void setWinningBid(FinalBid winningBid) {
-        this.winningFinalBid = winningBid;
-    }
+  public void setTrumpSuit(Suit trumpSuit) {
+    this.trumpSuit = trumpSuit;
+  }
 
-    public void setLobbySize(int size) {
-        this.lobbySize = size;
-    }
+  public void setBidType(BidType newBidType) {
+    bidType = newBidType;
+  }
 
-    public void setAnimationQueue(List<Animation> queue) {
-        this.animationQueue = queue;
-    }
+  public void setWinningBid(FinalBid winningBid) {
+    this.winningFinalBid = winningBid;
+  }
 
-    public PlayerPos getBidWinnerPos() {
-        return bidWinnerPos;
-    }
+  public void setLobbySize(int size) {
+    this.lobbySize = size;
+  }
 
-    public void setBidWinnerPos(PlayerPos winnerPos) {
-        this.bidWinnerPos = winnerPos;
-    }
+  public void setAnimationQueue(List<Animation> queue) {
+    this.animationQueue = queue;
+  }
+
+  public PlayerPos getBidWinnerPos() {
+    return bidWinnerPos;
+  }
+
+  public void setBidWinnerPos(PlayerPos winnerPos) {
+    this.bidWinnerPos = winnerPos;
+  }
 }

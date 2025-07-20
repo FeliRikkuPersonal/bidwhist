@@ -1,97 +1,97 @@
+// src/main/java/com/bidwhist/model/Deck.java
+
 package com.bidwhist.model;
 
+import com.bidwhist.utils.JokerUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.bidwhist.utils.JokerUtils;
-
 public class Deck {
 
-    private final List<Card> cards;
-    private Kitty kitty;
+  private final List<Card> cards;
+  private Kitty kitty;
 
-    public Deck() {
-        this.cards = new ArrayList<>();
-        buildStandardDeck();
-        this.kitty = new Kitty();       // create empty kitty
-    }
+  /* 
+   * Constructs a new standard Bid Whist deck.
+   * Includes 52 standard cards and 2 Jokers. Initializes an empty kitty.
+   */
+  public Deck() {
+    this.cards = new ArrayList<>();
+    buildStandardDeck();
+    this.kitty = new Kitty();
+  }
 
-    private void buildStandardDeck() {
-        // Add 52 normal cards (non-jokers)
-        for (Suit suit : Suit.values()) {
-            for (Rank rank : Rank.values()) {
-                if (!JokerUtils.isJokerRank(rank)) {
-                    cards.add(new Card(suit, rank));
-                }
-            }
+  /* 
+   * Populates the deck with standard cards (excluding Jokers), 
+   * then adds the small and big Jokers.
+   */
+  private void buildStandardDeck() {
+    for (Suit suit : Suit.values()) {
+      for (Rank rank : Rank.values()) {
+        if (!JokerUtils.isJokerRank(rank)) {
+          cards.add(new Card(suit, rank));
         }
-
-        // Add Jokers
-        cards.add(new Card(null, Rank.JOKER_S));
-        cards.add(new Card(null, Rank.JOKER_B));
+      }
     }
 
-    public void shuffle() {
-        Collections.shuffle(cards);
+    cards.add(new Card(null, Rank.JOKER_S));
+    cards.add(new Card(null, Rank.JOKER_B));
+  }
+
+  /* 
+   * Randomly shuffles the order of cards in the deck.
+   */
+  public void shuffle() {
+    Collections.shuffle(cards);
+  }
+
+  /* 
+   * Deals the first 48 cards evenly to 4 players, 
+   * then places the remaining 6 cards in the kitty.
+   */
+  public void deal(List<Player> players) {
+    for (int i = 0; i < 48; i++) {
+      int index = i % 4;
+      players.get(index).addCard(cards.get(i));
     }
 
-    public void deal(List<Player> players) {
-        for (int i = 0; i < 48; i++) {
-            if (i % 4 == 0) {
-                players.get(0).addCard(cards.get(i));
-
-            }
-            else if (i % 4 == 1) {
-                players.get(1).addCard(cards.get(i));
-
-            }
-            else if (i % 4 == 2) {
-                players.get(2).addCard(cards.get(i));
-
-            }
-            else {
-                players.get(3).addCard(cards.get(i));
-
-            }
-        }
-
-        for (int i = 48; i < 54; i++) {
-            kitty.addCard(cards.get(i));
-        }
+    for (int i = 48; i < 54; i++) {
+      kitty.addCard(cards.get(i));
     }
+  }
 
-    /* place holder for method to assigning hand to player.
-    *  private Hand assignHand(Hand hand) {
-    *       -some text here-
-    *       return hand;
-    *  }
-    */ 
-
-    public void resetJokerSuits() {
-        for (Card card : cards) {
-            card.clearSuit(); // only affects jokers
-        }
+  /* 
+   * Clears the assigned suit of all Jokers in the deck.
+   */
+  public void resetJokerSuits() {
+    for (Card card : cards) {
+      card.clearSuit();
     }
+  }
 
-    // Call to Card.assignSuit() for jokers only
-    public void assignTrumpSuitToJokers(Suit trump) {
-        for (Card card : cards) {
-            card.assignSuit(trump); // only affects jokers
-        }
+  /* 
+   * Assigns the trump suit to all Jokers in the deck.
+   */
+  public void assignTrumpSuitToJokers(Suit trump) {
+    for (Card card : cards) {
+      card.assignSuit(trump);
     }
+  }
 
-    public void clearKitty() {
-        System.out.println("[clearKitty]");
-        kitty.clear();
-    }
+  /* 
+   * Empties the kitty and logs the operation to console.
+   */
+  public void clearKitty() {
+    System.out.println("[clearKitty]");
+    kitty.clear();
+  }
 
-    public List<Card> getCards() {
-        return cards;
-    }
+  public List<Card> getCards() {
+    return cards;
+  }
 
-    public Kitty getKitty() {
-        return kitty;
-    }
+  public Kitty getKitty() {
+    return kitty;
+  }
 }
-

@@ -1,3 +1,5 @@
+// src/main/java/com/bidwhist/dto/AnimationType.java
+
 package com.bidwhist.dto;
 
 public enum AnimationType {

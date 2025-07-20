@@ -1,3 +1,5 @@
+// src/main/java/com/bidwhist/model/RoomStatus.java
+
 package com.bidwhist.model;
 
 public enum RoomStatus {

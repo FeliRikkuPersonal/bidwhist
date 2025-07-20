@@ -1,3 +1,5 @@
+// src/main/java/com/bidwhist/model/Rank.java
+
 package com.bidwhist.model;
 
 import java.util.Arrays;

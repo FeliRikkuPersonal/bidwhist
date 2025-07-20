@@ -1,10 +1,6 @@
-package com.bidwhist.model;
+// src/main/java/com/bidwhist/model/GameState.java
 
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+package com.bidwhist.model;
 
 import com.bidwhist.bidding.BidType;
 import com.bidwhist.bidding.FinalBid;
@@ -12,6 +8,11 @@ import com.bidwhist.bidding.InitialBid;
 import com.bidwhist.dto.Animation;
 import com.bidwhist.service.DeckService;
 import com.bidwhist.utils.PlayerUtils;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class GameState {
 
@@ -26,19 +27,19 @@ public class GameState {
     private int bidTurnIndex;
     private InitialBid highestBid;
     private BidType trumpType;
-    private final Map<PlayerPos, FinalBid> finalBidCache = new HashMap<>();
+    private Map<PlayerPos, FinalBid> finalBidCache = new HashMap<>();
     private FinalBid winningBid;
-    private String winningPlayerName; // <-- NEW FIELD
+    private String winningPlayerName;
     private List<Card> shuffledDeck;
     private PlayerPos firstBidder;
     private Difficulty difficulty;
-    private final GameRoom room;
+    private GameRoom room;
     private Map<PlayerPos, List<Animation>> animationList = new EnumMap<>(PlayerPos.class);
     private PlayerPos bidWinnderPos;
-    private final List<Card> playedCards = new ArrayList<>();
 
     private List<PlayedCard> currentTrick = new ArrayList<>();
     private List<Book> completedTricks = new ArrayList<>();
+    private final List<Card> playedCards = new ArrayList<>();
     private int currentPlayerIndex;
 
     private int teamAScore = 0;
@@ -61,7 +62,7 @@ public class GameState {
         this.bids = new ArrayList<>();
         this.bidTurnIndex = 0;
         this.highestBid = null;
-        this.winningPlayerName = null; // <-- Initialize
+        this.winningPlayerName = null;
         this.shuffledDeck = deck.getCards();
 
         for (PlayerPos pos : PlayerPos.values()) {
@@ -70,10 +71,8 @@ public class GameState {
     }
 
     public void addAnimation(Animation animation) {
-        if (animationList == null) {
+        if (animationList == null)
             return;
-        }
-
         for (List<Animation> queue : animationList.values()) {
             queue.add(animation);
         }
@@ -81,39 +80,28 @@ public class GameState {
 
     public boolean removeAnimationById(PlayerPos player, String animationId) {
         List<Animation> animations = animationList.get(player);
-
-        if (animations == null) {
-            System.out.println("⚠️ No animations found for player: " + player);
+        if (animations == null)
             return false;
+        return animations.removeIf(
+                animation -> animationId != null && animation.getId() != null
+                        && animationId.trim().equalsIgnoreCase(animation.getId().trim()));
+    }
+
+    public void addPlayedCard(Card card) {
+        if (card != null) {
+            playedCards.add(card);
         }
-
-        System.out.println("🔍 Attempting to remove animationId: " + animationId + " for player: " + player);
-
-        boolean removed = animations.removeIf(animation -> {
-            String currentId = animation.getId();
-            System.out.println("   → Comparing against animation ID: " + currentId);
-            return animationId != null && currentId != null
-                    && animationId.trim().equalsIgnoreCase(currentId.trim());
-        });
-
-        if (removed) {
-            System.out.println("✅ Animation removed successfully.");
-        } else {
-            System.out.println("❌ No matching animation found for ID: " + animationId);
-        }
-
-        return removed;
     }
 
     public Team getTeamByPlayerPos(List<Player> players, PlayerPos playerPos) {
         for (Player p : players) {
-            if (p.getPosition().equals(playerPos)) {
+            if (p.getPosition().equals(playerPos))
                 return p.getTeam();
-            }
         }
-        return null; // or "UNKNOWN", or throw new IllegalArgumentException(...)
+        return null;
     }
 
+    // Player and Room
     public List<Player> getPlayers() {
         return players;
     }
@@ -126,13 +114,9 @@ public class GameState {
         return room;
     }
 
-    public int getCurrentTurnIndex() {
-        return currentTurnIndex;
-    }
-
-    public void setCurrentTurnIndex(int index) {
-        this.currentTurnIndex = index;
-        System.out.println("DEBUG: Current Turn Index is " + currentTurnIndex);
+    // Game ID and Deck
+    public String getGameId() {
+        return gameId;
     }
 
     public Deck getDeck() {
@@ -147,36 +131,47 @@ public class GameState {
         this.shuffledDeck = shuffledDeck;
     }
 
-    public List<Card> getKitty() {
-        return kitty;
-    }
-
-    public PlayerPos getFirstBidder() {
-        return firstBidder;
-    }
-
-    public BidType getTrumpType() {
-        return trumpType;
-    }
-
-    public Map<PlayerPos, List<Animation>> getAnimationList() {
-        return animationList;
-    }
-
-    public void setTrumpType(BidType trumpType) {
-        this.trumpType = trumpType;
-    }
-
-    public void setKitty(List<Card> kitty) {
-        this.kitty = kitty;
-    }
-
+    // Game Phase and Turn
     public GamePhase getPhase() {
         return phase;
     }
 
     public void setPhase(GamePhase phase) {
         this.phase = phase;
+    }
+
+    public int getCurrentTurnIndex() {
+        return currentTurnIndex;
+    }
+
+    public void setCurrentTurnIndex(int index) {
+        this.currentTurnIndex = index;
+    }
+
+    public int getCurrentPlayerIndex() {
+        return currentPlayerIndex;
+    }
+
+    public void setCurrentPlayerIndex(int currentPlayerIndex) {
+        this.currentPlayerIndex = currentPlayerIndex;
+    }
+
+    // Kitty
+    public List<Card> getKitty() {
+        return kitty;
+    }
+
+    public void setKitty(List<Card> kitty) {
+        this.kitty = kitty;
+    }
+
+    // Trump and Bid Info
+    public BidType getTrumpType() {
+        return trumpType;
+    }
+
+    public void setTrumpType(BidType trumpType) {
+        this.trumpType = trumpType;
     }
 
     public Suit getTrumpSuit() {
@@ -187,12 +182,16 @@ public class GameState {
         this.trumpSuit = trumpSuit;
     }
 
-    public List<InitialBid> getBids() {
-        return bids;
+    public PlayerPos getFirstBidder() {
+        return firstBidder;
     }
 
-    public PlayerPos getBidWinnerPos() {
-        return bidWinnderPos;
+    public void setFirstBidder(PlayerPos firstBidder) {
+        this.firstBidder = firstBidder;
+    }
+
+    public List<InitialBid> getBids() {
+        return bids;
     }
 
     public void addBid(InitialBid bid) {
@@ -215,11 +214,34 @@ public class GameState {
         this.highestBid = highestBid;
     }
 
+    public FinalBid getWinningBid() {
+        return winningBid;
+    }
+
+    public void setWinningBid(FinalBid winningBid) {
+        this.winningBid = winningBid;
+    }
+
     public void setWinningBidStats(FinalBid bid) {
         this.winningBid = bid;
         this.winningPlayerName = PlayerUtils.getNameByPosition(bid.getPlayer(), players);
         this.trumpSuit = bid.getSuit();
+    }
 
+    public BidType getFinalBidType() {
+        return (winningBid != null) ? winningBid.getType() : null;
+    }
+
+    public PlayerPos getBidWinnerPos() {
+        return bidWinnderPos;
+    }
+
+    public void setBidWinnerPos(PlayerPos winnerPos) {
+        this.bidWinnderPos = winnerPos;
+    }
+
+    public PlayerPos getWinningPlayerPos() {
+        return winningBid.getPlayer();
     }
 
     public String getWinningPlayerName() {
@@ -230,38 +252,20 @@ public class GameState {
         this.winningPlayerName = winningPlayerName;
     }
 
-    public PlayerPos getWinningPlayerPos() {
-        return winningBid.getPlayer();
-    }
-
     public Map<PlayerPos, FinalBid> getFinalBidCache() {
         return finalBidCache;
     }
 
-    public BidType getFinalBidType() {
-        if (winningBid != null) {
-            return winningBid.getType();
-        } else {
-            return null;
-        }
+    // Animations
+    public Map<PlayerPos, List<Animation>> getAnimationList() {
+        return animationList;
     }
 
-    public void setFirstBidder(PlayerPos firstBidder) {
-        this.firstBidder = firstBidder;
+    public void setAnimationList(Map<PlayerPos, List<Animation>> animationList) {
+        this.animationList = animationList;
     }
 
-    public FinalBid getWinningBid() {
-        return winningBid;
-    }
-
-    public void setWinningBid(FinalBid winningBid) {
-        this.winningBid = winningBid;
-    }
-
-    public String getGameId() {
-        return gameId;
-    }
-
+    // Trick and Book
     public List<PlayedCard> getCurrentTrick() {
         return currentTrick;
     }
@@ -290,20 +294,11 @@ public class GameState {
         return completed;
     }
 
-    public void addPlayedCard(Card card) {
-        if (card != null) {
-            playedCards.add(card);
-        }
+    public List<Card> getPlayedCards() {
+        return playedCards;
     }
 
-    public int getCurrentPlayerIndex() {
-        return currentPlayerIndex;
-    }
-
-    public void setCurrentPlayerIndex(int currentPlayerIndex) {
-        this.currentPlayerIndex = currentPlayerIndex;
-    }
-
+    // Difficulty
     public Difficulty getDifficulty() {
         return difficulty;
     }
@@ -312,6 +307,7 @@ public class GameState {
         this.difficulty = difficulty;
     }
 
+    // Team Scores and Tricks
     public int getTeamAScore() {
         return teamAScore;
     }
@@ -359,17 +355,4 @@ public class GameState {
     public void setTeamScores(Map<Team, Integer> teamScores) {
         this.teamScores = teamScores;
     }
-
-    public void setAnimationList(Map<PlayerPos, List<Animation>> animationList) {
-        this.animationList = animationList;
-    }
-
-    public void setBidWinnerPos(PlayerPos winnerPos) {
-        this.bidWinnderPos = winnerPos;
-    }
-
-    public List<Card> getPlayedCards() {
-        return playedCards;
-    }
-
 }

@@ -1,39 +1,37 @@
+// src/main/java/com/bidwhist/dto/HandRequest.java
+
 package com.bidwhist.dto;
 
-import java.util.List;
-
-import com.bidwhist.model.Card;
 import com.bidwhist.model.PlayerPos;
 
+/*
+ * Represents a request for retrieving a player's hand from the game state.
+ * This is typically used after cards have been dealt, played, or reassigned.
+ */
 public class HandRequest {
-    private String gameId;
-    private PlayerPos player;
-    private List<Card> discards;
+  private String gameId;
+  private PlayerPos player;
 
-    public HandRequest() {}
+  public HandRequest() {}
 
-    public HandRequest(PlayerPos player, List<Card> discards) {
-        this.player = player;
-        this.discards = discards;
-    }
+  public HandRequest(String gameId, PlayerPos player) {
+    this.player = player;
+    this.gameId = gameId;
+  }
 
-    public PlayerPos getPlayer() {
-        return player;
-    }
+  public PlayerPos getPlayer() {
+    return player;
+  }
 
-    public void setPlayer(PlayerPos player) {
-        this.player = player;
-    }
+  public void setPlayer(PlayerPos player) {
+    this.player = player;
+  }
 
-    public List<Card> getDiscards() {
-        return discards;
-    }
+  public void setGameId(String gameId) {
+    this.gameId = gameId;
+  }
 
-    public void setDiscards(List<Card> discards) {
-        this.discards = discards;
-    }
-
-    public String getGameId() {
-        return gameId;  
-    }
+  public String getGameId() {
+    return gameId;
+  }
 }
