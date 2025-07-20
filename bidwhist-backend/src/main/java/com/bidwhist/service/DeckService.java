@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 public class DeckService {
 
   /*
-  * Creates a new shuffled deck and returns it.
-  */
+   * Creates a new shuffled deck and returns it.
+   */
   public static Deck createNewDeck() {
     Deck deck = new Deck();
     deck.shuffle();

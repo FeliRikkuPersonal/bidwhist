@@ -10,9 +10,9 @@ import { useGameState } from '../context/GameStateContext.jsx';
 import { useUIDisplay } from '../context/UIDisplayContext.jsx';
 
 /*
-* BiddingPanel manages the UI for players to place or pass a bid during the bidding phase.
-* It handles bid submission, phase control, and visibility based on turn order.
-*/
+ * BiddingPanel manages the UI for players to place or pass a bid during the bidding phase.
+ * It handles bid submission, phase control, and visibility based on turn order.
+ */
 export default function BiddingPanel({ closeBidding, onBidPlaced }) {
   const API = import.meta.env.VITE_API_URL;
 
@@ -42,8 +42,8 @@ export default function BiddingPanel({ closeBidding, onBidPlaced }) {
   const [isNo, setIsNo] = useState(false);
 
   /*
-  * Updates UI visibility based on whether it's the player's turn to bid
-  */
+   * Updates UI visibility based on whether it's the player's turn to bid
+   */
   useEffect(() => {
     if (!bidPhase || !viewerPosition || bidTurnIndex == null) return;
     if (!bidPhase || !viewerPosition || bidTurnIndex == null) return;
@@ -58,8 +58,8 @@ export default function BiddingPanel({ closeBidding, onBidPlaced }) {
   if (!showBidding) return null;
 
   /*
-  * sendBidRequest handles the POST request to submit a bid to the backend
-  */
+   * sendBidRequest handles the POST request to submit a bid to the backend
+   */
   const sendBidRequest = async (bidBody) => {
     const res = await fetch(`${API}/game/bid`, {
       method: 'POST',
@@ -83,8 +83,8 @@ export default function BiddingPanel({ closeBidding, onBidPlaced }) {
   };
 
   /*
-  * placeBid sends the current numeric bid value along with No Trump flag
-  */
+   * placeBid sends the current numeric bid value along with No Trump flag
+   */
   const placeBid = () => {
     sendBidRequest({
       gameId,
@@ -96,8 +96,8 @@ export default function BiddingPanel({ closeBidding, onBidPlaced }) {
   };
 
   /*
-  * passBid submits a pass bid (no value, not a No Trump)
-  */
+   * passBid submits a pass bid (no value, not a No Trump)
+   */
   const passBid = () => {
     sendBidRequest({
       gameId,
@@ -109,8 +109,8 @@ export default function BiddingPanel({ closeBidding, onBidPlaced }) {
   };
 
   /*
-  * Render the bid input panel and actions for Set, Pass, and Close
-  */
+   * Render the bid input panel and actions for Set, Pass, and Close
+   */
   return (
     <div className="bidding-overlay  grid-item center">
       <div className="bidding-panel">

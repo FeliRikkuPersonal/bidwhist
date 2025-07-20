@@ -1,10 +1,10 @@
 # Front End
 
 - cd into bidwhist-frontend
-- run `npm i`
+- run `npm i` /* if not installed */
 - to start the webserver run `npm run dev`
 
 # Back End
 
 - cd into bidwhist-backend
-- run `./mvnw spring-boot:run` or `./mvnw.exe spring-boot:run`
+- run `mvn “spring-boot:run” “-Dspring-boot.run.profiles=dev”`

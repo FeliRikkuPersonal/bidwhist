@@ -1,0 +1,22 @@
+{
+    "name": "bidwhist-frontend",
+    "version": "1.0.0",
+    "description": "Frontend for Bid Whist game",
+    "scripts": {
+        "start": "react-scripts start",
+        "build": "react-scripts build",
+        "format:prettier": "npx prettier --write \"bidwhist-frontend/**/*.{js,jsx,ts,tsx,json,css,html}\"",
+        "format:java": "java -jar google-java-format.jar --replace $(find bidwhist-backend -name '*.java')",
+        "format:all": "npm run format:prettier && npm run format:java"
+    },
+    "dependencies": {
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "react-scripts": "5.0.1"
+    },
+    "devDependencies": {
+        "prettier": "^3.6.2"
+    },
+    "keywords": [],
+    "license": "MIT"
+}

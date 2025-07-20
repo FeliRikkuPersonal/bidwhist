@@ -128,7 +128,7 @@ function App() {
       setShowGameScreen,
       setShowAnimatedCards,
       difficulty,
-    ],
+    ]
   );
 
   /*

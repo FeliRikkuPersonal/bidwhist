@@ -82,8 +82,14 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
       /* === DEAL animation: distribute cards to all players === */
       if (animation.type === 'DEAL') {
         const requiredRefs = [
-          'hand-south', 'hand-west', 'hand-north', 'hand-east',
-          'play-south', 'play-west', 'play-north', 'play-east',
+          'hand-south',
+          'hand-west',
+          'hand-north',
+          'hand-east',
+          'play-south',
+          'play-west',
+          'play-north',
+          'play-east',
         ];
         const refsReady = requiredRefs.every((dir) => get(dir)?.current);
 
@@ -110,7 +116,7 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
             deckPosition,
             setAnimatedCards,
             setShowAnimatedCards,
-            setBidPhase,
+            setBidPhase
           );
         }, 50);
       }
@@ -186,15 +192,18 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
         }
 
         /* after animation completes, clear board state */
-        setTimeout(() => {
-          setAnimatedCards([]);
-          setPlayedCardsByDirection({
-            north: null,
-            south: null,
-            east: null,
-            west: null,
-          });
-        }, cardList.length * 150 + 300);
+        setTimeout(
+          () => {
+            setAnimatedCards([]);
+            setPlayedCardsByDirection({
+              north: null,
+              south: null,
+              east: null,
+              west: null,
+            });
+          },
+          cardList.length * 150 + 300
+        );
       }
 
       /* CLEAR animation: reset all game visuals */
@@ -256,9 +265,7 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
     Object.entries(playedCardsByDirection).forEach(([dir, card]) => {
       if (!card) return;
       const playRefObj = get(`play-${dir}`);
-      const containerRect = document
-        .querySelector('.floating-card-layer')
-        ?.getBoundingClientRect();
+      const containerRect = document.querySelector('.floating-card-layer')?.getBoundingClientRect();
 
       if (!playRefObj?.current || !containerRect) return;
 
@@ -274,9 +281,7 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
   useEffect(() => {
     const updatePositions = () => {
       const bounds = localRef.current?.getBoundingClientRect();
-      const parentBounds = document
-        .querySelector('.floating-card-layer')
-        ?.getBoundingClientRect();
+      const parentBounds = document.querySelector('.floating-card-layer')?.getBoundingClientRect();
 
       if (bounds && parentBounds) {
         const centerX = bounds.left + bounds.width / 2 - parentBounds.left;
@@ -351,8 +356,14 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
         ></div>
       )}
 
-      <div ref={(el) => el && register('play-north', { current: el })} className="play-slot north" />
-      <div ref={(el) => el && register('play-south', { current: el })} className="play-slot south" />
+      <div
+        ref={(el) => el && register('play-north', { current: el })}
+        className="play-slot north"
+      />
+      <div
+        ref={(el) => el && register('play-south', { current: el })}
+        className="play-slot south"
+      />
       <div ref={(el) => el && register('play-east', { current: el })} className="play-slot east" />
       <div ref={(el) => el && register('play-west', { current: el })} className="play-slot west" />
 
@@ -406,13 +417,7 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
 
         {showAnimatedCards &&
           animatedCards.map((card, i) => (
-            <AnimatedCard
-              key={card.id}
-              card={card}
-              from={card.from}
-              to={card.to}
-              zIndex={i}
-            />
+            <AnimatedCard key={card.id} card={card} from={card.from} to={card.to} zIndex={i} />
           ))}
       </div>
     </div>

@@ -7,18 +7,18 @@ import { getCardImage } from '../utils/CardUtils';
 import { usePositionContext } from '../context/PositionContext.jsx';
 
 /*
-*
-* AnimatedCard handles the animation of a card moving from a source position (from)
-* to a destination position (to) with a smooth transition. It optionally triggers
-* a callback when the animation is complete.
-*
-*/
+ *
+ * AnimatedCard handles the animation of a card moving from a source position (from)
+ * to a destination position (to) with a smooth transition. It optionally triggers
+ * a callback when the animation is complete.
+ *
+ */
 export default function AnimatedCard({ card, from, to, zIndex = 10, onComplete }) {
   const { viewerName } = usePositionContext();
 
   /*
-  * Local state to control the inline CSS styles for animation
-  */
+   * Local state to control the inline CSS styles for animation
+   */
   const [style, setStyle] = useState({
     position: 'absolute',
     left: from.x,
@@ -29,8 +29,8 @@ export default function AnimatedCard({ card, from, to, zIndex = 10, onComplete }
   });
 
   /*
-  * Triggers the animation on mount and invokes the onComplete callback after delay
-  */
+   * Triggers the animation on mount and invokes the onComplete callback after delay
+   */
   useEffect(() => {
     requestAnimationFrame(() => {
       setStyle((prev) => ({
@@ -51,7 +51,7 @@ export default function AnimatedCard({ card, from, to, zIndex = 10, onComplete }
   const image = getCardImage(card, viewerName);
 
   /*
-  * Render the animated card image with calculated styles
-  */
+   * Render the animated card image with calculated styles
+   */
   return <img src={image} alt="Animated card" className="card-img" style={style} />;
 }

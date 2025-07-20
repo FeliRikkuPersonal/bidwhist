@@ -29,5 +29,5 @@ createRoot(document.getElementById('root')).render(
         </GameStateProvider>
       </RefProvider>
     </AlertProvider>
-  </StrictMode>,
+  </StrictMode>
 );

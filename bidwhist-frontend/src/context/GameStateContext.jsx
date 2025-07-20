@@ -20,26 +20,26 @@ export const useGameState = () => useContext(GameStateContext);
  * @returns {JSX.Element} Provider with game state values
  */
 export const GameStateProvider = ({ children }) => {
-  const [players, setPlayers] = useState([]);                     // List<PlayerView>
-  const [kitty, setKitty] = useState([]);                         // List<Card>
+  const [players, setPlayers] = useState([]); // List<PlayerView>
+  const [kitty, setKitty] = useState([]); // List<Card>
   const [currentTurnIndex, setCurrentTurnIndex] = useState(0);
-  const [phase, setPhase] = useState('START');                    // GamePhase
-  const [trumpSuit, setTrumpSuit] = useState(null);               // Suit
-  const [bidType, setBidType] = useState(null);                   // BidType
+  const [phase, setPhase] = useState('START'); // GamePhase
+  const [trumpSuit, setTrumpSuit] = useState(null); // Suit
+  const [bidType, setBidType] = useState(null); // BidType
   const [winningPlayerName, setWinningPlayerName] = useState(null);
-  const [highestBid, setHighestBid] = useState(null);             // InitialBid
-  const [shuffledDeck, setShuffledDeck] = useState([]);           // List<Card>
-  const [firstBidder, setFirstBidder] = useState(null);           // PlayerPos
+  const [highestBid, setHighestBid] = useState(null); // InitialBid
+  const [shuffledDeck, setShuffledDeck] = useState([]); // List<Card>
+  const [firstBidder, setFirstBidder] = useState(null); // PlayerPos
   const [bidTurnIndex, setBidTurnIndex] = useState(0);
-  const [bids, setBids] = useState([]);                           // List<InitialBid>
+  const [bids, setBids] = useState([]); // List<InitialBid>
   const [bidWinnerPos, setBidWinnerPos] = useState(null);
   const [winningBid, setWinningBid] = useState(null);
   const [lobbySize, setLobbySize] = useState(0);
   const [mode, setMode] = useState('single');
   const [difficulty, setDifficulty] = useState('EASY');
   const [gameId, setGameId] = useState(null);
-  const [currentTrick, setCurrentTrick] = useState([]);           // List<Card>
-  const [completedTricks, setCompletedTricks] = useState([]);     // List<Book>
+  const [currentTrick, setCurrentTrick] = useState([]); // List<Card>
+  const [completedTricks, setCompletedTricks] = useState([]); // List<Book>
   const [teamAScore, setTeamAScore] = useState(0);
   const [teamBScore, setTeamBScore] = useState(0);
   const [teamATricksWon, setTeamATricksWon] = useState(0);
@@ -107,32 +107,58 @@ export const GameStateProvider = ({ children }) => {
   return (
     <GameStateContext.Provider
       value={{
-        players, setPlayers,
-        kitty, setKitty,
-        currentTurnIndex, setCurrentTurnIndex,
-        phase, setPhase,
-        trumpSuit, setTrumpSuit,
-        bidType, setBidType,
-        bidWinnerPos, setBidWinnerPos,
-        winningPlayerName, setWinningPlayerName,
-        highestBid, setHighestBid,
-        shuffledDeck, setShuffledDeck,
-        firstBidder, setFirstBidder,
-        bidTurnIndex, setBidTurnIndex,
-        bids, setBids,
-        winningBid, setWinningBid,
-        lobbySize, setLobbySize,
-        mode, setMode,
-        difficulty, setDifficulty,
-        gameId, setGameId,
-        currentTrick, setCurrentTrick,
-        completedTricks, setCompletedTricks,
-        teamAScore, setTeamAScore,
-        teamBScore, setTeamBScore,
-        teamATricksWon, setTeamATricksWon,
-        teamBTricksWon, setTeamBTricksWon,
-        finalScore, setFinalScore,
-        activeGame, setActiveGame,
+        players,
+        setPlayers,
+        kitty,
+        setKitty,
+        currentTurnIndex,
+        setCurrentTurnIndex,
+        phase,
+        setPhase,
+        trumpSuit,
+        setTrumpSuit,
+        bidType,
+        setBidType,
+        bidWinnerPos,
+        setBidWinnerPos,
+        winningPlayerName,
+        setWinningPlayerName,
+        highestBid,
+        setHighestBid,
+        shuffledDeck,
+        setShuffledDeck,
+        firstBidder,
+        setFirstBidder,
+        bidTurnIndex,
+        setBidTurnIndex,
+        bids,
+        setBids,
+        winningBid,
+        setWinningBid,
+        lobbySize,
+        setLobbySize,
+        mode,
+        setMode,
+        difficulty,
+        setDifficulty,
+        gameId,
+        setGameId,
+        currentTrick,
+        setCurrentTrick,
+        completedTricks,
+        setCompletedTricks,
+        teamAScore,
+        setTeamAScore,
+        teamBScore,
+        setTeamBScore,
+        teamATricksWon,
+        setTeamATricksWon,
+        teamBTricksWon,
+        setTeamBTricksWon,
+        finalScore,
+        setFinalScore,
+        activeGame,
+        setActiveGame,
         updateFromResponse,
         debugLog,
       }}

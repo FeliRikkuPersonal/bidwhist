@@ -8,9 +8,8 @@ import com.bidwhist.model.PlayerPos;
 /**
  * DTO for submitting a card play action during the game.
  *
- * This request is sent from the frontend when a player attempts
- * to play a card during their turn. It includes the game ID,
- * the player’s position, and the card they wish to play.
+ * <p>This request is sent from the frontend when a player attempts to play a card during their
+ * turn. It includes the game ID, the player’s position, and the card they wish to play.
  */
 public class PlayRequest {
   private String gameId;

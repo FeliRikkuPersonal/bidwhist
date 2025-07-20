@@ -3,20 +3,20 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 /*
-*
-* PlayCardAnimation animates a card moving from a source DOM ref to a target DOM ref.
-* It calculates absolute screen positions and transitions the card accordingly.
-* Calls onComplete after animation is done.
-*
-*/
+ *
+ * PlayCardAnimation animates a card moving from a source DOM ref to a target DOM ref.
+ * It calculates absolute screen positions and transitions the card accordingly.
+ * Calls onComplete after animation is done.
+ *
+ */
 export default function PlayCardAnimation({ card, fromRef, toRef, onComplete }) {
   const [style, setStyle] = useState(null);
   const imgRef = useRef();
 
   /*
-  * Initializes the animation: sets start and end positions based on fromRef and toRef
-  * Triggers transition to the target location
-  */
+   * Initializes the animation: sets start and end positions based on fromRef and toRef
+   * Triggers transition to the target location
+   */
   useEffect(() => {
     if (!fromRef?.current || !toRef?.current) return;
 
@@ -63,8 +63,8 @@ export default function PlayCardAnimation({ card, fromRef, toRef, onComplete }) 
   if (!style) return null;
 
   /*
-  * Render the animated card image
-  */
+   * Render the animated card image
+   */
   return (
     <img
       ref={imgRef}

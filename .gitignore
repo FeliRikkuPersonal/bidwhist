@@ -30,3 +30,6 @@ nbdist/
 .mvn/wrapper/maven-wrapper.jar
 HELP.md
 !google-java-format.jar
+
+# Node
+node_modules/

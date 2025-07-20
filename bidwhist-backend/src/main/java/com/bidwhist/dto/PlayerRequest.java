@@ -7,8 +7,8 @@ import com.bidwhist.model.PlayerPos;
 /**
  * Represents a request payload for identifying or initializing a player in a game.
  *
- * Used in client-to-server communication when joining a game, assigning a position,
- * or identifying the player by name. Also carries the gameId for routing context.
+ * <p>Used in client-to-server communication when joining a game, assigning a position, or
+ * identifying the player by name. Also carries the gameId for routing context.
  */
 public class PlayerRequest {
   private String playerName;

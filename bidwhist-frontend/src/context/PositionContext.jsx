@@ -53,9 +53,7 @@ export function PositionProvider({ children }) {
    * Inverse of positionToDirection: UI direction → backend position
    */
   const directionToPosition = useMemo(() => {
-    return Object.fromEntries(
-      Object.entries(positionToDirection).map(([pos, dir]) => [dir, pos])
-    );
+    return Object.fromEntries(Object.entries(positionToDirection).map(([pos, dir]) => [dir, pos]));
   }, [positionToDirection]);
 
   /**

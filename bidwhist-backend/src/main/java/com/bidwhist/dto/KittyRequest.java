@@ -9,8 +9,8 @@ import java.util.List;
 /**
  * Represents a request to submit discarded cards to the kitty.
  *
- * Used after a player has claimed the kitty and must return 6 cards back to it.
- * Carries the player identity, discarded cards, and associated game context.
+ * <p>Used after a player has claimed the kitty and must return 6 cards back to it. Carries the
+ * player identity, discarded cards, and associated game context.
  */
 public class KittyRequest {
   private String gameId;

@@ -14,8 +14,8 @@ import com.bidwhist.model.PlayerPos;
  */
 public class InitialBid {
   private final PlayerPos player;
-  private final int value;       // Valid values: 4 to 7 (0 for pass)
-  private final boolean isNo;    // Whether this is a "No" bid
+  private final int value; // Valid values: 4 to 7 (0 for pass)
+  private final boolean isNo; // Whether this is a "No" bid
   private final boolean isPassed;
 
   /* Constructs a regular or "No" bid */

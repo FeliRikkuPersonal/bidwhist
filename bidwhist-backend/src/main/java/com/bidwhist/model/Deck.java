@@ -12,7 +12,7 @@ public class Deck {
   private final List<Card> cards;
   private Kitty kitty;
 
-  /* 
+  /*
    * Constructs a new standard Bid Whist deck.
    * Includes 52 standard cards and 2 Jokers. Initializes an empty kitty.
    */
@@ -22,8 +22,8 @@ public class Deck {
     this.kitty = new Kitty();
   }
 
-  /* 
-   * Populates the deck with standard cards (excluding Jokers), 
+  /*
+   * Populates the deck with standard cards (excluding Jokers),
    * then adds the small and big Jokers.
    */
   private void buildStandardDeck() {
@@ -39,15 +39,15 @@ public class Deck {
     cards.add(new Card(null, Rank.JOKER_B));
   }
 
-  /* 
+  /*
    * Randomly shuffles the order of cards in the deck.
    */
   public void shuffle() {
     Collections.shuffle(cards);
   }
 
-  /* 
-   * Deals the first 48 cards evenly to 4 players, 
+  /*
+   * Deals the first 48 cards evenly to 4 players,
    * then places the remaining 6 cards in the kitty.
    */
   public void deal(List<Player> players) {
@@ -61,7 +61,7 @@ public class Deck {
     }
   }
 
-  /* 
+  /*
    * Clears the assigned suit of all Jokers in the deck.
    */
   public void resetJokerSuits() {
@@ -70,7 +70,7 @@ public class Deck {
     }
   }
 
-  /* 
+  /*
    * Assigns the trump suit to all Jokers in the deck.
    */
   public void assignTrumpSuitToJokers(Suit trump) {
@@ -79,7 +79,7 @@ public class Deck {
     }
   }
 
-  /* 
+  /*
    * Empties the kitty and logs the operation to console.
    */
   public void clearKitty() {

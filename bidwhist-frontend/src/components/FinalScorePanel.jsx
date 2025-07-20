@@ -40,4 +40,3 @@ export default function FinalScorePanel({ scores, onNewGame }) {
     </div>
   );
 }
-

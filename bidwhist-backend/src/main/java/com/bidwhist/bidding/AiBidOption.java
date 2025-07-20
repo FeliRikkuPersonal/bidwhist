@@ -5,15 +5,14 @@ package com.bidwhist.bidding;
 import com.bidwhist.model.PlayerPos;
 
 /**
- * AiBidOption is a utility class that helps convert evaluated suit data
- * into FinalBid objects, based on the given direction (Uptown or Downtown)
- * and "No" bid status.
+ * AiBidOption is a utility class that helps convert evaluated suit data into FinalBid objects,
+ * based on the given direction (Uptown or Downtown) and "No" bid status.
  */
 public class AiBidOption {
 
   /**
-   * Converts a SuitEvaluation into a FinalBid if the strength is valid.
-   * Returns null for values below 4 or unsupported directions.
+   * Converts a SuitEvaluation into a FinalBid if the strength is valid. Returns null for values
+   * below 4 or unsupported directions.
    *
    * @param player The player making the bid (typically an AI).
    * @param eval The evaluated strength and suit breakdown.
@@ -22,11 +21,7 @@ public class AiBidOption {
    * @return FinalBid instance or null if strength < 4.
    */
   public static FinalBid fromEvaluation(
-    PlayerPos player,
-    SuitEvaluation eval,
-    BidType type,
-    boolean isNo
-  ) {
+      PlayerPos player, SuitEvaluation eval, BidType type, boolean isNo) {
     int strength;
 
     if (type == BidType.UPTOWN) {

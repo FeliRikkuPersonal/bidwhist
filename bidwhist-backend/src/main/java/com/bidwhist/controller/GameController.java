@@ -21,10 +21,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /*
-* REST Controller for all game-related endpoints.
-* Acts as the main entry point for starting, joining,
-* and interacting with game sessions.
-*/
+ * REST Controller for all game-related endpoints.
+ * Acts as the main entry point for starting, joining,
+ * and interacting with game sessions.
+ */
 @RestController
 @RequestMapping("/game")
 public class GameController {

@@ -111,10 +111,7 @@ function ModeSelector({ onStartGame }) {
       <h1 className="h1-welcome">Welcome to Bid Whist Online!</h1>
       <div className="mode-slider-toggle">
         <label className="switch">
-          <input
-            type="checkbox"
-            onChange={(e) => setMode(e.target.checked ? 'multi' : 'single')}
-          />
+          <input type="checkbox" onChange={(e) => setMode(e.target.checked ? 'multi' : 'single')} />
           <span className="slider"></span>
           <div className="labels">
             <span>Single</span>

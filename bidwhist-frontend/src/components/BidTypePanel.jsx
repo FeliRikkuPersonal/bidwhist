@@ -9,12 +9,12 @@ import { useGameState } from '../context/GameStateContext.jsx';
 import { useUIDisplay } from '../context/UIDisplayContext.jsx';
 
 /*
-*
-* BidTypePanel handles the final bid confirmation UI.
-* It allows the winning player to select bid direction and suit (if applicable),
-* and sends the finalized bid to the backend to transition the game phase.
-*
-*/
+ *
+ * BidTypePanel handles the final bid confirmation UI.
+ * It allows the winning player to select bid direction and suit (if applicable),
+ * and sends the finalized bid to the backend to transition the game phase.
+ *
+ */
 export default function BidTypePanel({ closeBidTypePanel }) {
   const { viewerPosition } = usePositionContext();
 
@@ -41,11 +41,11 @@ export default function BidTypePanel({ closeBidTypePanel }) {
   if (!showFinalizeBid) return null;
 
   /*
-  *
-  * finalizeBid sends the selected direction and suit (if not No Trump)
-  * to the server, updates global game state, and closes the panel.
-  *
-  */
+   *
+   * finalizeBid sends the selected direction and suit (if not No Trump)
+   * to the server, updates global game state, and closes the panel.
+   *
+   */
   const finalizeBid = async () => {
     const payload = {
       gameId: gameId,
@@ -83,11 +83,11 @@ export default function BidTypePanel({ closeBidTypePanel }) {
   };
 
   /*
-  *
-  * Render the bid direction and (conditionally) suit selector.
-  * Shows Confirm and Cancel buttons to finalize or abort.
-  *
-  */
+   *
+   * Render the bid direction and (conditionally) suit selector.
+   * Shows Confirm and Cancel buttons to finalize or abort.
+   *
+   */
   return (
     <div className="bidding-overlay">
       <div className="bidding-panel">

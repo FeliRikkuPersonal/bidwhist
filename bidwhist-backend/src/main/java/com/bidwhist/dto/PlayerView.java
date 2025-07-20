@@ -10,9 +10,9 @@ import java.util.List;
 /**
  * Represents the public-facing view of a player used for UI or client display.
  *
- * This DTO contains key details such as player name, position, team, whether the player is an AI,
- * and the list of cards in their hand. It is intended for sending sanitized game state info
- * to the frontend during gameplay or updates.
+ * <p>This DTO contains key details such as player name, position, team, whether the player is an
+ * AI, and the list of cards in their hand. It is intended for sending sanitized game state info to
+ * the frontend during gameplay or updates.
  */
 public class PlayerView {
   private final String name;

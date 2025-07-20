@@ -1,22 +1,22 @@
 // src/animations/DealAnimation.jsx
 
 /**
-*
-* Animate dealing cards clockwise to each player.
-* Each card is animated from the deck to the player's hand based on their position.
-* The animation is timed to mimic a real-world dealing sequence, interleaved by round.
-*
-* @param {Array<string>} playerPositions - e.g., ['P1', 'P2', 'P3', 'P4']
-* @param {Array<Object>} cards - flat list of cards with .owner and .cardImage
-* @param {Object} positionMap - maps backend positions (P1, P2) → view positions (south, west, etc.)
-* @param {Function} [onComplete] - optional callback when all animations finish
-* @param {Function} get - retrieves registered DOM refs for players
-* @param {Object} deckPosition - x/y coordinates of the deck
-* @param {Function} setAnimatedCards - state setter to add animated cards
-* @param {Function} setShowAnimatedCards - toggles visibility of animated cards
-* @param {Function} setBidPhase - triggers transition to bidding phase
-*
-*/
+ *
+ * Animate dealing cards clockwise to each player.
+ * Each card is animated from the deck to the player's hand based on their position.
+ * The animation is timed to mimic a real-world dealing sequence, interleaved by round.
+ *
+ * @param {Array<string>} playerPositions - e.g., ['P1', 'P2', 'P3', 'P4']
+ * @param {Array<Object>} cards - flat list of cards with .owner and .cardImage
+ * @param {Object} positionMap - maps backend positions (P1, P2) → view positions (south, west, etc.)
+ * @param {Function} [onComplete] - optional callback when all animations finish
+ * @param {Function} get - retrieves registered DOM refs for players
+ * @param {Object} deckPosition - x/y coordinates of the deck
+ * @param {Function} setAnimatedCards - state setter to add animated cards
+ * @param {Function} setShowAnimatedCards - toggles visibility of animated cards
+ * @param {Function} setBidPhase - triggers transition to bidding phase
+ *
+ */
 export function dealCardsClockwise(
   playerPositions,
   cards,
@@ -26,7 +26,7 @@ export function dealCardsClockwise(
   deckPosition,
   setAnimatedCards,
   setShowAnimatedCards,
-  setBidPhase,
+  setBidPhase
 ) {
   const totalCards = cards.length;
   const delayPerCard = 120; /* milliseconds between each card */
@@ -38,9 +38,9 @@ export function dealCardsClockwise(
   });
 
   /*
-  * Interleave cards by round, so each player receives one card per cycle
-  * This simulates realistic clockwise dealing
-  */
+   * Interleave cards by round, so each player receives one card per cycle
+   * This simulates realistic clockwise dealing
+   */
   for (let round = 0; round < grouped[playerPositions[0]].length; round++) {
     for (let p = 0; p < playerPositions.length; p++) {
       const player = playerPositions[p];
@@ -78,8 +78,8 @@ export function dealCardsClockwise(
   }
 
   /*
-  * Final callback to end animation sequence and trigger next phase
-  */
+   * Final callback to end animation sequence and trigger next phase
+   */
   if (onComplete) {
     setTimeout(
       () => {
@@ -87,7 +87,7 @@ export function dealCardsClockwise(
         setShowAnimatedCards(false);
         setBidPhase(true);
       },
-      totalCards * delayPerCard + 500,
+      totalCards * delayPerCard + 500
     );
   }
 }
