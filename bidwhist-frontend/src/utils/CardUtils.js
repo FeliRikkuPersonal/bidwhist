@@ -1,21 +1,18 @@
 // src/utils/CardUtils.js
-export function getCardImage(card, viewerName, contextPhase) {
+
+/**
+ * Returns the image path for a card based on its visibility.
+ *
+ * @param {Object} card - The card object containing visibility and image info
+ * @returns {string} Path to the card image to display
+ */
+export function getCardImage(card) {
   if (!card) {
-    console.warn("getCardImage called with null/undefined card");
-    return "/static/img/deck/Deck_Back.png";
+    console.warn('getCardImage called with null/undefined card');
+    return '/static/img/deck/Deck_Back.png';
   }
 
-  switch (card.visibility) {
-    case 'VISIBLE_TO_ALL':
-      return `/static/img/deck/${card.cardImage}`;
-
-    case 'VISIBLE_TO_SELF':
-      return card.owner === viewerName
-        ? `/static/img/deck/${card.cardImage}`
-        : `/static/img/deck/Deck_Back.png`;
-
-    case 'HIDDEN':
-    default:
-      return '/static/img/deck/Deck_Back.png';
-  }
+  return card.visibility === 'VISIBLE_TO_ALL'
+    ? `/static/img/deck/${card.cardImage}`
+    : '/static/img/deck/Deck_Back.png';
 }

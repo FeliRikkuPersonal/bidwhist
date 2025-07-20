@@ -1,8 +1,19 @@
-import { createContext, useContext, useState } from 'react';
+// src/context/UIDisplayContext.jsx
 
+import { createContext, useContext, useState } from 'react';
 
 export const UIDisplayContext = createContext(null);
 
+/**
+ * Provides shared UI display state across the app, including:
+ * - Which screen to show (lobby/game)
+ * - Game animations and card visibility
+ * - Trick counters, shuffle display, bidding/kitty phases
+ * - Hand mappings and played card tracking
+ *
+ * @param {React.ReactNode} children - Child components that will consume the context
+ * @returns {JSX.Element} Context provider wrapping children
+ */
 export function UIDisplayProvider({ children }) {
   const [handMap, setHandMap] = useState({
     north: [],
@@ -10,6 +21,7 @@ export function UIDisplayProvider({ children }) {
     east: [],
     west: [],
   });
+
   const [showGameScreen, setShowGameScreen] = useState(false);
   const [showAnimatedCards, setShowAnimatedCards] = useState(false);
   const [deckPosition, setDeckPosition] = useState({ x: 0, y: 0 });
@@ -32,12 +44,19 @@ export function UIDisplayProvider({ children }) {
   const [teamATricks, setTeamATricks] = useState(0);
   const [teamBTricks, setTeamBTricks] = useState(0);
 
+  /**
+   * Updates the animation queue from a backend response.
+   * Used during polling to prepare card animations.
+   */
   const queueAnimationFromResponse = (response) => {
     if ('animationQueue' in response) setAnimationQueue(response.animationQueue);
-  }
+  };
 
+  /**
+   * Logs the current UI context state to the console for debugging purposes.
+   */
   const debugLog = () => {
-    console.log("[🧠 UIDisplayContext Snapshot]", {
+    console.log('[🧠 UIDisplayContext Snapshot]', {
       showGameScreen,
       showAnimatedCards,
       deckPosition,
@@ -59,66 +78,75 @@ export function UIDisplayProvider({ children }) {
       teamATricks,
       teamBTricks,
     });
-  }
-
-  const setHandFor = (direction, hand) => {
-    setHandMap(prev => ({ ...prev, [direction]: hand }));
   };
 
+  /**
+   * Updates the hand for a specific direction (south, west, etc.).
+   */
+  const setHandFor = (direction, hand) => {
+    setHandMap((prev) => ({ ...prev, [direction]: hand }));
+  };
 
   return (
-    <UIDisplayContext.Provider value={{
-      handMap,
-      setHandMap,
-      showGameScreen,
-      setShowGameScreen,
-      showAnimatedCards,
-      setShowAnimatedCards,
-      deckPosition,
-      setDeckPosition,
-      playedCardPosition,
-      setPlayedCardPosition,
-      animatedCards,
-      setAnimatedCards,
-      showShuffle,
-      setShowShuffle,
-      showHands,
-      setShowHands,
-      showBidding,
-      setShowBidding,
-      bidPhase,
-      setBidPhase,
-      kittyPhase,
-      setKittyPhase,
-      showFinalizeBid,
-      setShowFinalizeBid,
-      awardKitty,
-      setAwardKitty,
-      myTurn,
-      setMyTurn,
-      discardPile,
-      setDiscardPile,
-      selectedCard,
-      setSelectedCard,
-      loadGame,
-      setLoadGame,
-      showLobby,
-      setShowLobby,
-      playedCard,
-      setPlayedCard,
-      animationQueue,
-      setAnimationQueue,
-      teamATricks,
-      setTeamATricks,
-      teamBTricks,
-      setTeamBTricks,
-      setHandFor,
-      queueAnimationFromResponse,
-      debugLog,
-    }}>
+    <UIDisplayContext.Provider
+      value={{
+        handMap,
+        setHandMap,
+        showGameScreen,
+        setShowGameScreen,
+        showAnimatedCards,
+        setShowAnimatedCards,
+        deckPosition,
+        setDeckPosition,
+        playedCardPosition,
+        setPlayedCardPosition,
+        animatedCards,
+        setAnimatedCards,
+        showShuffle,
+        setShowShuffle,
+        showHands,
+        setShowHands,
+        showBidding,
+        setShowBidding,
+        bidPhase,
+        setBidPhase,
+        kittyPhase,
+        setKittyPhase,
+        showFinalizeBid,
+        setShowFinalizeBid,
+        awardKitty,
+        setAwardKitty,
+        myTurn,
+        setMyTurn,
+        discardPile,
+        setDiscardPile,
+        selectedCard,
+        setSelectedCard,
+        loadGame,
+        setLoadGame,
+        showLobby,
+        setShowLobby,
+        playedCard,
+        setPlayedCard,
+        animationQueue,
+        setAnimationQueue,
+        teamATricks,
+        setTeamATricks,
+        teamBTricks,
+        setTeamBTricks,
+        setHandFor,
+        queueAnimationFromResponse,
+        debugLog,
+      }}
+    >
       {children}
     </UIDisplayContext.Provider>
   );
 }
 
+/**
+ * Hook to consume UIDisplay context in functional components.
+ *
+ * @returns {object} Context state and handlers related to UI display logic
+ */
 export const useUIDisplay = () => useContext(UIDisplayContext);
