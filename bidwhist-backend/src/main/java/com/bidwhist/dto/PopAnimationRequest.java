@@ -7,10 +7,10 @@ import com.bidwhist.model.PlayerPos;
 /**
  * DTO for animation removal requests.
  *
- * <p>Sent from the frontend when an animation has finished playing on a specific client. This
+ * Sent from the frontend when an animation has finished playing on a specific client. This
  * request tells the server to pop the animation from the corresponding player's queue.
  *
- * <p>Used in real-time play zones to keep animation state synced across players.
+ * Used in real-time play zones to keep animation state synced across players.
  */
 public class PopAnimationRequest {
   private String gameId;

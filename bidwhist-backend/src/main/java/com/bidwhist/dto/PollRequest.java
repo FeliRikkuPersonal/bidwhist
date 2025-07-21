@@ -7,7 +7,7 @@ import com.bidwhist.model.PlayerPos;
 /**
  * DTO for polling the current game state.
  *
- * <p>Typically used by the frontend to ask the server for updates based on the player's position
+ * Typically used by the frontend to ask the server for updates based on the player's position
  * and associated game ID. Helps keep client state synchronized during multiplayer sessions.
  */
 public class PollRequest {

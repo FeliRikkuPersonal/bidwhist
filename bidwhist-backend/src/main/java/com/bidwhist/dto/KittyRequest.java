@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Represents a request to submit discarded cards to the kitty.
  *
- * <p>Used after a player has claimed the kitty and must return 6 cards back to it. Carries the
+ * Used after a player has claimed the kitty and must return 6 cards back to it. Carries the
  * player identity, discarded cards, and associated game context.
  */
 public class KittyRequest {
