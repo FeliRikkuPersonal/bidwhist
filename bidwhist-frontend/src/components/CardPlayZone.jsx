@@ -18,8 +18,18 @@ import { dealCardsClockwise } from '../animations/DealAnimation';
 
 import '../css/CardPlayZone.css';
 
+/*
+* CardPlayZone manages the central play area of the
+* Bid Whist card game. It handles:
+*   - Card play animations (deal, play, collect, clear)
+*   - Drag-and-drop logic for playing cards
+*   - Updating card positions for animation accuracy
+*   - Triggering UI components for bidding and bid type
+*   - Communicating animation progress with the backend
+*/
+
 export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef, onCardPlayed }) {
-  // UI state setters and visual state from UIDisplayContext
+
   const {
     setHandFor,
     setShowHands,
@@ -39,7 +49,7 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
     setTeamBTricks,
   } = useUIDisplay();
 
-  // Player metadata and mapping utilities from PositionContext
+
   const {
     debugLog: positionLog,
     playerName,
@@ -48,11 +58,11 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
     positionToDirection,
   } = usePositionContext();
 
-  // Game state and server-bound data from GameStateContext
+
   const { gameId, players, setKitty, bids, winningPlayerName, setWinningBid, bidWinnerPos } =
     useGameState();
 
-  // Local component state
+
   const [isOver, setIsOver] = useState(false); // Tracks if drag is over drop zone
   const [lastAnimation, setLastAnimation] = useState(null); // Prevents duplicate animation runs
   const [playAnimations, setPlayAnimations] = useState([]); // Currently running card play animations
@@ -64,12 +74,12 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
     west: null,
   }); // Visual state of cards on table by direction
 
-  // Refs and utility functions
+
   const localRef = useRef(); // Main container ref for sizing/layout
   const { register, get } = useZoneRefs(); // Shared card zone registry
   const API = import.meta.env.VITE_API_URL; // Server endpoint
 
-  /* useEffect: Handles queued game animations like DEAL, PLAY, COLLECT, etc. */
+  /* Handles queued game animations like DEAL, PLAY, COLLECT, etc. */
   useEffect(() => {
     if (!animationQueue || animationQueue.length === 0) return;
 
@@ -79,7 +89,7 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
     setLastAnimation(animation.id);
 
     const runAnimation = async () => {
-      /* === DEAL animation: distribute cards to all players === */
+
       if (animation.type === 'DEAL') {
         const requiredRefs = [
           'hand-south',
@@ -121,7 +131,6 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
         }, 50);
       }
 
-      /* === PLAY animation: animate a single card being played === */
       if (animation.type === 'PLAY') {
         const { card, player } = animation;
         const direction = positionToDirection[player];
@@ -156,7 +165,6 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
         setPlayedCardsByDirection((prev) => ({ ...prev, [direction]: card }));
       }
 
-      /* === COLLECT animation: gather played cards into team pile === */
       if (animation.type === 'COLLECT') {
         const { cardList, winningTeam } = animation;
         const myTeam = viewerPosition === 'P1' || viewerPosition === 'P3' ? 'A' : 'B';
@@ -177,7 +185,7 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
             {
               id: `collect-${card.cardImage}-${card.owner}`,
               ...card,
-              cardImage: 'Deck_Back.png', // use back of card when collecting
+              cardImage: 'Deck_Back.png',
               from,
               to,
             },
@@ -206,14 +214,12 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
         );
       }
 
-      /* CLEAR animation: reset all game visuals */
       if (animation.type === 'CLEAR') {
         setTeamATricks(0);
         setTeamBTricks(0);
         setWinningBid(null);
       }
 
-      /* UPDATE_CARDS animation: refresh hands from server */
       if (animation.type === 'UPDATE_CARDS') {
         try {
           const res = await fetch(`${API}/game/update-cards`, {
@@ -260,7 +266,7 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
     runAnimation();
   }, [animationQueue, lastAnimation, players, viewerPosition, backendPositions, deckPosition]);
 
-  /* useEffect: Tracks and updates the screen position of each played card */
+  /* Tracks and updates the screen position of each played card */
   useEffect(() => {
     Object.entries(playedCardsByDirection).forEach(([dir, card]) => {
       if (!card) return;
@@ -277,7 +283,7 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
     });
   }, [playedCardsByDirection]);
 
-  /* useEffect: Updates the deck center point relative to its parent container */
+  /* Updates the deck center point relative to its parent container */
   useEffect(() => {
     const updatePositions = () => {
       const bounds = localRef.current?.getBoundingClientRect();
@@ -295,7 +301,7 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
     return () => window.removeEventListener('resize', updatePositions);
   }, []);
 
-  /* useEffect: Registers a directional ref for the play zone container */
+  /* Registers a directional ref for the play zone container */
   useEffect(() => {
     if (!viewerPosition || !positionToDirection) return;
     const direction = positionToDirection[viewerPosition];
@@ -303,7 +309,7 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
     register(`CardPlayZone-${direction}`, localRef);
   }, [viewerPosition, positionToDirection, register]);
 
-  /* useEffect: Triggers Finalize Bid panel if bidding phase is complete and viewer won */
+  /* Triggers Finalize Bid panel if bidding phase is complete and viewer won */
   useEffect(() => {
     const bidsComplete = bids?.length === 4;
     console.log(`Bid length = ${bids?.length}`);
@@ -342,7 +348,7 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
     setIsOver(false);
   };
 
-  /* JSX: Card play zone layout, drag drop logic, animated overlays */
+
   return (
     <div ref={localRef} className="card-play-zone">
       {positionToDirection[viewerPosition] === 'south' && (
