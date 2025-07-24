@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.bidwhist.bidding.BidType;
 import com.bidwhist.bidding.FinalBid;
 import com.bidwhist.bidding.HandEvaluator;
 import com.bidwhist.bidding.InitialBid;
@@ -80,11 +81,11 @@ public class AIUtils {
                 aiBid = AIUtils.generateAIBid(game, nextBidder);
                 System.out.println(
                         "DEBUG: "
-                                + nextBidder.getName()
-                                + " (AI) bids "
-                                + aiBid.getValue()
-                                + " is No?: "
-                                + aiBid.isNo());
+                        + nextBidder.getName()
+                        + " (AI) bids "
+                        + aiBid.getValue()
+                        + " is No?: "
+                        + aiBid.isNo());
             }
 
             game.addBid(aiBid);
@@ -112,11 +113,11 @@ public class AIUtils {
             Card chosenCard = chooseCardForAI(game, current, game.getCurrentTrick());
             System.out.println(
                     "DEBUG: "
-                            + current.getName()
-                            + " played card: "
-                            + chosenCard
-                            + " "
-                            + game.getCurrentTurnIndex());
+                    + current.getName()
+                    + " played card: "
+                    + chosenCard
+                    + " "
+                    + game.getCurrentTurnIndex());
 
             current.getHand().getCards().remove(chosenCard);
 
@@ -173,19 +174,15 @@ public class AIUtils {
      *
      * <p>
      * - EASY: Plays the lowest legal card to keep logic simple. - MEDIUM: Leads
-     * with the highest
-     * non-trump card or follows suit with the lowest. - HARD: Evaluates trump, lead
-     * suit, partner
-     * position, and past tricks to choose: - A safe high card if leading - A
-     * defensive low card if
-     * partner is winning - The weakest card that can beat the current winner - A
-     * fallback lowest card
-     * when no better play is found
+     * with the highest non-trump card or follows suit with the lowest. - HARD:
+     * Evaluates trump, lead suit, partner position, and past tricks to choose:
+     * - A safe high card if leading - A defensive low card if partner is
+     * winning - The weakest card that can beat the current winner - A fallback
+     * lowest card when no better play is found
      *
      * <p>
-     * Decision logic adjusts dynamically based on trick position, trump usage, and
-     * potential to
-     * preserve strong cards for later rounds.
+     * Decision logic adjusts dynamically based on trick position, trump usage,
+     * and potential to preserve strong cards for later rounds.
      */
     public static Card chooseCardForAI(GameState game, Player aiPlayer, List<PlayedCard> currentTrick) {
         List<Card> hand = aiPlayer.getHand().getCards();
@@ -227,8 +224,8 @@ public class AIUtils {
             Suit leadSuit = currentTrick.isEmpty()
                     ? null
                     : (currentTrick.get(0).getCard() != null
-                            ? currentTrick.get(0).getCard().getSuit()
-                            : null);
+                    ? currentTrick.get(0).getCard().getSuit()
+                    : null);
             game.setLeadSuit(leadSuit);
             PlayedCard winningCard = trickIndex > 0 ? GameplayUtils.getWinningCard(currentTrick, trumpSuit) : null;
             Card currentWinning = winningCard != null ? winningCard.getCard() : null;
@@ -250,9 +247,8 @@ public class AIUtils {
                         .filter(c -> !JokerUtils.isJokerRank(c.getRank())) // Avoid jokers
                         .filter(
                                 c -> c.getSuit() == null
-                                        || !c.getSuit().equals(trumpSuit)
-                                        || CardUtils.allHigherTrumpCardsPlayed(
-                                                c, game.getCompletedCards(), trumpSuit))
+                                || !c.getSuit().equals(trumpSuit)
+                                || CardUtils.allHigherTrumpCardsPlayed(c, game.getCompletedCards(), trumpSuit, game.getBidType() == BidType.NO_TRUMP))
                         .max(Comparator.comparingInt(c -> c.getRank().getValue()));
 
                 if (safeLead.isPresent()) {
@@ -305,9 +301,8 @@ public class AIUtils {
                             .filter(c -> c.getRank().getValue() >= Rank.QUEEN.getValue())
                             .filter(
                                     c -> c.getSuit() == null
-                                            || !c.getSuit().equals(trumpSuit)
-                                            || CardUtils.allHigherTrumpCardsPlayed(
-                                                    c, game.getCompletedCards(), trumpSuit))
+                                    || !c.getSuit().equals(trumpSuit)
+                                    || CardUtils.allHigherTrumpCardsPlayed(c, game.getCompletedCards(), trumpSuit, game.getBidType() == BidType.NO_TRUMP))
                             .findFirst();
                     if (safeHigh.isPresent()) {
                         return safeHigh.get();
@@ -331,9 +326,8 @@ public class AIUtils {
                         .filter(c -> c.getRank().getValue() >= Rank.QUEEN.getValue())
                         .filter(
                                 c -> c.getSuit() == null
-                                        || !c.getSuit().equals(trumpSuit)
-                                        || CardUtils.allHigherTrumpCardsPlayed(
-                                                c, game.getCompletedCards(), trumpSuit))
+                                || !c.getSuit().equals(trumpSuit)
+                                || CardUtils.allHigherTrumpCardsPlayed(c, game.getCompletedCards(), trumpSuit, game.getBidType() == BidType.NO_TRUMP))
                         .findFirst();
                 if (safeHigh.isPresent()) {
                     return safeHigh.get();
@@ -361,9 +355,8 @@ public class AIUtils {
                     Optional<Card> safeBurn = followSuit.stream()
                             .filter(
                                     c -> c.getSuit() == null
-                                            || !c.getSuit().equals(trumpSuit)
-                                            || CardUtils.allHigherTrumpCardsPlayed(
-                                                    c, game.getCompletedCards(), trumpSuit))
+                                    || !c.getSuit().equals(trumpSuit)
+                                    || CardUtils.allHigherTrumpCardsPlayed(c, game.getCompletedCards(), trumpSuit, game.getBidType() == BidType.NO_TRUMP))
                             .max(Comparator.comparingInt(c -> c.getRank().getValue()));
                     if (safeBurn.isPresent()) {
                         return safeBurn.get();
@@ -393,9 +386,8 @@ public class AIUtils {
                     .filter(c -> c.getRank().getValue() >= Rank.QUEEN.getValue())
                     .filter(
                             c -> c.getSuit() == null
-                                    || !c.getSuit().equals(trumpSuit)
-                                    || CardUtils.allHigherTrumpCardsPlayed(
-                                            c, game.getCompletedCards(), trumpSuit))
+                            || !c.getSuit().equals(trumpSuit)
+                            || CardUtils.allHigherTrumpCardsPlayed(c, game.getCompletedCards(), trumpSuit, game.getBidType() == BidType.NO_TRUMP))
                     .findFirst();
             if (safeHigh.isPresent()) {
                 return safeHigh.get();
@@ -413,7 +405,8 @@ public class AIUtils {
      * Checks if the AI's partner is currently winning the trick.
      *
      * <p>
-     * Finds the current winning card and compares its player to the AI’s partner.
+     * Finds the current winning card and compares its player to the AI’s
+     * partner.
      */
     @SuppressWarnings("unused")
     public static boolean isPartnerWinning(List<PlayedCard> trick, PlayerPos aiPos, Suit trumpSuit) {
@@ -435,9 +428,9 @@ public class AIUtils {
      * Checks if the challenger card can beat the current winning card.
      *
      * <p>
-     * Trump beats non-trump. Otherwise, the higher card of the same suit wins. If
-     * suits differ and
-     * neither is trump, the lead suit may still win if higher.
+     * Trump beats non-trump. Otherwise, the higher card of the same suit wins.
+     * If suits differ and neither is trump, the lead suit may still win if
+     * higher.
      */
     public static boolean canBeat(Card challenger, Card currentWinning, Suit trumpSuit, Suit leadSuit) {
         Suit challengerSuit = challenger.getSuit();
