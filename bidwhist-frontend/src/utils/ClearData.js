@@ -49,7 +49,12 @@ export function clearAllGameData() {
     'animationQueue',
     'teamATricks',
     'teamBTricks',
-
+    'animatedCards',
+    'playedCardPosition',
+    'playedCardsByDirection',
+    'ShowAnimatedCards',
+    'showHands',
+    'showShuffle',
     // PositionContext
     'playerName',
     'viewerPosition',
@@ -65,4 +70,5 @@ export function clearAllGameData() {
 
   keysToClear.forEach((key) => localStorage.removeItem(key));
   console.log('[🧨 Cleared all game data]');
+
 }

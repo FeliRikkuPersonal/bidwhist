@@ -221,7 +221,7 @@ function App() {
     <div className="index-wrapper">
       <div className="index-container">
         {loadGame ? (
-          <GameScreen />
+          <GameScreen bidType={bidType}/>
         ) : showLobby ? (
           <LobbyScreen gameId={gameId} playerName={playerName} />
         ) : (

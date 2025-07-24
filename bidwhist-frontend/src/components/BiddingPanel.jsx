@@ -8,6 +8,7 @@ import React, { useState, useEffect } from 'react';
 import { usePositionContext } from '../context/PositionContext.jsx';
 import { useGameState } from '../context/GameStateContext.jsx';
 import { useUIDisplay } from '../context/UIDisplayContext.jsx';
+import handleQuit from '../utils/handleQuit.js';
 
 /*
  * BiddingPanel manages the UI for players to place or pass a bid during the bidding phase.
@@ -41,25 +42,15 @@ export default function BiddingPanel({ closeBidding, onBidPlaced }) {
   const [bidValue, setBidValue] = useState('');
   const [isNo, setIsNo] = useState(false);
 
-  /*
-   * Updates UI visibility based on whether it's the player's turn to bid
-   */
   useEffect(() => {
     if (!bidPhase || !viewerPosition || bidTurnIndex == null) return;
-    if (!bidPhase || !viewerPosition || bidTurnIndex == null) return;
-
     const turnPlayerPos = ['P1', 'P2', 'P3', 'P4'][bidTurnIndex];
     const isMyTurn = viewerPosition === turnPlayerPos;
-
     setShowBidding(bidPhase && isMyTurn);
   }, [bids, bidPhase, bidTurnIndex, viewerPosition]);
 
-  /* do not render if bidding is not visible */
   if (!showBidding) return null;
 
-  /*
-   * sendBidRequest handles the POST request to submit a bid to the backend
-   */
   const sendBidRequest = async (bidBody) => {
     const res = await fetch(`${API}/game/bid`, {
       method: 'POST',
@@ -68,7 +59,6 @@ export default function BiddingPanel({ closeBidding, onBidPlaced }) {
     });
 
     const bidData = await res.json();
-
     if (res.ok) {
       onBidPlaced?.(bidData);
       setBidPhase(false);
@@ -82,9 +72,6 @@ export default function BiddingPanel({ closeBidding, onBidPlaced }) {
     }
   };
 
-  /*
-   * placeBid sends the current numeric bid value along with No Trump flag
-   */
   const placeBid = () => {
     sendBidRequest({
       gameId,
@@ -95,9 +82,6 @@ export default function BiddingPanel({ closeBidding, onBidPlaced }) {
     });
   };
 
-  /*
-   * passBid submits a pass bid (no value, not a No Trump)
-   */
   const passBid = () => {
     sendBidRequest({
       gameId,
@@ -108,14 +92,10 @@ export default function BiddingPanel({ closeBidding, onBidPlaced }) {
     });
   };
 
-  /*
-   * Render the bid input panel and actions for Set, Pass, and Close
-   */
   return (
-    <div className="bidding-overlay  grid-item center">
+    <div className="bidding-overlay grid-item center">
       <div className="bidding-panel">
         <h2>Place Your Bid</h2>
-
         <input
           type="number"
           min="4"
@@ -125,21 +105,23 @@ export default function BiddingPanel({ closeBidding, onBidPlaced }) {
           onChange={(e) => setBidValue(e.target.value)}
           className="index-input-box short-box enter-bid-input"
         />
-
         <label>
-          <input type="checkbox" checked={isNo} onChange={(e) => setIsNo(e.target.checked)} />
+          <input
+            type="checkbox"
+            checked={isNo}
+            onChange={(e) => setIsNo(e.target.checked)}
+          />
           No Trump
         </label>
-
         <div className="settings-actions">
-          <button className="index-button settings-button" onClick={placeBid}>
+          <button onClick={placeBid} className="index-button settings-button">
             Set Bid
           </button>
-          <button className="index-button settings-button" onClick={passBid}>
+          <button onClick={passBid} className="index-button settings-button">
             Pass
           </button>
-          <button className="index-button settings-button" onClick={closeBidding}>
-            Close
+          <button onClick={handleQuit} className="index-button settings-button">
+            Quit
           </button>
         </div>
       </div>

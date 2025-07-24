@@ -4,6 +4,7 @@ import '../css/ModeSelector.css';
 import React, { useState } from 'react';
 import { useGameState } from '../context/GameStateContext';
 import { usePositionContext } from '../context/PositionContext';
+import { clearAllGameData } from '../utils/ClearData';
 
 /**
  * ModeSelector allows the user to:
@@ -31,6 +32,7 @@ function ModeSelector({ onStartGame }) {
     if (!trimmedName) return;
 
     const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+    clearAllGameData()
     setPlayerName(trimmedName);
     setMode('single');
     setGameId(code);

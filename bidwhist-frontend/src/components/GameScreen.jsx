@@ -13,7 +13,7 @@ import { usePositionContext } from '../context/PositionContext.jsx';
 import { useUIDisplay } from '../context/UIDisplayContext.jsx';
 import { useZoneRefs } from '../context/RefContext.jsx';
 import { useAlert } from '../context/AlertContext.jsx';
-import { clearAllGameData } from '../utils/ClearData.js';
+import handleQuit from '../utils/handleQuit.js';
 
 /**
  * Main game interface layout and logic. Displays all player zones, trick piles, and
@@ -21,7 +21,7 @@ import { clearAllGameData } from '../utils/ClearData.js';
  *
  * @returns {JSX.Element} The full game screen layout
  */
-export default function GameScreen() {
+export default function GameScreen({bidType}) {
   const { gameId, updateFromResponse, players } = useGameState();
   const { positionToDirection, viewerPosition } = usePositionContext();
 
@@ -160,7 +160,9 @@ export default function GameScreen() {
           <PlayerZone {...playerProps.north.props} />
         </div>
 
-        <div className="grid-item top-right" />
+        <div className="grid-item top-right" >
+        {bidType &&<button className="index-button quit-button" onClick={handleQuit}>Quit</button>}
+        </div>
 
         {/* Middle row */}
         <div className="grid-item middle-left">
@@ -182,25 +184,7 @@ export default function GameScreen() {
 
         {/* Bottom row */}
         <div className="grid-item bottom-left">
-          {/* 🚨 TEMP: Clear All Game Data Button */}
-          <button
-            onClick={() => {
-              clearAllGameData();
-              window.location.reload(); // optional: force refresh or reroute
-            }}
-            style={{
-              marginTop: '8px',
-              padding: '4px 8px',
-              backgroundColor: '#d33',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              fontSize: '0.8rem',
-              cursor: 'pointer',
-            }}
-          >
-            Clear Game Data
-          </button>
+        
         </div>
 
 

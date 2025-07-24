@@ -7,6 +7,7 @@ import React, { useState } from 'react';
 import { usePositionContext } from '../context/PositionContext.jsx';
 import { useGameState } from '../context/GameStateContext.jsx';
 import { useUIDisplay } from '../context/UIDisplayContext.jsx';
+import handleQuit from '../utils/handleQuit.js';
 
 /*
  *
@@ -126,7 +127,7 @@ export default function BidTypePanel({ closeBidTypePanel }) {
           <button className="index-button settings-button" onClick={finalizeBid}>
             Confirm
           </button>
-          <button className="index-button settings-button" onClick={closeBidTypePanel}>
+          <button className="index-button settings-button" onClick={handleQuit}>
             Cancel
           </button>
         </div>
