@@ -7,6 +7,7 @@ import com.bidwhist.bidding.InitialBid;
 import com.bidwhist.model.Player;
 import com.bidwhist.model.PlayerPos;
 import com.bidwhist.model.Suit;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /*
  * DTO representing a player's bid submission from client to server.
@@ -17,6 +18,7 @@ public class BidRequest {
   private PlayerPos player;
   private int value;
   private BidType type;
+  @JsonProperty("isNo")
   private boolean isNo;
   private Suit suit;
 
