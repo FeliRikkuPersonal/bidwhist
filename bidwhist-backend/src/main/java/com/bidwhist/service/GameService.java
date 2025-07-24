@@ -308,7 +308,7 @@ public class GameService {
         game.setWinningBid(finalBid);
         game.setWinningBidStats(finalBid);
         game.getBids().clear();
-        game.setTrumpType(request.getType());
+        game.setBidType(request.getType());
         game.setTrumpSuit(request.getSuit());
         game.getDeck().assignTrumpSuitToJokers(request.getSuit());
 

@@ -507,7 +507,7 @@ public class AIUtils {
 
         PlayerPos winnerPos = game.getHighestBid().getPlayer();
         FinalBid winningBid = game.getFinalBidCache().get(winnerPos);
-        game.setTrumpType(winningBid.getType());
+        game.setBidType(winningBid.getType());
         game.setPhase(GamePhase.PLAY);
         game.setCurrentTurnIndex(winnerPos.ordinal());
 

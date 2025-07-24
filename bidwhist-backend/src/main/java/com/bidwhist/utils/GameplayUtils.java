@@ -144,7 +144,7 @@ public class GameplayUtils {
 
         Suit leadSuit = trick.get(0).getCard().getSuit();
         Suit trumpSuit = game.getTrumpSuit();
-        BidType bidType = game.getTrumpType();
+        BidType bidType = game.getBidType();
 
         /* NO_TRUMP: highest lead suit wins */
         if (bidType == BidType.NO_TRUMP) {
@@ -212,7 +212,7 @@ public class GameplayUtils {
         game.getCurrentTrick().clear();
         game.setHighestBid(null);
         game.setWinningPlayerName(null);
-        game.setTrumpType(null);
+        game.setBidType(null);
         game.getTeamTrickCounts().clear();
         game.getDeck().resetJokerSuits();
         game.getFinalBidCache().clear();

@@ -26,7 +26,7 @@ public class GameState {
   private final List<InitialBid> bids;
   private int bidTurnIndex;
   private InitialBid highestBid;
-  private BidType trumpType;
+  private BidType bidType;
   private Map<PlayerPos, FinalBid> finalBidCache = new HashMap<>();
   private FinalBid winningBid;
   private String winningPlayerName;
@@ -172,12 +172,12 @@ public class GameState {
     }
 
     // Trump and Bid Info
-    public BidType getTrumpType() {
-        return trumpType;
+    public BidType getBidType() {
+        return bidType;
     }
 
-    public void setTrumpType(BidType trumpType) {
-        this.trumpType = trumpType;
+    public void setBidType(BidType bidType) {
+        this.bidType = bidType;
     }
 
     public Suit getTrumpSuit() {
@@ -186,14 +186,6 @@ public class GameState {
 
     public void setTrumpSuit(Suit trumpSuit) {
         this.trumpSuit = trumpSuit;
-    }
-
-    public BidType getBidType() {
-        return bidType;
-    }
-
-    public void setBidType(BidType bidType) {
-        this.bidType = bidType;
     }
 
     public PlayerPos getFirstBidder() {
