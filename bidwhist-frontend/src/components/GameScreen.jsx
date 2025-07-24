@@ -13,6 +13,7 @@ import { usePositionContext } from '../context/PositionContext.jsx';
 import { useUIDisplay } from '../context/UIDisplayContext.jsx';
 import { useZoneRefs } from '../context/RefContext.jsx';
 import { useAlert } from '../context/AlertContext.jsx';
+import { clearAllGameData } from '../utils/ClearData.js';
 
 /**
  * Main game interface layout and logic. Displays all player zones, trick piles, and
@@ -181,8 +182,27 @@ export default function GameScreen() {
 
         {/* Bottom row */}
         <div className="grid-item bottom-left">
-          <div className="placeholder-zone">Kitty & Discard</div>
+          {/* 🚨 TEMP: Clear All Game Data Button */}
+          <button
+            onClick={() => {
+              clearAllGameData();
+              window.location.reload(); // optional: force refresh or reroute
+            }}
+            style={{
+              marginTop: '8px',
+              padding: '4px 8px',
+              backgroundColor: '#d33',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              fontSize: '0.8rem',
+              cursor: 'pointer',
+            }}
+          >
+            Clear Game Data
+          </button>
         </div>
+
 
         <div className="grid-item bottom-center">
           <PlayerZone ref={southZoneRef} dropZoneRef={dropZoneRef} {...playerProps.south.props} />

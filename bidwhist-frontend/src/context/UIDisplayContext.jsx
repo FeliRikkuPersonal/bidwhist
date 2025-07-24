@@ -39,9 +39,15 @@ export function UIDisplayProvider({ children }) {
   const [showLobby, setShowLobby] = useLocalStorage('showLobby', false);
   const [teamATricks, setTeamATricks] = useLocalStorage('teamATricks', 0);
   const [teamBTricks, setTeamBTricks] = useLocalStorage('teamBTricks', 0);
+  const [animatedCards, setAnimatedCards] = useLocalStorage('animatedCards', []);
+    const [playedCardsByDirection, setPlayedCardsByDirection] = useLocalStorage('playedCardsByDirection', {
+      north: null,
+      south: null,
+      east: null,
+      west: null,
+    }); // Visual state of cards on table by direction
 
 
-  const [animatedCards, setAnimatedCards] = useState([]);
   const [animationQueue, setAnimationQueue] = useState([]);
   const [deckPosition, setDeckPosition] = useState({ x: 0, y: 0 });
   const [playedCard, setPlayedCard] = useState(null);
@@ -134,6 +140,8 @@ export function UIDisplayProvider({ children }) {
         setShowLobby,
         playedCard,
         setPlayedCard,
+        playedCardsByDirection,
+        setPlayedCardsByDirection,
         animationQueue,
         setAnimationQueue,
         teamATricks,

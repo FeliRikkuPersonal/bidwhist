@@ -25,7 +25,7 @@ export function clearCurrentGameData() {
     'kitty',
   ];
 
-  keysToClear.forEach(localStorage.removeItem);
+  keysToClear.forEach((key) => localStorage.removeItem(key));
   console.log('[🧹 Cleared current game session data]');
 }
 
@@ -63,6 +63,6 @@ export function clearAllGameData() {
     'activeGame',
   ];
 
-  keysToClear.forEach(localStorage.removeItem);
+  keysToClear.forEach((key) => localStorage.removeItem(key));
   console.log('[🧨 Cleared all game data]');
 }
