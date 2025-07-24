@@ -1,5 +1,5 @@
 // src/components/CardPlayZone.js
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
 import { useUIDisplay } from '../context/UIDisplayContext.jsx';
 import { useGameState } from '../context/GameStateContext.jsx';

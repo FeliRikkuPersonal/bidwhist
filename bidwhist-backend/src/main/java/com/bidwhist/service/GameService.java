@@ -18,6 +18,7 @@ import com.bidwhist.dto.PlayRequest;
 import com.bidwhist.dto.PlayerView;
 import com.bidwhist.dto.PollRequest;
 import com.bidwhist.dto.PopAnimationRequest;
+import com.bidwhist.dto.QuitGameRequest;
 import com.bidwhist.dto.StartGameRequest;
 import com.bidwhist.model.Book;
 import com.bidwhist.model.Card;
@@ -389,6 +390,7 @@ public class GameService {
     List<PlayedCard> currentTrick = game.getCurrentTrick();
     if (!currentTrick.isEmpty()) {
       Suit leadSuit = currentTrick.get(0).getCard().getSuit();
+      game.setLeadSuit(leadSuit);
       boolean hasLeadSuit = currentPlayer.getHand().getCards().stream().anyMatch(c -> c.getSuit() == leadSuit);
       if (hasLeadSuit && cardToPlay.getSuit() != leadSuit) {
         throw new IllegalArgumentException("Must follow suit if possible");
@@ -401,7 +403,7 @@ public class GameService {
     currentTrick.add(validPlayedCard);
     game.addPlayedCard(cardToPlay);
 
-    game.addAnimation(new Animation(validPlayedCard));
+    game.addAnimation(new Animation(validPlayedCard, game.getLeadSuit()));
     game.setCurrentTurnIndex((game.getCurrentTurnIndex() + 1) % 4);
 
     if (currentTrick.size() == 4) {
@@ -454,6 +456,18 @@ public class GameService {
     String animationId = request.getAnimationId();
 
     game.removeAnimationById(playerPosition, animationId);
+  }
+
+  /*
+   * Removes a person from a game.
+   */
+  public void quitMyGame(QuitGameRequest request) {
+    GameState game = getGameById(request.getGameId());
+    String player = PlayerUtils.getNameByPosition(request.getPlayer(), game.getPlayers());
+    if (request.getMode() == "multiplayer") {
+      game.addAnimation(new Animation(player));
+      games.remove(request.getGameId());
+    }
   }
 
   /*

@@ -19,7 +19,8 @@ public class KittyRequest {
 
   public KittyRequest() {}
 
-  public KittyRequest(PlayerPos player, List<Card> discards) {
+  public KittyRequest(String gameId, PlayerPos player, List<Card> discards) {
+    this.gameId = gameId;
     this.player = player;
     this.discards = discards;
   }

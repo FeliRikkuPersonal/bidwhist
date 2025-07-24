@@ -12,6 +12,7 @@ import com.bidwhist.dto.KittyRequest;
 import com.bidwhist.dto.PlayRequest;
 import com.bidwhist.dto.PollRequest;
 import com.bidwhist.dto.PopAnimationRequest;
+import com.bidwhist.dto.QuitGameRequest;
 import com.bidwhist.dto.StartGameRequest;
 import com.bidwhist.service.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,6 +72,12 @@ public class GameController {
   @PostMapping("/play")
   public GameStateResponse playTurn(@RequestBody PlayRequest request) {
     return gameService.playCard(request);
+  }
+
+  /* Ends game for single, leaves game for multiplayer */
+  @PostMapping("/quit")
+  public void quitGame(@RequestBody QuitGameRequest request) {
+    gameService.quitMyGame(request);
   }
 
   /* Removes the completed animation from the queue */

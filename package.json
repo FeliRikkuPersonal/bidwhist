@@ -7,7 +7,8 @@
         "build": "react-scripts build",
         "format:prettier": "npx prettier --write \"bidwhist-frontend/**/*.{js,jsx,ts,tsx,json,css,html}\"",
         "format:java": "java -jar google-java-format.jar --replace $(find bidwhist-backend -name '*.java')",
-        "format:all": "npm run format:prettier && npm run format:java"
+        "format:all": "npm run format:prettier && npm run format:java",
+        "test": "jest"
     },
     "dependencies": {
         "react": "^18.2.0",
@@ -18,5 +19,17 @@
         "prettier": "^3.6.2"
     },
     "keywords": [],
-    "license": "MIT"
+    "license": "MIT",
+    "jest": {
+        "reporters": [
+            "default",
+            [
+                "jest-html-reporter",
+                {
+                    "pageTitle": "Frontend Test Report",
+                    "outputPath": "reports/frontend-test-report.html"
+                }
+            ]
+        ]
+    }
 }

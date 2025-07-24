@@ -11,6 +11,11 @@ public class JoinGameRequest {
   private String playerName;
   private String gameId;
 
+  public JoinGameRequest(String playerName, String gameId) {
+    this.playerName = playerName;
+    this.gameId = gameId;
+  }
+
   public String getPlayerName() {
     return playerName;
   }

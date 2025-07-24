@@ -1,5 +1,7 @@
 // src/animations/DealAnimation.jsx
 
+import React from 'react';
+
 /**
  *
  * Animate dealing cards clockwise to each player.

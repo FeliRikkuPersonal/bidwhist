@@ -1,6 +1,6 @@
 // src/components/GameScreen.jsx
 
-import { useRef, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import '../css/GameScreen.css';
 import '../css/Card.css';
 import '../css/PlayerZone.css';

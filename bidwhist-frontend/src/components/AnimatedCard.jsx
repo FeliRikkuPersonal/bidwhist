@@ -1,6 +1,6 @@
 // src/components/AnimatedCard.jsx
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import '../css/Card.css';
 
 import { getCardImage } from '../utils/CardUtils';

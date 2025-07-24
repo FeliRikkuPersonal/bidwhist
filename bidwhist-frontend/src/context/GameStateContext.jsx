@@ -1,6 +1,7 @@
 // src/context/GameStateContext.js
 
-import { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState } from 'react';
+import { useLocalStorage } from '../hooks/useLocalStorage';
 
 const GameStateContext = createContext(null);
 
@@ -20,8 +21,12 @@ export const useGameState = () => useContext(GameStateContext);
  * @returns {JSX.Element} Provider with game state values
  */
 export const GameStateProvider = ({ children }) => {
+  const [kitty, setKitty] = useLocalStorage('kitty', []); // List<Card>
+  const [mode, setMode] = useLocalStorage('mode', 'single');
+  const [difficulty, setDifficulty] = useLocalStorage('difficulty', 'EASY');
+  const [activeGame, setActiveGame] = useLocalStorage('activeGame', false);
+
   const [players, setPlayers] = useState([]); // List<PlayerView>
-  const [kitty, setKitty] = useState([]); // List<Card>
   const [currentTurnIndex, setCurrentTurnIndex] = useState(0);
   const [phase, setPhase] = useState('START'); // GamePhase
   const [trumpSuit, setTrumpSuit] = useState(null); // Suit
@@ -35,17 +40,16 @@ export const GameStateProvider = ({ children }) => {
   const [bidWinnerPos, setBidWinnerPos] = useState(null);
   const [winningBid, setWinningBid] = useState(null);
   const [lobbySize, setLobbySize] = useState(0);
-  const [mode, setMode] = useState('single');
-  const [difficulty, setDifficulty] = useState('EASY');
   const [gameId, setGameId] = useState(null);
   const [currentTrick, setCurrentTrick] = useState([]); // List<Card>
+  const [leadSuit, setLeadSuit] = useState(null);
   const [completedTricks, setCompletedTricks] = useState([]); // List<Book>
   const [teamAScore, setTeamAScore] = useState(0);
   const [teamBScore, setTeamBScore] = useState(0);
   const [teamATricksWon, setTeamATricksWon] = useState(0);
   const [teamBTricksWon, setTeamBTricksWon] = useState(0);
   const [finalScore, setFinalScore] = useState(false);
-  const [activeGame, setActiveGame] = useState(false);
+
 
   /**
    * Updates game state from a backend response object.
@@ -146,6 +150,8 @@ export const GameStateProvider = ({ children }) => {
         currentTrick,
         setCurrentTrick,
         completedTricks,
+        leadSuit,
+        setLeadSuit,
         setCompletedTricks,
         teamAScore,
         setTeamAScore,

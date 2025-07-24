@@ -6,6 +6,7 @@ import com.bidwhist.model.Book;
 import com.bidwhist.model.Card;
 import com.bidwhist.model.PlayedCard;
 import com.bidwhist.model.PlayerPos;
+import com.bidwhist.model.Suit;
 import com.bidwhist.model.Team;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
@@ -27,16 +28,20 @@ public class Animation {
   @JsonProperty private Team winningTeam;
   @JsonProperty private List<PlayerView> playerViews;
   @JsonProperty private List<Card> kittyView;
+  @JsonProperty private Suit leadSuit;
+  @JsonProperty private String exitingPlayerName;
+  @JsonProperty private String message;
 
   public Animation() {}
 
   /*
    * Constructs a PLAY animation from a PlayedCard object.
    */
-  public Animation(PlayedCard playedCard) {
+  public Animation(PlayedCard playedCard, Suit leadSuit) {
     this.type = AnimationType.PLAY;
     this.card = playedCard.getCard();
     this.player = playedCard.getPlayer();
+    this.leadSuit = leadSuit;
   }
 
   /*
@@ -63,6 +68,15 @@ public class Animation {
     this.type = AnimationType.UPDATE_CARDS;
     this.playerViews = playerViews;
     this.kittyView = kittyView;
+  }
+
+  /*
+   * Constructs a QUIT_GAME animation.
+   */
+  public Animation(String playerName) {
+    this.type = AnimationType.QUIT_GAME;
+    this.exitingPlayerName = playerName;
+    this.message = playerName + " has left the game. Game Over.";
   }
 
   /*

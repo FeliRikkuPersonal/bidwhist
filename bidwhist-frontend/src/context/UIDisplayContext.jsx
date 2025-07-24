@@ -1,6 +1,8 @@
 // src/context/UIDisplayContext.jsx
 
-import { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState } from 'react';
+import { useLocalStorage } from '../hooks/useLocalStorage';
+import { useGameState } from './GameStateContext';
 
 export const UIDisplayContext = createContext(null);
 
@@ -15,41 +17,45 @@ export const UIDisplayContext = createContext(null);
  * @returns {JSX.Element} Context provider wrapping children
  */
 export function UIDisplayProvider({ children }) {
-  const [handMap, setHandMap] = useState({
+  const [handMap, setHandMap] = useLocalStorage('handMap', {
     north: [],
     south: [],
     east: [],
     west: [],
   });
 
-  const [showGameScreen, setShowGameScreen] = useState(false);
-  const [showAnimatedCards, setShowAnimatedCards] = useState(false);
-  const [deckPosition, setDeckPosition] = useState({ x: 0, y: 0 });
-  const [playedCardPosition, setPlayedCardPosition] = useState(null);
-  const [animatedCards, setAnimatedCards] = useState([]);
-  const [showShuffle, setShowShuffle] = useState(false);
-  const [showHands, setShowHands] = useState(false);
-  const [showBidding, setShowBidding] = useState(false);
-  const [bidPhase, setBidPhase] = useState(false);
-  const [kittyPhase, setKittyPhase] = useState(false);
-  const [showFinalizeBid, setShowFinalizeBid] = useState(false);
-  const [awardKitty, setAwardKitty] = useState(false);
-  const [myTurn, setMyTurn] = useState(false);
-  const [discardPile, setDiscardPile] = useState([]);
-  const [selectedCard, setSelectedCard] = useState([]);
-  const [loadGame, setLoadGame] = useState(false);
-  const [showLobby, setShowLobby] = useState(false);
-  const [playedCard, setPlayedCard] = useState(null);
-  const [animationQueue, setAnimationQueue] = useState([]);
-  const [teamATricks, setTeamATricks] = useState(0);
-  const [teamBTricks, setTeamBTricks] = useState(0);
+  const [showGameScreen, setShowGameScreen] = useLocalStorage('showGameScreen', false);
+  const [showAnimatedCards, setShowAnimatedCards] = useLocalStorage('showAnimatedCards', false);
+  const [playedCardPosition, setPlayedCardPosition] = useLocalStorage('playedCardPosition', null);
+  const [showShuffle, setShowShuffle] = useLocalStorage('showShuffle', false);
+  const [showHands, setShowHands] = useLocalStorage('showHands', false);
+  const [showBidding, setShowBidding] = useLocalStorage('showBidding', false);
+  const [bidPhase, setBidPhase] = useLocalStorage('bidPhase', false);
+  const [kittyPhase, setKittyPhase] = useLocalStorage('kittyPhase', false);
+  const [showFinalizeBid, setShowFinalizeBid] = useLocalStorage('showFinalizeBid', false);
+  const [awardKitty, setAwardKitty] = useLocalStorage('awardKitty', false);
+  const [discardPile, setDiscardPile] = useLocalStorage('discardPile', []);
+  const [loadGame, setLoadGame] = useLocalStorage('loadGame', false);
+  const [showLobby, setShowLobby] = useLocalStorage('showLobby', false);
+  const [teamATricks, setTeamATricks] = useLocalStorage('teamATricks', 0);
+  const [teamBTricks, setTeamBTricks] = useLocalStorage('teamBTricks', 0);
 
+
+  const [animatedCards, setAnimatedCards] = useState([]);
+  const [animationQueue, setAnimationQueue] = useState([]);
+  const [deckPosition, setDeckPosition] = useState({ x: 0, y: 0 });
+  const [playedCard, setPlayedCard] = useState(null);
+  const [selectedCard, setSelectedCard] = useState([]);
+  const [myTurn, setMyTurn] = useState(false);
+
+  const { setLeadSuit } = useGameState();
   /**
    * Updates the animation queue from a backend response.
    * Used during polling to prepare card animations.
    */
   const queueAnimationFromResponse = (response) => {
     if ('animationQueue' in response) setAnimationQueue(response.animationQueue);
+    if ('leadSuit' in response) setLeadSuit(response.leadSuit);
   };
 
   /**

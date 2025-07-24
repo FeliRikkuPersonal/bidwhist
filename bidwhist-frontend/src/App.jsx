@@ -1,6 +1,6 @@
 // src/App.jsx
 
-import { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import './css/index.css';
 import './css/Card.css';
 import './css/Animations.css';

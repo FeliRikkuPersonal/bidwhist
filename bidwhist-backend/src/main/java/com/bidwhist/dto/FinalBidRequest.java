@@ -19,6 +19,13 @@ public class FinalBidRequest {
 
   public FinalBidRequest() {}
 
+  public FinalBidRequest(String gameId, PlayerPos player, BidType bidtype, Suit suit) {
+    this.gameId = gameId;
+    this.player = player;
+    this.type = bidtype;
+    this.suit = suit;
+  }
+
   public PlayerPos getPlayer() {
     return player;
   }

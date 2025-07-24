@@ -35,10 +35,11 @@ public class GameState {
   private Difficulty difficulty;
   private GameRoom room;
   private Map<PlayerPos, List<Animation>> animationList = new EnumMap<>(PlayerPos.class);
-  private PlayerPos bidWinnderPos;
+  private PlayerPos bidWinnerPos;
 
   private List<PlayedCard> currentTrick = new ArrayList<>();
   private List<Book> completedTricks = new ArrayList<>();
+  private Suit leadSuit;
   private final List<Card> playedCards = new ArrayList<>();
   private int currentPlayerIndex;
 
@@ -232,11 +233,11 @@ public class GameState {
   }
 
   public PlayerPos getBidWinnerPos() {
-    return bidWinnderPos;
+    return bidWinnerPos;
   }
 
   public void setBidWinnerPos(PlayerPos winnerPos) {
-    this.bidWinnderPos = winnerPos;
+    this.bidWinnerPos = winnerPos;
   }
 
   public PlayerPos getWinningPlayerPos() {
@@ -271,6 +272,14 @@ public class GameState {
 
   public void setCurrentTrick(List<PlayedCard> currentTrick) {
     this.currentTrick = currentTrick;
+  }
+
+  public Suit getLeadSuit() {
+    return leadSuit;
+  }
+
+  public void setLeadSuit(Suit suit) {
+    this.leadSuit = suit;
   }
 
   public List<Book> getCompletedTricks() {

@@ -8,5 +8,6 @@ public enum AnimationType {
   COLLECT,
   CLEAR,
   UPDATE_CARDS,
-  SHOW_WINNER
+  SHOW_WINNER,
+  QUIT_GAME
 }

@@ -103,8 +103,6 @@ public class AIUtils {
      * Handles animations, trick resolution, and transitions to scoring or new hand.
      */
     public static void autoPlayAITurns(GameState game) {
-        boolean needNewHand;
-
         while (true) {
             Player current = game.getPlayers().get(game.getCurrentTurnIndex());
             if (!current.isAI()) {
@@ -126,7 +124,7 @@ public class AIUtils {
 
             game.getCurrentTrick().add(validPlayedCard);
 
-            game.addAnimation(new Animation(validPlayedCard));
+            game.addAnimation(new Animation(validPlayedCard, game.getLeadSuit()));
             game.setCurrentTurnIndex((game.getCurrentTurnIndex() + 1) % 4);
 
             if (game.getCurrentTrick().size() == 4) {
@@ -208,6 +206,7 @@ public class AIUtils {
             }
 
             Suit leadSuit = currentTrick.get(0).getCard() != null ? currentTrick.get(0).getCard().getSuit() : null;
+            game.setLeadSuit(leadSuit);
             List<Card> sameSuit = hand.stream()
                     .filter(c -> c.getSuit() != null && c.getSuit().equals(leadSuit))
                     .collect(Collectors.toList());
@@ -230,6 +229,7 @@ public class AIUtils {
                     : (currentTrick.get(0).getCard() != null
                             ? currentTrick.get(0).getCard().getSuit()
                             : null);
+            game.setLeadSuit(leadSuit);
             PlayedCard winningCard = trickIndex > 0 ? GameplayUtils.getWinningCard(currentTrick, trumpSuit) : null;
             Card currentWinning = winningCard != null ? winningCard.getCard() : null;
 
