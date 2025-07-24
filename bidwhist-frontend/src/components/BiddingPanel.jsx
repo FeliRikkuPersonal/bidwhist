@@ -4,7 +4,7 @@ import '../css/BiddingPanel.css';
 import '../css/index.css';
 import '../css/GameScreen.css';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePositionContext } from '../context/PositionContext.jsx';
 import { useGameState } from '../context/GameStateContext.jsx';
 import { useUIDisplay } from '../context/UIDisplayContext.jsx';

@@ -1,6 +1,6 @@
 // src/components/BidZone.jsx
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useGameState } from '../context/GameStateContext.jsx';
 import { useUIDisplay } from '../context/UIDisplayContext.jsx';
 

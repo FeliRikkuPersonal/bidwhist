@@ -1,6 +1,6 @@
 // src/components/FinalScorePanel.jsx
 
-import '../FinalScorePanel.css';
+import React from 'react';
 import { useGameState } from '../context/GameStateContext';
 
 /**

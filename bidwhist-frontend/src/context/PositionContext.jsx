@@ -1,7 +1,8 @@
 // src/context/PositionContext.jsx
 
-import { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { useGameState } from './GameStateContext';
+import { useLocalStorage } from '../hooks/useLocalStorage';
 
 export const PositionContext = createContext(null);
 
@@ -14,10 +15,10 @@ export const PositionContext = createContext(null);
  * @returns {JSX.Element} Context provider for player positioning and mapping
  */
 export function PositionProvider({ children }) {
-  const [playerName, setPlayerName] = useState(null);
-  const [viewerPosition, setViewerPosition] = useState(null);
-  const [viewerTeam, setViewerTeam] = useState(null);
-  const [backendPositions, setBackendPositions] = useState({}); // backend position → name
+  const [playerName, setPlayerName] = useLocalStorage('playerName', null);
+  const [viewerPosition, setViewerPosition] = useLocalStorage('viewerPosition', null);
+  const [viewerTeam, setViewerTeam] = useLocalStorage('viewerTeam', null);
+  const [backendPositions, setBackendPositions] = useLocalStorage('backendPositions', {}); // backend position → name
 
   const viewerDirection = 'south'; // always fixed as the local user's direction
 

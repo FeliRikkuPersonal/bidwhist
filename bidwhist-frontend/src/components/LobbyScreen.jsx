@@ -1,5 +1,6 @@
 // src/components/LobbyScreen.jsx
 
+import React from 'react';
 import { useGameState } from '../context/GameStateContext';
 
 /**

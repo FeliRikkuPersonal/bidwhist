@@ -1,5 +1,5 @@
 // src/components/CardPlayZone.js
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
 import { useUIDisplay } from '../context/UIDisplayContext.jsx';
 import { useGameState } from '../context/GameStateContext.jsx';
@@ -38,6 +38,8 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
     setDeckPosition,
     setPlayedCard,
     setPlayedCardPosition,
+    playedCardsByDirection,
+    setPlayedCardsByDirection,
     animatedCards,
     setAnimatedCards,
     showAnimatedCards,
@@ -67,13 +69,6 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
   const [lastAnimation, setLastAnimation] = useState(null); // Prevents duplicate animation runs
   const [playAnimations, setPlayAnimations] = useState([]); // Currently running card play animations
   const [playedCardPosition, setPlayedCardPositions] = useState({}); // Positional cache of dropped cards
-  const [playedCardsByDirection, setPlayedCardsByDirection] = useState({
-    north: null,
-    south: null,
-    east: null,
-    west: null,
-  }); // Visual state of cards on table by direction
-
 
   const localRef = useRef(); // Main container ref for sizing/layout
   const { register, get } = useZoneRefs(); // Shared card zone registry
@@ -251,6 +246,11 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
         // TODO: implement winner reveal animation or panel
       }
 
+      /* === QUIT_GAME animation: (not implemented yet) === */
+      if (animation.type === 'QUIT_GAME') {
+        // TODO: implement winner reveal animation or panel
+      }
+
       /* Notify backend that the animation has finished */
       await fetch(`${API}/game/pop-animation`, {
         method: 'POST',
@@ -316,7 +316,7 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
     const iWonBid = bidWinnerPos === viewerPosition;
     console.log(`Winner Positions: ${bidWinnerPos} Player Position ${viewerPosition}`);
     setShowFinalizeBid(bidsComplete && iWonBid);
-  }, [bids, winningPlayerName, playerName]);
+  }, [bids, winningPlayerName, bidWinnerPos, playerName]);
 
   /* handleDrop: Processes a card being dropped into play by the player */
   const handleDrop = async (e) => {

@@ -3,7 +3,7 @@
 import '../css/BiddingPanel.css';
 import '../css/index.css';
 import '../css/GameScreen.css';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { usePositionContext } from '../context/PositionContext.jsx';
 import { useGameState } from '../context/GameStateContext.jsx';
 import { useUIDisplay } from '../context/UIDisplayContext.jsx';
@@ -29,7 +29,7 @@ export default function BidTypePanel({ closeBidTypePanel }) {
     setWinningPlayerName,
   } = useGameState();
 
-  const { showFinalizeBid, setAwardKitty } = useUIDisplay();
+  const { showFinalizeBid, setShowFinalizeBid, setAwardKitty } = useUIDisplay();
 
   const [direction, setDirection] = useState('UPTOWN');
   const [suit, setSuit] = useState('HEARTS');
@@ -74,6 +74,7 @@ export default function BidTypePanel({ closeBidTypePanel }) {
         setBids([]);
         setAwardKitty(true);
         closeBidTypePanel?.();
+        setShowFinalizeBid(false);
       } else {
         console.error('Finalize Bid failed:', data);
       }

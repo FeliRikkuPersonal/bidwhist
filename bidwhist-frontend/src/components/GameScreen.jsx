@@ -1,6 +1,6 @@
 // src/components/GameScreen.jsx
 
-import { useRef, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import '../css/GameScreen.css';
 import '../css/Card.css';
 import '../css/PlayerZone.css';
@@ -13,6 +13,7 @@ import { usePositionContext } from '../context/PositionContext.jsx';
 import { useUIDisplay } from '../context/UIDisplayContext.jsx';
 import { useZoneRefs } from '../context/RefContext.jsx';
 import { useAlert } from '../context/AlertContext.jsx';
+import { clearAllGameData } from '../utils/ClearData.js';
 
 /**
  * Main game interface layout and logic. Displays all player zones, trick piles, and
@@ -182,7 +183,26 @@ export default function GameScreen() {
         <div className="grid-item bottom-left">
           {awardKitty && <p className='discard-text'>Select 6 cards to discard</p>}
       
+          <button
+            onClick={() => {
+              clearAllGameData();
+              window.location.reload(); // optional: force refresh or reroute
+            }}
+            style={{
+              marginTop: '8px',
+              padding: '4px 8px',
+              backgroundColor: '#d33',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              fontSize: '0.8rem',
+              cursor: 'pointer',
+            }}
+          >
+            Clear Game Data
+          </button>
         </div>
+
 
         <div className="grid-item bottom-center">
           <PlayerZone ref={southZoneRef} dropZoneRef={dropZoneRef} {...playerProps.south.props} />

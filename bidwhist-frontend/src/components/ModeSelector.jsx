@@ -1,7 +1,7 @@
 // src/components/ModeSelector.jsx
 
 import '../css/ModeSelector.css';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useGameState } from '../context/GameStateContext';
 import { usePositionContext } from '../context/PositionContext';
 
@@ -32,6 +32,7 @@ function ModeSelector({ onStartGame }) {
 
     const code = Math.random().toString(36).substring(2, 8).toUpperCase();
     setPlayerName(trimmedName);
+    setMode('single');
     setGameId(code);
     onStartGame(trimmedName, difficulty, code);
   };

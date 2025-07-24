@@ -1,6 +1,6 @@
 // src/components/Scoreboard.jsx
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useGameState } from '../context/GameStateContext.jsx';
 import { usePositionContext } from '../context/PositionContext.jsx';
 import BidZone from './BidZone.jsx';

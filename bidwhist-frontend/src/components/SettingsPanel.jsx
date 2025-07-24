@@ -1,5 +1,7 @@
 // src/components/SettingsPanel.jsx
 
+import React from 'react';
+
 /**
  * A simple UI panel for applying or closing game settings.
  *
