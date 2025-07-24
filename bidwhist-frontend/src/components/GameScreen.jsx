@@ -21,6 +21,7 @@ import { useAlert } from '../context/AlertContext.jsx';
  * @returns {JSX.Element} The full game screen layout
  */
 export default function GameScreen() {
+  const API = import.meta.env.VITE_API_URL;
   const { gameId, updateFromResponse, players } = useGameState();
   const { positionToDirection, viewerPosition } = usePositionContext();
 
@@ -105,7 +106,6 @@ export default function GameScreen() {
       discards: discardPile,
     };
 
-    const API = import.meta.env.VITE_API_URL;
 
     try {
       const res = await fetch(`${API}/game/kitty`, {
@@ -134,7 +134,6 @@ export default function GameScreen() {
   return (
     <div className="game-screen-container">
       <div className="game-grid">
-        {/* Top row */}
         <div className="grid-item top-left">
           <div className="placeholder-zone" ref={theirTrickRef}>
             {[...Array(teamBTricks)].map((_, i) => (
@@ -181,16 +180,13 @@ export default function GameScreen() {
 
         {/* Bottom row */}
         <div className="grid-item bottom-left">
-          <div className="placeholder-zone">Kitty & Discard</div>
+          {awardKitty && <p className='discard-text'>Select 6 cards to discard</p>}
+      
         </div>
 
         <div className="grid-item bottom-center">
           <PlayerZone ref={southZoneRef} dropZoneRef={dropZoneRef} {...playerProps.south.props} />
-          {awardKitty && (
-            <button className="index-button settings-button" onClick={discard}>
-              Submit
-            </button>
-          )}
+          
         </div>
 
         <div className="grid-item bottom-right">
@@ -208,8 +204,17 @@ export default function GameScreen() {
                   transform: 'translateY(-50%)',
                   zIndex: i,
                 }}
+                
               />
+              
             ))}
+            {awardKitty && (
+
+            <button className="index-button settings-button" onClick={discard}>
+  Submit
+            </button>
+
+        )}
           </div>
         </div>
       </div>

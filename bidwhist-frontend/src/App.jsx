@@ -232,7 +232,7 @@ function App() {
           />
         )}
       </div>
-      <div className="scoreboard-wrapper">{activeGame && <Scoreboard bidType={bidType} />}</div>
+      <div className="scoreboard-wrapper">{activeGame && <Scoreboard bidType={bidType} phase={phase}/>}</div>
     </div>
   );
 }

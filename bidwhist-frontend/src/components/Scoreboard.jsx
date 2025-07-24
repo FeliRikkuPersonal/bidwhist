@@ -13,7 +13,7 @@ import '../css/ScoreBoard.css';
  * @param {string} bidType - The type of bidding phase (used to show BidZone)
  * @returns {JSX.Element} Scoreboard UI
  */
-export default function Scoreboard({ bidType }) {
+export default function Scoreboard({ bidType,phase }) {
   const { teamAScore, teamBScore, winningBid } = useGameState();
   const { viewerPosition, playerTeam } = usePositionContext();
 
@@ -67,6 +67,7 @@ export default function Scoreboard({ bidType }) {
         )}
       </div>
       {bidType && <BidZone />}
+      {String(phase[0]).toUpperCase() + String(phase).slice(1).toLowerCase() + " " + "Phase"}
     </div>
   );
 }
