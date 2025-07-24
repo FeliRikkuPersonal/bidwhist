@@ -2,16 +2,27 @@
 
 package com.bidwhist.utils;
 
-import com.bidwhist.bidding.BidType;
-import com.bidwhist.bidding.FinalBid;
-import com.bidwhist.bidding.InitialBid;
-import com.bidwhist.model.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.*;
-
-import static org.junit.jupiter.api.Assertions.*;
+import com.bidwhist.bidding.BidType;
+import com.bidwhist.bidding.FinalBid;
+import com.bidwhist.bidding.InitialBid;
+import com.bidwhist.model.Card;
+import com.bidwhist.model.GamePhase;
+import com.bidwhist.model.GameState;
+import com.bidwhist.model.PlayedCard;
+import com.bidwhist.model.Player;
+import com.bidwhist.model.PlayerPos;
+import com.bidwhist.model.Rank;
+import com.bidwhist.model.Suit;
+import com.bidwhist.model.Team;
 
 class GameplayUtilsTest {
 
@@ -31,7 +42,7 @@ class GameplayUtilsTest {
             game.addPlayer(player);
         }
         game.setTrumpSuit(Suit.HEARTS);
-        game.setTrumpType(BidType.UPTOWN);
+        game.setBidType(BidType.UPTOWN);
         game.setPhase(GamePhase.SHUFFLE);
     }
 
@@ -49,7 +60,7 @@ class GameplayUtilsTest {
 
     @Test
     void testDetermineTrickWinner_uptownPrefersTrump() {
-        game.setTrumpType(BidType.UPTOWN);
+        game.setBidType(BidType.UPTOWN);
         List<PlayedCard> trick = List.of(
                 new PlayedCard(PlayerPos.P1, new Card(Suit.SPADES, Rank.FOUR)),
                 new PlayedCard(PlayerPos.P2, new Card(Suit.HEARTS, Rank.THREE)),
@@ -62,7 +73,7 @@ class GameplayUtilsTest {
 
     @Test
     void testDetermineTrickWinner_downtownInvertsRanks() {
-        game.setTrumpType(BidType.DOWNTOWN);
+        game.setBidType(BidType.DOWNTOWN);
         List<PlayedCard> trick = List.of(
                 new PlayedCard(PlayerPos.P1, new Card(Suit.SPADES, Rank.TWO)),
                 new PlayedCard(PlayerPos.P2, new Card(Suit.SPADES, Rank.THREE)),
@@ -75,7 +86,7 @@ class GameplayUtilsTest {
 
     @Test
     void testDetermineTrickWinner_noTrumpLeadSuitWins() {
-        game.setTrumpType(BidType.NO_TRUMP);
+        game.setBidType(BidType.NO_TRUMP);
         game.setTrumpSuit(null);
 
         List<PlayedCard> trick = List.of(

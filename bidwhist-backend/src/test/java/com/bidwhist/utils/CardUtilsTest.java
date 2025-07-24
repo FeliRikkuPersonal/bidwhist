@@ -2,15 +2,16 @@
 
 package com.bidwhist.utils;
 
-import com.bidwhist.model.Card;
-import com.bidwhist.model.Rank;
-import com.bidwhist.model.Suit;
-import org.junit.jupiter.api.Test;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
+
+import com.bidwhist.model.Card;
+import com.bidwhist.model.Rank;
+import com.bidwhist.model.Suit;
 
 class CardUtilsTest {
 
@@ -67,7 +68,7 @@ class CardUtilsTest {
                 new Card(Suit.SPADES, Rank.JOKER_B)
         );
 
-        boolean result = CardUtils.allHigherTrumpCardsPlayed(candidate, played, Suit.SPADES);
+        boolean result = CardUtils.allHigherTrumpCardsPlayed(candidate, played, Suit.SPADES, false);
         assertTrue(result);
     }
 
@@ -79,7 +80,7 @@ class CardUtilsTest {
                 new Card(Suit.SPADES, Rank.KING) // missing ACE, JOKER_S, JOKER_B
         );
 
-        boolean result = CardUtils.allHigherTrumpCardsPlayed(candidate, played, Suit.SPADES);
+        boolean result = CardUtils.allHigherTrumpCardsPlayed(candidate, played, Suit.SPADES, false);
         assertFalse(result);
     }
 
@@ -92,15 +93,15 @@ class CardUtilsTest {
                 new Card(Suit.HEARTS, Rank.ACE)
         );
 
-        boolean result = CardUtils.allHigherTrumpCardsPlayed(candidate, played, Suit.SPADES);
+        boolean result = CardUtils.allHigherTrumpCardsPlayed(candidate, played, Suit.SPADES, false);
         assertFalse(result);
     }
 
     @Test
     void testAllHigherTrumpCardsPlayed_false_onNullInput() {
         List<Card> played = new ArrayList<>();
-        assertFalse(CardUtils.allHigherTrumpCardsPlayed(null, List.of(), Suit.SPADES));
-        assertFalse(CardUtils.allHigherTrumpCardsPlayed(new Card(Suit.SPADES, Rank.JACK), played, Suit.SPADES));
-        assertFalse(CardUtils.allHigherTrumpCardsPlayed(new Card(Suit.SPADES, Rank.TEN), List.of(), null));
+        assertFalse(CardUtils.allHigherTrumpCardsPlayed(null, List.of(), Suit.SPADES,false));
+        assertFalse(CardUtils.allHigherTrumpCardsPlayed(new Card(Suit.SPADES, Rank.JACK), played, Suit.SPADES,false));
+        assertFalse(CardUtils.allHigherTrumpCardsPlayed(new Card(Suit.SPADES, Rank.TEN), List.of(), null,false));
     }
 }
