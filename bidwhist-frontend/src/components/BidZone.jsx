@@ -1,49 +1,28 @@
-// src/components/BidZone.jsx
-
-import React, { useEffect, useState } from 'react';
-import { useGameState } from '../context/GameStateContext.jsx';
-import { useUIDisplay } from '../context/UIDisplayContext.jsx';
-
+import React from 'react';
 import '../css/BidZone.css';
 
-export default function BidZone() {
-  const { phase, bids } = useGameState();
-  const { bidPhase, kittyPhase, setKittyPhase } = useUIDisplay();
+/**
+ * BidZone displays all player bids if the phase is BIDDING or KITTY.
+ */
+export default function BidZone({ phase, bids }) {
+  const showPlayerBids = phase === 'BIDDING' || phase === 'KITTY';
 
-  const [showPlayerBids, setShowPlayerBids] = useState(false);
-
-  /*
-   * formatBid: Returns a human-readable string based on the player's bid.
-   * If the player passed, shows "X passes". If they made a bid, shows the amount and optional "No".
-   */
   function formatBid(bid) {
     if (bid.passed) return `${bid.player} passes`;
     return `${bid.player} bids ${bid.value}${bid.isNo ? ' No' : ''}`;
   }
 
-  /*
-   * useEffect: Controls when the bid history becomes visible.
-   * Shows player bids if the game is in the bid or kitty phase.
-   * Also triggers a side effect to mark the UI as in "kitty phase" if relevant.
-   */
-  useEffect(() => {
-    setKittyPhase(phase === 'KITTY');
-    setShowPlayerBids(bidPhase || kittyPhase);
-  }, [phase, bidPhase, kittyPhase]);
-
-  /*
-   * JSX: Displays the bid zone when active.
-   * Shows all recorded bids in a scrollable section.
-   */
   return (
     <div className="bid-zone">
       {showPlayerBids && (
         <div className="player-bids">
-          <h4>Player Bids</h4>
+          <p className="player-bid-header">Player Bids</p>
           <div className="bidding-history">
-            {bids?.map((bid, index) => (
-              <div key={index}>{formatBid(bid)}</div>
-            ))}
+            {bids && bids.length > 0 ? (
+              bids.map((bid, index) => <div key={index}>{formatBid(bid)}</div>)
+            ) : (
+              <p>No bids yet.</p>
+            )}
           </div>
         </div>
       )}

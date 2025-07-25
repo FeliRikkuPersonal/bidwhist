@@ -1,5 +1,3 @@
-// src/components/Scoreboard.jsx
-
 import React, { useState, useEffect } from 'react';
 import { useGameState } from '../context/GameStateContext.jsx';
 import { usePositionContext } from '../context/PositionContext.jsx';
@@ -8,12 +6,8 @@ import '../css/ScoreBoard.css';
 
 /**
  * Displays the score for both teams and the current winning bid.
- * Also conditionally renders the BidZone if a bidType is active.
- *
- * @param {string} bidType - The type of bidding phase (used to show BidZone)
- * @returns {JSX.Element} Scoreboard UI
  */
-export default function Scoreboard({ bidType }) {
+export default function Scoreboard({ activeGame, phase, bids, bidType }) {
   const { teamAScore, teamBScore, winningBid } = useGameState();
   const { viewerPosition, playerTeam } = usePositionContext();
 
@@ -21,10 +15,6 @@ export default function Scoreboard({ bidType }) {
   const [theirTeam, setTheirTeam] = useState(0);
   const [formattedBid, setFormattedBid] = useState('');
 
-  /**
-   * Determine which team the viewer is on based on their position.
-   * P1/P3 are always Team A; P2/P4 are Team B.
-   */
   useEffect(() => {
     if (viewerPosition === 'P1' || viewerPosition === 'P3') {
       setMyTeam(teamAScore);
@@ -35,38 +25,49 @@ export default function Scoreboard({ bidType }) {
     }
   }, [viewerPosition, teamAScore, teamBScore]);
 
-  /**
-   * Builds a readable version of the winning bid for display.
-   */
   useEffect(() => {
     if (winningBid) {
-      const isNo = winningBid.isNo ? '-No' : '';
-      const suit = winningBid.suit ?? '';
-      const type = winningBid.type ?? '';
-      const value = winningBid.value ?? '';
+      const isNo = winningBid.isNo ? 'No' : '';
+      const bidString = `${winningBid.value} ${isNo} ${winningBid.type} ${winningBid.suit}`.trim();
       const team = playerTeam[winningBid.player];
-
-      setFormattedBid(`Team ${team} / ${value}${isNo} ${type} ${suit}`.trim());
+      setFormattedBid({ bidString, team });
     } else {
       setFormattedBid('');
     }
-  }, [winningBid]);
+  }, [winningBid, playerTeam]);
 
   return (
     <div className="scoreboard">
-      <div className="scoreboard-content">
-        <p className="score-headers">Team</p>
-        <p className="score-value">{myTeam}</p>
-        <p className="score-headers">Opponents</p>
-        <p className="score-value">{theirTeam}</p>
-        {formattedBid && (
-          <>
-            <p className="score-headers">Winning Bid</p>
-            <p className="score-value">{formattedBid}</p>
-          </>
-        )}
-      </div>
-      {bidType && <BidZone />}
+      {activeGame && (
+        <>
+          <div className="scoreboard-content left-content">
+            <p className="team-name">Team A</p>
+            <p className="score-value">{myTeam}</p>
+          </div>
+
+          <div className="center-content">
+            {formattedBid ? (
+              <div className="winning-bid">
+                <p className="score-headers">Winning Bid</p>
+                <p className="winning-team-name">Team {formattedBid.team}</p>
+                <p className="wining-bid-value">{formattedBid.bidString}</p>
+              </div>
+            ) : (
+              <>
+                <BidZone phase={phase} bids={bids} />
+              </>
+            )}
+            <div className="phase-indicator">
+              <p className="phase-text">{phase[0] + phase.slice(1).toLowerCase()} Phase</p>
+            </div>
+          </div>
+
+          <div className="scoreboard-content right-content">
+            <p className="team-name">Team B</p>
+            <p className="score-value">{theirTeam}</p>
+          </div>
+        </>
+      )}
     </div>
   );
 }

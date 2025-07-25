@@ -21,7 +21,7 @@ import handleQuit from '../utils/handleQuit.js';
  *
  * @returns {JSX.Element} The full game screen layout
  */
-export default function GameScreen({bidType}) {
+export default function GameScreen({ bidType }) {
   const { gameId, updateFromResponse, players } = useGameState();
   const { positionToDirection, viewerPosition } = usePositionContext();
 
@@ -160,8 +160,12 @@ export default function GameScreen({bidType}) {
           <PlayerZone {...playerProps.north.props} />
         </div>
 
-        <div className="grid-item top-right" >
-        {bidType &&<button className="index-button quit-button" onClick={handleQuit}>Quit</button>}
+        <div className="grid-item top-right">
+          {bidType && (
+            <button className="index-button quit-button" onClick={handleQuit}>
+              Quit
+            </button>
+          )}
         </div>
 
         {/* Middle row */}
@@ -183,21 +187,18 @@ export default function GameScreen({bidType}) {
         </div>
 
         {/* Bottom row */}
-        <div className="grid-item bottom-left">
-        
-        </div>
-
+        <div className="grid-item bottom-left">{awardKitty && 'Select 6 cards to discard'}</div>
 
         <div className="grid-item bottom-center">
           <PlayerZone ref={southZoneRef} dropZoneRef={dropZoneRef} {...playerProps.south.props} />
+        </div>
+
+        <div className="grid-item bottom-right">
           {awardKitty && (
             <button className="index-button settings-button" onClick={discard}>
               Submit
             </button>
           )}
-        </div>
-
-        <div className="grid-item bottom-right">
           <div className="placeholder-zone" ref={yourTrickRef}>
             {[...Array(teamATricks)].map((_, i) => (
               <img

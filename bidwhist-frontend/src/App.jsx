@@ -36,6 +36,7 @@ function App() {
     activeGame,
     setActiveGame,
     bidType,
+    bids,
   } = useGameState();
 
   const {
@@ -219,9 +220,13 @@ function App() {
    */
   return (
     <div className="index-wrapper">
+      <div className="scoreboard-wrapper">
+        <Scoreboard activeGame={activeGame} phase={phase} bidType={bidType} bids={bids} />
+      </div>
+
       <div className="index-container">
         {loadGame ? (
-          <GameScreen bidType={bidType}/>
+          <GameScreen bidType={bidType} />
         ) : showLobby ? (
           <LobbyScreen gameId={gameId} playerName={playerName} />
         ) : (
@@ -232,7 +237,6 @@ function App() {
           />
         )}
       </div>
-      <div className="scoreboard-wrapper">{activeGame && <Scoreboard bidType={bidType} />}</div>
     </div>
   );
 }

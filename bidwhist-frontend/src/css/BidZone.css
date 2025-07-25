@@ -1,4 +1,7 @@
 .bid-zone {
-  justify-content: center;
-  align-items: center;
+  text-align: center;
+}
+
+.player-bid-header {
+  text-decoration: underline;
 }
