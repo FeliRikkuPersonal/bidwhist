@@ -11,6 +11,8 @@ import LobbyScreen from './components/LobbyScreen.jsx';
 import { useUIDisplay } from './context/UIDisplayContext.jsx';
 import { useGameState } from './context/GameStateContext.jsx';
 import { usePositionContext } from './context/PositionContext.jsx';
+import { useAlert } from './context/AlertContext.jsx';
+import { useThrowAlert } from './hooks/useThrowAlert.js';
 
 /*
  * Includes handling game start, updating game state from the backend, and rendering
@@ -60,6 +62,9 @@ function App() {
     queueAnimationFromResponse,
   } = useUIDisplay();
 
+  const throwAlert = useThrowAlert();
+  const { showAlert } = useAlert();
+
   const API = import.meta.env.VITE_API_URL;
 
   /*
@@ -70,6 +75,7 @@ function App() {
     async (name, difficulty, code) => {
       const trimmedName = name.trim();
       if (!trimmedName) {
+        showAlert('Cannot start game with empty name.')
         console.warn('[App] Name is empty after trimming. Aborting start.');
         return;
       }
@@ -89,6 +95,7 @@ function App() {
         const data = await res.json();
 
         if (!res.ok || !data.players || !data.playerPosition) {
+          throwAlert(data, 'error');
           console.error('[App] Invalid start response:', data);
           return;
         }

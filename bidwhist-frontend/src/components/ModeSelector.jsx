@@ -5,6 +5,8 @@ import React, { useState } from 'react';
 import { useGameState } from '../context/GameStateContext';
 import { usePositionContext } from '../context/PositionContext';
 import { clearAllGameData } from '../utils/ClearData';
+import { useAlert } from '../context/AlertContext';
+import { useThrowAlert } from '../hooks/useThrowAlert';
 
 /**
  * ModeSelector allows the user to:
@@ -19,6 +21,8 @@ import { clearAllGameData } from '../utils/ClearData';
 function ModeSelector({ onStartGame }) {
   const { setGameId, mode, setMode, difficulty, setDifficulty } = useGameState();
   const { setPlayerName } = usePositionContext();
+  const { showAlert } = useAlert();
+  const throwAlert = useThrowAlert();
 
   const [newPlayerName, setNewPlayerName] = useState('');
   const [lobbyCode, setLobbyCode] = useState('');
@@ -29,7 +33,10 @@ function ModeSelector({ onStartGame }) {
    */
   const handleStart = () => {
     const trimmedName = newPlayerName.trim();
-    if (!trimmedName) return;
+    if (!trimmedName) {
+      showAlert('Cannot start game with empty name.')
+      return;
+    }
 
     const code = Math.random().toString(36).substring(2, 8).toUpperCase();
     clearAllGameData()
@@ -64,7 +71,9 @@ function ModeSelector({ onStartGame }) {
       if (res.ok) {
         console.log('Joined game:', data);
         setMode('multiplayer');
+        setViewerPosition(data.playerPosition);
       } else {
+        throwAlert(data, 'error');
         console.error('Failed to join game:', data);
       }
     } catch (err) {
@@ -98,7 +107,9 @@ function ModeSelector({ onStartGame }) {
       if (res.ok) {
         console.log('✅ Game created:', data);
         setMode('multiplayer');
+        setViewerPosition(data.playerPosition);
       } else {
+        throwAlert(data, 'error');
         console.error('Failed to create game:', data);
       }
     } catch (err) {

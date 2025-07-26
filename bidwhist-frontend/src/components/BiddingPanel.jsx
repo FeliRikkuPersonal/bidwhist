@@ -8,6 +8,7 @@ import React, { useState, useEffect } from 'react';
 import { usePositionContext } from '../context/PositionContext.jsx';
 import { useGameState } from '../context/GameStateContext.jsx';
 import { useUIDisplay } from '../context/UIDisplayContext.jsx';
+import { useThrowAlert } from '../hooks/useThrowAlert.js';
 import handleQuit from '../utils/handleQuit.js';
 
 /*
@@ -39,6 +40,7 @@ export default function BiddingPanel({ closeBidding, onBidPlaced }) {
     setShowFinalizeBid,
   } = useUIDisplay();
 
+  const throwAlert = useThrowAlert();
   const [bidValue, setBidValue] = useState('');
   const [isNo, setIsNo] = useState(false);
 
@@ -68,6 +70,7 @@ export default function BiddingPanel({ closeBidding, onBidPlaced }) {
       setCurrentTurnIndex(bidData.currentTurnIndex);
       closeBidding();
     } else {
+      throwAlert(bidData, 'warning')
       console.error('Bid failed:', bidData);
     }
   };

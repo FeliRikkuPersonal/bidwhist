@@ -5,6 +5,7 @@ import { useUIDisplay } from '../context/UIDisplayContext.jsx';
 import { useGameState } from '../context/GameStateContext.jsx';
 import { usePositionContext } from '../context/PositionContext.jsx';
 import { useZoneRefs } from '../context/RefContext';
+import { useThrowAlert } from '../hooks/useThrowAlert.js';
 
 import AnimatedCard from './AnimatedCard';
 import PlayCardAnimation from '../animations/PlayCardAnimation.jsx';
@@ -64,12 +65,12 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
   const { gameId, players, setKitty, bids, winningPlayerName, setWinningBid, bidWinnerPos } =
     useGameState();
 
-
   const [isOver, setIsOver] = useState(false); // Tracks if drag is over drop zone
   const [lastAnimation, setLastAnimation] = useState(null); // Prevents duplicate animation runs
   const [playAnimations, setPlayAnimations] = useState([]); // Currently running card play animations
   const [playedCardPosition, setPlayedCardPositions] = useState({}); // Positional cache of dropped cards
 
+  const throwAlert = useThrowAlert();
   const localRef = useRef(); // Main container ref for sizing/layout
   const { register, get } = useZoneRefs(); // Shared card zone registry
   const API = import.meta.env.VITE_API_URL; // Server endpoint
@@ -225,6 +226,7 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
 
           const data = await res.json();
           if (!res.ok || !data.players || !data.kitty) {
+            throwAlert(data, 'warninge');
             console.error('[CardPlayZone] Invalid update response:', data);
             return;
           }
@@ -252,7 +254,7 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
       }
 
       /* Notify backend that the animation has finished */
-      await fetch(`${API}/game/pop-animation`, {
+      const res2 = await fetch(`${API}/game/pop-animation`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -261,6 +263,10 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
           animationId: animation.id,
         }),
       });
+      const data = await res2.json();
+      if (!res2.ok) {
+        throwAlert(data, 'error');
+      }
     };
 
     runAnimation();
@@ -325,11 +331,18 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
     if (!rawData || !isOver) return;
     const card = JSON.parse(rawData);
 
-    await fetch(`${API}/game/play`, {
+    const res3 = await fetch(`${API}/game/play`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ gameId, player: viewerPosition, card }),
     });
+
+    const data = await res3.json();
+
+    if (!res3.ok) {
+      throwAlert(data, 'info');
+      return;
+    }
 
     if (positionToDirection[viewerPosition] === 'south') {
       setPlayedCard(card);

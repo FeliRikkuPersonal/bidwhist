@@ -13,6 +13,7 @@ import { usePositionContext } from '../context/PositionContext.jsx';
 import { useUIDisplay } from '../context/UIDisplayContext.jsx';
 import { useZoneRefs } from '../context/RefContext.jsx';
 import { useAlert } from '../context/AlertContext.jsx';
+import { useThrowAlert } from '../hooks/useThrowAlert.js';
 import handleQuit from '../utils/handleQuit.js';
 
 /**
@@ -36,6 +37,7 @@ export default function GameScreen({ bidType }) {
   } = useUIDisplay();
 
   const { showAlert } = useAlert();
+  const throwAlert = useThrowAlert();
   const { register } = useZoneRefs();
 
   const dropZoneRef = useRef();
@@ -122,9 +124,11 @@ export default function GameScreen({ bidType }) {
         setDiscardPile([]);
         setAwardKitty(false);
       } else {
+        throwAlert(data, 'info');
         console.error('Discard failed:', data);
       }
     } catch (error) {
+      showAlert('Network error. Please try again.', 'error');
       console.error('Network error:', error);
     }
   };

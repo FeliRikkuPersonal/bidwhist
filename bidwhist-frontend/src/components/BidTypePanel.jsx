@@ -7,6 +7,7 @@ import React, { useState } from 'react';
 import { usePositionContext } from '../context/PositionContext.jsx';
 import { useGameState } from '../context/GameStateContext.jsx';
 import { useUIDisplay } from '../context/UIDisplayContext.jsx';
+import { useThrowAlert } from '../hooks/useThrowAlert.js';
 import handleQuit from '../utils/handleQuit.js';
 
 /*
@@ -31,6 +32,7 @@ export default function BidTypePanel({ closeBidTypePanel }) {
   } = useGameState();
 
   const { showFinalizeBid, setShowFinalizeBid, setAwardKitty } = useUIDisplay();
+  const throwAlert = useThrowAlert();
 
   const [direction, setDirection] = useState('UPTOWN');
   const [suit, setSuit] = useState('HEARTS');
@@ -77,6 +79,7 @@ export default function BidTypePanel({ closeBidTypePanel }) {
         closeBidTypePanel?.();
         setShowFinalizeBid(false);
       } else {
+        throwAlert(data, 'warning');
         console.error('Finalize Bid failed:', data);
       }
     } catch (error) {
