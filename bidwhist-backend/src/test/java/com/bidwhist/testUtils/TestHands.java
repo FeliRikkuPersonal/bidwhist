@@ -1,0 +1,221 @@
+package com.bidwhist.testUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.bidwhist.model.Card;
+import com.bidwhist.model.Hand;
+
+public class TestHands {
+    Hand noTrumpHighHand = new Hand();
+    List<Card> noTrumpHighList = new ArrayList<>();
+    Hand noTrumpLowHand = new Hand();
+    List<Card> noTrumpLowList = new ArrayList<>();
+    Hand strongUptownHand = new Hand();
+    List<Card> strongUptownList = new ArrayList<>();
+    Hand strongDowntownHand = new Hand();
+    List<Card> strongDowntownList = new ArrayList<>();
+    Hand strongDowntownWithJokerGapHand = new Hand();
+    List<Card> strongDowntownWithJokerGapList = new ArrayList<>();
+    Hand ambiguousUptownDowntownHand = new Hand();
+    List<Card> ambiguousUptownDowntownList = new ArrayList<>();
+    Hand maxUptownStrengthHand = new Hand();
+    List<Card> maxUptownStrengthList = new ArrayList<>();
+    Hand unbridgeableGapsHand = new Hand();
+    List<Card> unbridgeableGapsList = new ArrayList<>();
+
+    public TestHands() {
+        noTrumpHighList.addAll(List.of(
+                // Spades
+                TestCardUtil.getCard("ACE_of_SPADES"),
+                TestCardUtil.getCard("KING_of_SPADES"),
+                TestCardUtil.getCard("QUEEN_of_SPADES"),
+
+                // Hearts
+                TestCardUtil.getCard("ACE_of_HEARTS"),
+                TestCardUtil.getCard("KING_of_HEARTS"),
+                TestCardUtil.getCard("QUEEN_of_HEARTS"),
+
+                // Diamonds
+                TestCardUtil.getCard("ACE_of_DIAMONDS"),
+                TestCardUtil.getCard("KING_of_DIAMONDS"),
+
+                // Clubs
+                TestCardUtil.getCard("ACE_of_CLUBS"),
+                TestCardUtil.getCard("KING_of_CLUBS"),
+
+                // Fillers
+                TestCardUtil.getCard("TWO_of_SPADES"),
+                TestCardUtil.getCard("THREE_of_CLUBS")));
+
+        noTrumpLowList.addAll(List.of(
+                // Spades: A-2-3-4
+                TestCardUtil.getCard("ACE_of_SPADES"),
+                TestCardUtil.getCard("TWO_of_SPADES"),
+                TestCardUtil.getCard("THREE_of_SPADES"),
+                TestCardUtil.getCard("FOUR_of_SPADES"),
+
+                // Hearts: A-2-3
+                TestCardUtil.getCard("ACE_of_HEARTS"),
+                TestCardUtil.getCard("TWO_of_HEARTS"),
+                TestCardUtil.getCard("THREE_of_HEARTS"),
+
+                // Clubs: A-2-3
+                TestCardUtil.getCard("ACE_of_CLUBS"),
+                TestCardUtil.getCard("TWO_of_CLUBS"),
+                TestCardUtil.getCard("THREE_of_CLUBS"),
+
+                // Diamonds: A-2
+                TestCardUtil.getCard("ACE_of_DIAMONDS"),
+                TestCardUtil.getCard("TWO_of_DIAMONDS")));
+
+        strongUptownList.addAll(List.of(
+                // Spades: Ace through 7
+                TestCardUtil.getCard("ACE_of_SPADES"),
+                TestCardUtil.getCard("KING_of_SPADES"),
+                TestCardUtil.getCard("QUEEN_of_SPADES"),
+                TestCardUtil.getCard("JACK_of_SPADES"),
+                TestCardUtil.getCard("TEN_of_SPADES"),
+                TestCardUtil.getCard("NINE_of_SPADES"),
+                TestCardUtil.getCard("EIGHT_of_SPADES"),
+                TestCardUtil.getCard("SEVEN_of_SPADES"),
+
+                // Filler cards (random off-suit, unrelated)
+                TestCardUtil.getCard("TWO_of_HEARTS"),
+                TestCardUtil.getCard("FIVE_of_DIAMONDS"),
+                TestCardUtil.getCard("FOUR_of_CLUBS"),
+                TestCardUtil.getCard("SIX_of_HEARTS")));
+
+        strongDowntownList.addAll(List.of(
+                // Spades: Ace through Eight (low run)
+                TestCardUtil.getCard("ACE_of_SPADES"),
+                TestCardUtil.getCard("TWO_of_SPADES"),
+                TestCardUtil.getCard("THREE_of_SPADES"),
+                TestCardUtil.getCard("FOUR_of_SPADES"),
+                TestCardUtil.getCard("FIVE_of_SPADES"),
+                TestCardUtil.getCard("SIX_of_SPADES"),
+                TestCardUtil.getCard("SEVEN_of_SPADES"),
+                TestCardUtil.getCard("EIGHT_of_SPADES"),
+
+                // 5 unrelated filler cards
+                TestCardUtil.getCard("KING_of_HEARTS"),
+                TestCardUtil.getCard("NINE_of_DIAMONDS"),
+                TestCardUtil.getCard("TEN_of_CLUBS"),
+                TestCardUtil.getCard("JACK_of_HEARTS")));
+
+        strongDowntownWithJokerGapList.addAll(List.of(
+                // Spades (low run with one gap at 5)
+                TestCardUtil.getCard("ACE_of_SPADES"),
+                TestCardUtil.getCard("TWO_of_SPADES"),
+                TestCardUtil.getCard("THREE_of_SPADES"),
+                TestCardUtil.getCard("FOUR_of_SPADES"),
+                // MISSING: FIVE_of_SPADES
+                TestCardUtil.getCard("SIX_of_SPADES"),
+                TestCardUtil.getCard("SEVEN_of_SPADES"),
+                TestCardUtil.getCard("EIGHT_of_SPADES"),
+
+                // Fillers: 1 Joker + 4 random cards
+                TestCardUtil.getCard("JOKER_S"), // Joker bridges the gap
+                TestCardUtil.getCard("KING_of_HEARTS"),
+                TestCardUtil.getCard("NINE_of_DIAMONDS"),
+                TestCardUtil.getCard("TEN_of_CLUBS"),
+                TestCardUtil.getCard("QUEEN_of_CLUBS")));
+
+        ambiguousUptownDowntownList.addAll(List.of(
+                // Spades: Uptown run
+                TestCardUtil.getCard("ACE_of_SPADES"),
+                TestCardUtil.getCard("KING_of_SPADES"),
+                TestCardUtil.getCard("QUEEN_of_SPADES"),
+                TestCardUtil.getCard("JACK_of_SPADES"),
+                TestCardUtil.getCard("TEN_of_SPADES"),
+
+                // Hearts: Downtown run
+                TestCardUtil.getCard("ACE_of_HEARTS"),
+                TestCardUtil.getCard("TWO_of_HEARTS"),
+                TestCardUtil.getCard("THREE_of_HEARTS"),
+                TestCardUtil.getCard("FOUR_of_HEARTS"),
+                TestCardUtil.getCard("FIVE_of_HEARTS"),
+
+                // Two Jokers
+                TestCardUtil.getCard("JOKER_B"),
+                TestCardUtil.getCard("JOKER_S")));
+
+        maxUptownStrengthList.addAll(List.of(
+                // 10-card Uptown run in Spades (A → 4)
+                TestCardUtil.getCard("ACE_of_SPADES"),
+                TestCardUtil.getCard("KING_of_SPADES"),
+                TestCardUtil.getCard("QUEEN_of_SPADES"),
+                TestCardUtil.getCard("JACK_of_SPADES"),
+                TestCardUtil.getCard("TEN_of_SPADES"),
+                TestCardUtil.getCard("NINE_of_SPADES"),
+                TestCardUtil.getCard("EIGHT_of_SPADES"),
+                TestCardUtil.getCard("SEVEN_of_SPADES"),
+                TestCardUtil.getCard("SIX_of_SPADES"),
+                TestCardUtil.getCard("FIVE_of_SPADES"),
+
+                // 2 Jokers
+                TestCardUtil.getCard("JOKER_B"),
+                TestCardUtil.getCard("JOKER_S")));
+
+        unbridgeableGapsList.addAll(List.of(
+                // Spades with gaps: A, K, 10, 8, 5 — missing Q, J, 9, 7, 6, 4, 3, 2
+                TestCardUtil.getCard("ACE_of_SPADES"),
+                TestCardUtil.getCard("KING_of_SPADES"),
+                TestCardUtil.getCard("TEN_of_SPADES"),
+                TestCardUtil.getCard("EIGHT_of_SPADES"),
+                TestCardUtil.getCard("FIVE_of_SPADES"),
+
+                // One Joker (not enough to bridge)
+                TestCardUtil.getCard("JOKER_S"),
+
+                // Filler cards
+                TestCardUtil.getCard("TWO_of_HEARTS"),
+                TestCardUtil.getCard("FOUR_of_CLUBS"),
+                TestCardUtil.getCard("NINE_of_DIAMONDS"),
+                TestCardUtil.getCard("SIX_of_HEARTS"),
+                TestCardUtil.getCard("TEN_of_CLUBS"),
+                TestCardUtil.getCard("QUEEN_of_DIAMONDS")));
+
+    }
+
+    public Hand getNoTrumpHighHand() {
+        noTrumpHighHand.addCards(noTrumpHighList);
+        return noTrumpHighHand;
+    }
+
+    public Hand getNoTrumpLowHand() {
+        noTrumpLowHand.addCards(noTrumpLowList);
+        return noTrumpLowHand;
+    }
+
+    public Hand getStrongUptownHand() {
+        strongUptownHand.addCards(strongUptownList);
+        return strongUptownHand;
+    }
+
+    public Hand getStrongDowntownHand() {
+        strongDowntownHand.addCards(strongDowntownList);
+        return strongDowntownHand;
+    }
+
+    public Hand getStrongDowntownWithJokerGapHand() {
+        strongDowntownWithJokerGapHand.addCards(strongDowntownWithJokerGapList);
+        return strongDowntownWithJokerGapHand;
+    }
+
+    public Hand getAmbiguousUptownDowntownHand() {
+        ambiguousUptownDowntownHand.addCards(ambiguousUptownDowntownList);
+        return ambiguousUptownDowntownHand;
+    }
+
+    public Hand getMaxUptownStrengthHand() {
+        maxUptownStrengthHand.addCards(maxUptownStrengthList);
+        return maxUptownStrengthHand;
+    }
+
+    public Hand getUnbridgeableGapsHand() {
+        unbridgeableGapsHand.addCards(unbridgeableGapsList);
+        return unbridgeableGapsHand;
+    }
+
+}

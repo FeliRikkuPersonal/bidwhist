@@ -29,7 +29,7 @@ useEffect(() => {
 }, [backendPositions, players]);
 
 
-  // Hide lobby once all players have joined
+  // Set backend positions once all players are added
   useEffect(() => {
     if (playersPresent) {
       const positionNameMap = Object.fromEntries(players.map((p) => [p.position, p.name]));
