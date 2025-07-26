@@ -51,9 +51,8 @@ public class GameplayUtils {
      * Determines which card is currently winning a trick.
      *
      * <p>
-     * It checks each card in the trick. Trump cards beat non-trump cards. If both
-     * are trump or
-     * both are the lead suit, the higher rank wins.
+     * It checks each card in the trick. Trump cards beat non-trump cards. If
+     * both are trump or both are the lead suit, the higher rank wins.
      */
     public static PlayedCard getWinningCard(List<PlayedCard> trick, Suit trumpSuit) {
         if (trick.isEmpty()) {
@@ -103,6 +102,9 @@ public class GameplayUtils {
         if (tricksWon >= requiredTricks) {
             // Team succeeded: total tricks - 5 base tricks
             deltaScore = tricksWon - 5;
+            if (winningBid.isNo()) {
+                deltaScore *= 2;
+            }
         } else {
             // Team failed: lose bid value
             deltaScore = -winningBid.getValue();
