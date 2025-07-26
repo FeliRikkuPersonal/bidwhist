@@ -206,20 +206,20 @@ function App() {
    */
   useEffect(() => {
     if (mode === 'multiplayer') {
-      setShowLobby(lobbySize > 0 && lobbySize < 4);
-      setShowGameScreen(lobbySize === 4);
+      setShowLobby(lobbySize > 0 && !showGameScreen);
     }
 
     const isSinglePlayer = mode === 'single';
     const validPositions = ['P1', 'P2', 'P3', 'P4'];
+    const fullBackend = Object.keys(backendPositions).length === 4;
 
     const singlePlayerReady =
       showGameScreen && validPositions.includes(viewerPosition) && isSinglePlayer;
     const multiPlayerReady =
-      showGameScreen && validPositions.includes(viewerPosition) && !isSinglePlayer;
+      showGameScreen && validPositions.includes(viewerPosition) && !isSinglePlayer && fullBackend;
 
     setLoadGame(singlePlayerReady || multiPlayerReady);
-  }, [mode, lobbySize, showGameScreen, viewerPosition]);
+  }, [mode, lobbySize, showGameScreen, viewerPosition, backendPositions]);
 
   /*
    * Renders the appropriate screen (ModeSelector, LobbyScreen, or GameScreen)

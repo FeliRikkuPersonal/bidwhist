@@ -114,10 +114,6 @@ function ModeSelector({ onStartGame }) {
         setMode('multiplayer');
         setViewerPosition(data.playerPosition);
         setViewerTeam(data.playerTeam);
-        setPlayers(data.players);
-        const positionNameMap = Object.fromEntries(data.players.map((p) => [p.position, p.name]));
-        setBackendPositions(positionNameMap);
-
       } else {
         throwAlert(data, 'error');
         console.error('Failed to create game:', data);
