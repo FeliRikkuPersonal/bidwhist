@@ -20,7 +20,7 @@ import { useThrowAlert } from '../hooks/useThrowAlert';
  */
 function ModeSelector({ onStartGame }) {
   const { setGameId, mode, setMode, difficulty, setDifficulty } = useGameState();
-  const { setPlayerName } = usePositionContext();
+  const { setPlayerName, setViewerPosition, setViewerTeam } = usePositionContext();
   const { showAlert } = useAlert();
   const throwAlert = useThrowAlert();
 
@@ -72,6 +72,11 @@ function ModeSelector({ onStartGame }) {
         console.log('Joined game:', data);
         setMode('multiplayer');
         setViewerPosition(data.playerPosition);
+        setViewerTeam(data.playerTeam);
+        setPlayers(data.players);
+        const positionNameMap = Object.fromEntries(data.players.map((p) => [p.position, p.name]));
+        setBackendPositions(positionNameMap);
+
       } else {
         throwAlert(data, 'error');
         console.error('Failed to join game:', data);
@@ -108,6 +113,11 @@ function ModeSelector({ onStartGame }) {
         console.log('✅ Game created:', data);
         setMode('multiplayer');
         setViewerPosition(data.playerPosition);
+        setViewerTeam(data.playerTeam);
+        setPlayers(data.players);
+        const positionNameMap = Object.fromEntries(data.players.map((p) => [p.position, p.name]));
+        setBackendPositions(positionNameMap);
+
       } else {
         throwAlert(data, 'error');
         console.error('Failed to create game:', data);

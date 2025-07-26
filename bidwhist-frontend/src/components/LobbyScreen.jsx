@@ -2,6 +2,8 @@
 
 import React from 'react';
 import { useGameState } from '../context/GameStateContext';
+import { usePositionContext } from '../context/PositionContext';
+import { delay } from '../utils/TimeUtils';
 
 /**
  * Displays the multiplayer lobby screen while waiting for players to join.
@@ -12,9 +14,12 @@ import { useGameState } from '../context/GameStateContext';
  */
 function LobbyScreen({ gameId }) {
   const { players } = useGameState();
+  const API = import.meta.env.VITE_API_URL;
 
   // Hide lobby once all players have joined
   if (players.length === 4) {
+    delay(3000);
+
     return null;
   }
 
