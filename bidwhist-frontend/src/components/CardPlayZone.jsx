@@ -263,8 +263,13 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
           animationId: animation.id,
         }),
       });
-      const data = await res2.json();
       if (!res2.ok) {
+        let data;
+        try {
+          data = await res2.json();
+        } catch (e) {
+          data = { message: 'Something went wrong' };
+        }
         throwAlert(data, 'error');
       }
     };
