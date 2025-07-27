@@ -2,66 +2,66 @@
   height: 100%;
   width: 100%;
   display: flex;
-  justify-content: space-between;
-  /* border: 1px solid rgba(8, 29, 8, 0.322); */
-  /* border-radius: 25px; */
-  /* box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.377); */
-  /* background: rgba(255, 255, 255, 0.01); */
-  /* backdrop-filter: blur(10px); */
-  /* -webkit-backdrop-filter: blur(15px); */
-  /* padding: 5px; */
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.01);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(8, 29, 8, 0.322);
+  border-radius: 25px;
+  box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.377);
+}
+
+.scoreboard-content {
+  flex: 1;
+  min-width: 150px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.center-content {
+  height: 100%;
+  flex: 2;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid rgba(8, 29, 8, 0.322);
+  border-radius: 25px;
+  box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.377);
+  background: rgba(126, 69, 69, 0.01);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(15px);
 }
 
 .score-headers {
   text-decoration: underline;
+  margin-bottom: 5px;
 }
+
 .score-value {
   font-size: x-large;
   font-weight: bold;
 }
 
-.scoreboard-content {
-  width: 200px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.left-content {
-  border: 1px solid rgba(8, 29, 8, 0.322);
-  border-radius: 25px;
-  box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.377);
-  background: rgba(255, 255, 255, 0.01);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(15px);
-}
-
-.center-content {
-  height: 100%;
-  width: 500px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  border: 1px solid rgba(8, 29, 8, 0.322);
-  border-radius: 25px;
-  box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.377);
-  background: rgba(255, 255, 255, 0.01);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(15px);
+.team-name {
+  font-weight: 600;
+  margin-bottom: 5px;
+  font-size: 1.1rem;
 }
 
 .winning-bid {
   text-align: center;
-  width: 100%;
+  margin-bottom: 10px;
 }
 
-.right-content {
-  border: 1px solid rgba(8, 29, 8, 0.322);
-  border-radius: 25px;
-  box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.377);
-  background: rgba(255, 255, 255, 0.01);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(15px);
+.phase-indicator .phase-text {
+  font-size: 0.9rem;
+  font-style: italic;
 }
