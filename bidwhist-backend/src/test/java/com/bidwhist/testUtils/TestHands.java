@@ -7,21 +7,21 @@ import com.bidwhist.model.Card;
 import com.bidwhist.model.Hand;
 
 public class TestHands {
-    Hand noTrumpHighHand = new Hand();
+    public Hand noTrumpHighHand = new Hand();
     List<Card> noTrumpHighList = new ArrayList<>();
-    Hand noTrumpLowHand = new Hand();
+    public Hand noTrumpLowHand = new Hand();
     List<Card> noTrumpLowList = new ArrayList<>();
-    Hand strongUptownHand = new Hand();
+    public Hand strongUptownHand = new Hand();
     List<Card> strongUptownList = new ArrayList<>();
-    Hand strongDowntownHand = new Hand();
+    public Hand strongDowntownHand = new Hand();
     List<Card> strongDowntownList = new ArrayList<>();
-    Hand strongDowntownWithJokerGapHand = new Hand();
+    public Hand strongDowntownWithJokerGapHand = new Hand();
     List<Card> strongDowntownWithJokerGapList = new ArrayList<>();
-    Hand ambiguousUptownDowntownHand = new Hand();
+    public Hand ambiguousUptownDowntownHand = new Hand();
     List<Card> ambiguousUptownDowntownList = new ArrayList<>();
-    Hand maxUptownStrengthHand = new Hand();
+    public Hand maxUptownStrengthHand = new Hand();
     List<Card> maxUptownStrengthList = new ArrayList<>();
-    Hand unbridgeableGapsHand = new Hand();
+    public Hand unbridgeableGapsHand = new Hand();
     List<Card> unbridgeableGapsList = new ArrayList<>();
 
     public TestHands() {
@@ -159,11 +159,12 @@ public class TestHands {
 
         unbridgeableGapsList.addAll(List.of(
                 // Spades with gaps: A, K, 10, 8, 5 — missing Q, J, 9, 7, 6, 4, 3, 2
-                TestCardUtil.getCard("ACE_of_SPADES"),
-                TestCardUtil.getCard("KING_of_SPADES"),
                 TestCardUtil.getCard("TEN_of_SPADES"),
-                TestCardUtil.getCard("EIGHT_of_SPADES"),
+                TestCardUtil.getCard("SEVEN_of_SPADES"),
+                
+                
                 TestCardUtil.getCard("FIVE_of_SPADES"),
+                TestCardUtil.getCard("TWO_of_SPADES"),
 
                 // One Joker (not enough to bridge)
                 TestCardUtil.getCard("JOKER_S"),
@@ -173,48 +174,49 @@ public class TestHands {
                 TestCardUtil.getCard("FOUR_of_CLUBS"),
                 TestCardUtil.getCard("NINE_of_DIAMONDS"),
                 TestCardUtil.getCard("SIX_of_HEARTS"),
+                TestCardUtil.getCard("EIGHT_of_CLUBS"),
                 TestCardUtil.getCard("TEN_of_CLUBS"),
                 TestCardUtil.getCard("QUEEN_of_DIAMONDS")));
 
+        noTrumpHighHand.addCards(noTrumpHighList);
+        noTrumpLowHand.addCards(noTrumpLowList);
+        strongUptownHand.addCards(strongUptownList);
+        strongDowntownHand.addCards(strongDowntownList);
+        strongDowntownWithJokerGapHand.addCards(strongDowntownWithJokerGapList);
+        ambiguousUptownDowntownHand.addCards(ambiguousUptownDowntownList);
+        maxUptownStrengthHand.addCards(maxUptownStrengthList);
+        unbridgeableGapsHand.addCards(unbridgeableGapsList);
     }
 
     public Hand getNoTrumpHighHand() {
-        noTrumpHighHand.addCards(noTrumpHighList);
         return noTrumpHighHand;
     }
 
-    public Hand getNoTrumpLowHand() {
-        noTrumpLowHand.addCards(noTrumpLowList);
+    public Hand getNoTrumpLowHand() {        
         return noTrumpLowHand;
     }
 
     public Hand getStrongUptownHand() {
-        strongUptownHand.addCards(strongUptownList);
         return strongUptownHand;
     }
 
     public Hand getStrongDowntownHand() {
-        strongDowntownHand.addCards(strongDowntownList);
         return strongDowntownHand;
     }
 
-    public Hand getStrongDowntownWithJokerGapHand() {
-        strongDowntownWithJokerGapHand.addCards(strongDowntownWithJokerGapList);
+    public Hand getStrongDowntownWithJokerGapHand() { 
         return strongDowntownWithJokerGapHand;
     }
 
-    public Hand getAmbiguousUptownDowntownHand() {
-        ambiguousUptownDowntownHand.addCards(ambiguousUptownDowntownList);
+    public Hand getAmbiguousUptownDowntownHand() {        
         return ambiguousUptownDowntownHand;
     }
 
-    public Hand getMaxUptownStrengthHand() {
-        maxUptownStrengthHand.addCards(maxUptownStrengthList);
+    public Hand getMaxUptownStrengthHand() {        
         return maxUptownStrengthHand;
     }
 
-    public Hand getUnbridgeableGapsHand() {
-        unbridgeableGapsHand.addCards(unbridgeableGapsList);
+    public Hand getUnbridgeableGapsHand() {        
         return unbridgeableGapsHand;
     }
 

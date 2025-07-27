@@ -141,7 +141,8 @@ public class HandEvaluator {
   }
 
   /**
-   * Measures a suit-based run (sequence) in either uptown/downtown direction. Jokers can be used to
+   * Measures a suit-based run (sequence) in either uptown/downtown direction.
+   * Jokers can be used to
    * bridge gaps.
    */
   public static int evaluateRun(List<Rank> ranksInSuit, int jokers, List<Rank> order) {
@@ -164,7 +165,8 @@ public class HandEvaluator {
           i--; // retry shortened list
           j = 0;
         }
-      } else break;
+      } else
+        break;
     }
 
     if (jokers == 2) {
