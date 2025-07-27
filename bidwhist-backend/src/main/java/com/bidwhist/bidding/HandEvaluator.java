@@ -17,7 +17,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Evaluates a player's hand for possible bids. Handles per-suit evaluation (Uptown/Downtown) and
+ * Evaluates a player's hand for possible bids. Handles per-suit evaluation
+ * (Uptown/Downtown) and
  * "No" bid options using pure runs.
  */
 public class HandEvaluator {
@@ -31,45 +32,42 @@ public class HandEvaluator {
   private int noDowntown;
 
   // Static rank orderings for bid evaluation
-  public static final List<Rank> UPTOWN_ORDER =
-      List.of(
-          Rank.ACE,
-          Rank.KING,
-          Rank.QUEEN,
-          Rank.JACK,
-          Rank.TEN,
-          Rank.NINE,
-          Rank.EIGHT,
-          Rank.SEVEN,
-          Rank.SIX,
-          Rank.FIVE,
-          Rank.FOUR,
-          Rank.THREE,
-          Rank.TWO);
+  public static final List<Rank> UPTOWN_ORDER = List.of(
+      Rank.ACE,
+      Rank.KING,
+      Rank.QUEEN,
+      Rank.JACK,
+      Rank.TEN,
+      Rank.NINE,
+      Rank.EIGHT,
+      Rank.SEVEN,
+      Rank.SIX,
+      Rank.FIVE,
+      Rank.FOUR,
+      Rank.THREE,
+      Rank.TWO);
 
-  public static final List<Rank> DOWNTOWN_ORDER =
-      List.of(
-          Rank.ACE,
-          Rank.TWO,
-          Rank.THREE,
-          Rank.FOUR,
-          Rank.FIVE,
-          Rank.SIX,
-          Rank.SEVEN,
-          Rank.EIGHT,
-          Rank.NINE,
-          Rank.TEN,
-          Rank.JACK,
-          Rank.QUEEN,
-          Rank.KING);
+  public static final List<Rank> DOWNTOWN_ORDER = List.of(
+      Rank.ACE,
+      Rank.TWO,
+      Rank.THREE,
+      Rank.FOUR,
+      Rank.FIVE,
+      Rank.SIX,
+      Rank.SEVEN,
+      Rank.EIGHT,
+      Rank.NINE,
+      Rank.TEN,
+      Rank.JACK,
+      Rank.QUEEN,
+      Rank.KING);
 
   /** Binds this evaluator to a specific player's hand. */
   public HandEvaluator(Player player) {
     this.cards = player.getHand().getCards();
     this.jokerCount = JokerUtils.countJokers(player.getHand());
 
-    List<Card> nonJokers =
-        cards.stream().filter(card -> !card.getRank().name().contains("JOKER")).toList();
+    List<Card> nonJokers = cards.stream().filter(card -> !card.getRank().name().contains("JOKER")).toList();
 
     this.suits = splitBySuit(nonJokers);
   }
@@ -82,7 +80,8 @@ public class HandEvaluator {
   }
 
   /**
-   * Returns all valid bids the hand could support. Includes suit-based Uptown/Downtown bids and No
+   * Returns all valid bids the hand could support. Includes suit-based
+   * Uptown/Downtown bids and No
    * Trump bids.
    */
   public List<FinalBid> evaluateAll(PlayerPos player) {
@@ -91,7 +90,8 @@ public class HandEvaluator {
     for (SuitEvaluation eval : suitEvals) {
       for (BidType type : List.of(BidType.UPTOWN, BidType.DOWNTOWN)) {
         FinalBid bid = AiBidOption.fromEvaluation(player, eval, type, false);
-        if (bid != null) bidOptions.add(bid);
+        if (bid != null)
+          bidOptions.add(bid);
       }
     }
 
@@ -103,7 +103,8 @@ public class HandEvaluator {
       }
     }
 
-    for (FinalBid bid : bidOptions) System.out.println(bid.toString());
+    for (FinalBid bid : bidOptions)
+      System.out.println(bid.toString());
 
     return bidOptions;
   }
@@ -111,9 +112,11 @@ public class HandEvaluator {
   /** Splits a hand of cards into groups by suit. */
   public static Map<Suit, List<Card>> splitBySuit(List<Card> fullHand) {
     Map<Suit, List<Card>> suits = new EnumMap<>(Suit.class);
-    for (Suit suit : Suit.values()) suits.put(suit, new ArrayList<>());
+    for (Suit suit : Suit.values())
+      suits.put(suit, new ArrayList<>());
     for (Card card : fullHand) {
-      if (card.getSuit() != null) suits.get(card.getSuit()).add(card);
+      if (card.getSuit() != null)
+        suits.get(card.getSuit()).add(card);
     }
     return suits;
   }
@@ -131,7 +134,8 @@ public class HandEvaluator {
       results.add(new SuitEvaluation(suit, high, low, cards.size()));
     }
 
-    for (SuitEvaluation result : results) System.out.println(result.toString());
+    for (SuitEvaluation result : results)
+      System.out.println(result.toString());
 
     return results;
   }
@@ -163,17 +167,36 @@ public class HandEvaluator {
       } else break;
     }
 
-    return kept.size() + jokers;
+    if (jokers == 2) {
+      return kept.size() + jokers;
+    } else if ( jokers == 1) {
+      if (kept.size() + jokers >= 6) {
+        return 5;
+      } else {
+        return kept.size() + jokers;
+      }
+    } else {
+      if (kept.size() <= 5) {
+        return 5;
+      } else {
+        return kept.size();
+      }
+    }
   }
 
+
+
+  
   /** Calculates continuous high-card run across all suits (used for No bids). */
   public static int evaluatePureRun(List<Card> cards, List<Rank> order) {
     Set<Rank> ranksInHand = cards.stream().map(Card::getRank).collect(Collectors.toSet());
 
     int run = 0;
     for (Rank rank : order) {
-      if (ranksInHand.contains(rank)) run++;
-      else break;
+      if (ranksInHand.contains(rank))
+        run++;
+      else
+        break;
     }
     return run;
   }
@@ -188,15 +211,15 @@ public class HandEvaluator {
 
   /** Calculates the low-direction total run score across suits for No-Trump. */
   public static int evaluateNoBidLow(Map<Suit, List<Card>> suits) {
-    int run =
-        suits.values().stream().mapToInt(cards -> evaluatePureRun(cards, DOWNTOWN_ORDER)).sum();
+    int run = suits.values().stream().mapToInt(cards -> evaluatePureRun(cards, DOWNTOWN_ORDER)).sum();
 
     System.out.println("No-Down: " + run);
     return run;
   }
 
   /**
-   * Fallback method for forcing a valid 4-value minimum bid. Picks the best suit/direction
+   * Fallback method for forcing a valid 4-value minimum bid. Picks the best
+   * suit/direction
    * available.
    */
   public FinalBid getForcedMinimumBid(PlayerPos player) {
@@ -207,8 +230,7 @@ public class HandEvaluator {
 
     for (SuitEvaluation eval : suitEvals) {
       for (BidType type : List.of(BidType.UPTOWN, BidType.DOWNTOWN)) {
-        int strength =
-            (type == BidType.UPTOWN) ? eval.getUptownStrength() : eval.getDowntownStrength();
+        int strength = (type == BidType.UPTOWN) ? eval.getUptownStrength() : eval.getDowntownStrength();
 
         if (strength > bestStrength) {
           bestStrength = strength;
