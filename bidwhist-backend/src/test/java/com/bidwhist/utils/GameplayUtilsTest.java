@@ -91,8 +91,8 @@ class GameplayUtilsTest {
 
         List<PlayedCard> trick = List.of(
                 new PlayedCard(PlayerPos.P1, new Card(Suit.CLUBS, Rank.TEN)),
-                new PlayedCard(PlayerPos.P2, new Card(Suit.CLUBS, Rank.ACE)),
-                new PlayedCard(PlayerPos.P3, new Card(Suit.HEARTS, Rank.KING))
+                new PlayedCard(PlayerPos.P2, new Card(Suit.CLUBS, Rank.JACK)),
+                new PlayedCard(PlayerPos.P3, new Card(Suit.HEARTS, Rank.ACE))
         );
 
         PlayedCard winner = GameplayUtils.determineTrickWinner(game, trick);
