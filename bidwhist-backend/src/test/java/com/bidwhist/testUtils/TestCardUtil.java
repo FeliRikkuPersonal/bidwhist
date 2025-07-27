@@ -41,7 +41,7 @@ public class TestCardUtil {
      * @return Card instance or null if not found
      */
     public static Card getCard(String name) {
-        return allCards.get(name.toUpperCase());
+        return allCards.get(name);
     }
 
     /**
