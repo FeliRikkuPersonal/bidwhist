@@ -218,11 +218,16 @@ public class GameService {
         if (!bid.isPassed()) {
             InitialBid currentHighest = game.getHighestBid();
 
-            if (currentHighest == null || bid.getValue() > currentHighest.getValue()) {
+            // Compares bid to select winner (if same value NO_TRUMP wins if isNO() otherwise first bidder wins)
+            if (currentHighest == null || bid.compareTo(currentHighest) > 0) {
+                game.setHighestBid(bid);
+            }
+
+            /*if (currentHighest == null || bid.getValue() > currentHighest.getValue()) {
                 game.setHighestBid(bid);
             } else if (bid.getValue() == currentHighest.getValue()) {
                 // Same-value bid — do nothing, keep earlier bid
-            }
+            }*/
         }
 
         int nextIndex = (game.getBidTurnIndex() + 1) % game.getPlayers().size();
@@ -420,7 +425,7 @@ public class GameService {
         List<PlayedCard> currentTrick = game.getCurrentTrick();
         if (!currentTrick.isEmpty()) {
             Suit leadSuit = currentTrick.get(0).getCard().getSuit();
-      game.setLeadSuit(leadSuit);
+            game.setLeadSuit(leadSuit);
             boolean hasLeadSuit = currentPlayer.getHand().getCards().stream().anyMatch(c -> c.getSuit() == leadSuit);
             if (hasLeadSuit && cardToPlay.getSuit() != leadSuit) {
                 throw new IllegalArgumentException("Must follow suit if possible");
@@ -433,8 +438,8 @@ public class GameService {
         currentTrick.add(validPlayedCard);
         game.addPlayedCard(cardToPlay);
 
-    game.addAnimation(new Animation(validPlayedCard, game.getLeadSuit()));
-    game.setCurrentTurnIndex((game.getCurrentTurnIndex() + 1) % 4);
+        game.addAnimation(new Animation(validPlayedCard, game.getLeadSuit()));
+        game.setCurrentTurnIndex((game.getCurrentTurnIndex() + 1) % 4);
 
         if (currentTrick.size() == 4) {
             PlayedCard winningPlay = GameplayUtils.determineTrickWinner(game, currentTrick);
@@ -488,17 +493,17 @@ public class GameService {
         game.removeAnimationById(playerPosition, animationId);
     }
 
-  /*
+    /*
    * Removes a person from a game.
-   */
-  public void quitMyGame(QuitGameRequest request) {
-    GameState game = getGameById(request.getGameId());
-    String player = PlayerUtils.getNameByPosition(request.getPlayer(), game.getPlayers());
-    if (request.getMode() == "multiplayer") {
-      game.addAnimation(new Animation(player));
-      games.remove(request.getGameId());
+     */
+    public void quitMyGame(QuitGameRequest request) {
+        GameState game = getGameById(request.getGameId());
+        String player = PlayerUtils.getNameByPosition(request.getPlayer(), game.getPlayers());
+        if (request.getMode() == "multiplayer") {
+            game.addAnimation(new Animation(player));
+            games.remove(request.getGameId());
+        }
     }
-  }
 
     /*
    * Returns the latest game state for polling updates.

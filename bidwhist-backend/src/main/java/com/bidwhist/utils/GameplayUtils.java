@@ -102,12 +102,14 @@ public class GameplayUtils {
         if (tricksWon >= requiredTricks) {
             // Team succeeded: total tricks - 5 base tricks
             deltaScore = tricksWon - 5;
-            if (winningBid.isNo()) {
-                deltaScore *= 2;
-            }
         } else {
             // Team failed: lose bid value
             deltaScore = -winningBid.getValue();
+        }
+
+        // Double points gained or lost if NO_TRUMP bid
+        if (winningBid.isNo()) {
+            deltaScore *= 2;
         }
 
         int newScore = game.getTeamScores().getOrDefault(biddingTeam, 0) + deltaScore;
@@ -148,13 +150,15 @@ public class GameplayUtils {
         Suit trumpSuit = game.getTrumpSuit();
         BidType bidType = game.getBidType();
 
-        /* NO_TRUMP: highest lead suit wins */
+        // Excludes jokers from being eligible to win if bidType == NO_TRUMP
         if (bidType == BidType.NO_TRUMP) {
             return trick.stream()
-                    .filter(pc -> pc.getCard().getSuit() == leadSuit)
+                    .filter(pc -> {
+                        Card c = pc.getCard();
+                        return !c.isJoker() && c.getSuit() == leadSuit;
+                    })
                     .max(Comparator.comparing(pc -> pc.getCard().getRank().getValue()))
-                    .orElseThrow(
-                            () -> new IllegalStateException("No cards of lead suit found in NO_TRUMP bid"));
+                    .orElseThrow(() -> new IllegalStateException("No non-joker cards of lead suit found in NO_TRUMP bid"));
         }
 
         /* DOWNTOWN: inverted rank values except ACE and JOKERs */

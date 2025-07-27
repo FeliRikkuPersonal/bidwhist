@@ -32,6 +32,7 @@ public class AIUtils {
      * Saves final bid to cache for later reference.
      */
     public static InitialBid generateAIBid(GameState game, Player ai) {
+        
         HandEvaluator evaluator = new HandEvaluator(ai);
         evaluator.evaluateHand();
 
@@ -39,7 +40,7 @@ public class AIUtils {
         InitialBid currentHigh = game.getHighestBid();
 
         List<FinalBid> strongerBids = bidOptions.stream()
-                .filter(bid -> currentHigh == null || bid.getValue() > currentHigh.getValue())
+                .filter(bid -> currentHigh == null || bid.getInitialBid().compareTo(currentHigh) > 0)
                 .toList();
 
         if (strongerBids.isEmpty()) {
@@ -91,7 +92,7 @@ public class AIUtils {
             game.addBid(aiBid);
 
             if (!aiBid.isPassed()
-                    && (game.getHighestBid() == null || aiBid.getValue() > game.getHighestBid().getValue())) {
+                    && (game.getHighestBid() == null || aiBid.compareTo(game.getHighestBid()) > 0)) {
                 game.setHighestBid(aiBid);
             }
 
