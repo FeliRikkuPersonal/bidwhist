@@ -32,7 +32,7 @@ public class AIUtils {
      * Saves final bid to cache for later reference.
      */
     public static InitialBid generateAIBid(GameState game, Player ai) {
-        
+
         HandEvaluator evaluator = new HandEvaluator(ai);
         evaluator.evaluateHand();
 
@@ -203,7 +203,12 @@ public class AIUtils {
                         .orElse(hand.get(0));
             }
 
-            Suit leadSuit = currentTrick.get(0).getCard() != null ? currentTrick.get(0).getCard().getSuit() : null;
+            Suit leadSuit = currentTrick.stream()
+                    .map(PlayedCard::getCard)
+                    .filter(c -> !c.isJoker())
+                    .map(Card::getSuit)
+                    .findFirst()
+                    .orElse(null);
             game.setLeadSuit(leadSuit);
             List<Card> sameSuit = hand.stream()
                     .filter(c -> c.getSuit() != null && c.getSuit().equals(leadSuit))
@@ -222,11 +227,12 @@ public class AIUtils {
 
         if (difficulty == Difficulty.HARD) {
             int trickIndex = currentTrick.size();
-            Suit leadSuit = currentTrick.isEmpty()
-                    ? null
-                    : (currentTrick.get(0).getCard() != null
-                    ? currentTrick.get(0).getCard().getSuit()
-                    : null);
+            Suit leadSuit = currentTrick.stream()
+                    .map(PlayedCard::getCard)
+                    .filter(c -> !c.isJoker())
+                    .map(Card::getSuit)
+                    .findFirst()
+                    .orElse(null);
             game.setLeadSuit(leadSuit);
             PlayedCard winningCard = trickIndex > 0 ? GameplayUtils.getWinningCard(currentTrick, trumpSuit) : null;
             Card currentWinning = winningCard != null ? winningCard.getCard() : null;
@@ -475,7 +481,12 @@ public class AIUtils {
                     .orElse(hand.get(0));
         }
 
-        Suit leadSuit = trick.get(0).getCard().getSuit();
+        Suit leadSuit = trick.stream()
+                .map(PlayedCard::getCard)
+                .filter(c -> !c.isJoker())
+                .map(Card::getSuit)
+                .findFirst()
+                .orElse(null);
         List<Card> sameSuit = hand.stream().filter(c -> c.getSuit() == leadSuit).collect(Collectors.toList());
 
         if (!sameSuit.isEmpty()) {

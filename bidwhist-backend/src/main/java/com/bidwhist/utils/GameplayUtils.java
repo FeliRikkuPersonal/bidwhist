@@ -146,12 +146,18 @@ public class GameplayUtils {
             throw new IllegalArgumentException("Cannot determine trick winner: trick is empty.");
         }
 
-        Suit leadSuit = trick.get(0).getCard().getSuit();
+        Suit leadSuit = trick.stream()
+                .map(PlayedCard::getCard)
+                .filter(c -> !c.isJoker())
+                .map(Card::getSuit)
+                .findFirst()
+                .orElse(null);
         Suit trumpSuit = game.getTrumpSuit();
         BidType bidType = game.getBidType();
+        boolean isNoBid = game.getWinningBid() != null && game.getWinningBid().isNo();
 
         // Excludes jokers from being eligible to win if bidType == NO_TRUMP
-        if (bidType == BidType.NO_TRUMP) {
+        if (isNoBid) {
             return trick.stream()
                     .filter(pc -> {
                         Card c = pc.getCard();
