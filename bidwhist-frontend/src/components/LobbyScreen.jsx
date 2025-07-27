@@ -5,8 +5,7 @@ import { useGameState } from '../context/GameStateContext';
 import { usePositionContext } from '../context/PositionContext';
 import { useUIDisplay } from '../context/UIDisplayContext';
 import { delay } from '../utils/TimeUtils';
-
-
+import '../css/LobbyScreen.css';
 /**
  * Displays the multiplayer lobby screen while waiting for players to join.
  * Automatically hides once 4 players are present to allow game transition.
@@ -21,13 +20,12 @@ function LobbyScreen({ gameId }) {
   const API = import.meta.env.VITE_API_URL;
 
   const [backendSet, setBackendSet] = useState(false);
-const [playersPresent, setPlayersPresent] = useState(false);
+  const [playersPresent, setPlayersPresent] = useState(false);
 
-useEffect(() => {
-  setBackendSet(Object.keys(backendPositions).length === 4);
-  setPlayersPresent(players.length === 4);
-}, [backendPositions, players]);
-
+  useEffect(() => {
+    setBackendSet(Object.keys(backendPositions).length === 4);
+    setPlayersPresent(players.length === 4);
+  }, [backendPositions, players]);
 
   // Set backend positions once all players are added
   useEffect(() => {
@@ -43,7 +41,7 @@ useEffect(() => {
       setShowLobby(false);
       setShowGameScreen(true);
     }
-  }
+  };
 
   return (
     <div className="lobby-screen">
@@ -56,11 +54,11 @@ useEffect(() => {
           <li key={i}>{p.name}</li>
         ))}
       </ul>
-      {backendSet &&
-        <button onClick={handleReady}>
+      {backendSet && (
+        <button className="ready-button" onClick={handleReady}>
           Ready
         </button>
-      }
+      )}
     </div>
   );
 }

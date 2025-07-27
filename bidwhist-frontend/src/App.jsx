@@ -75,7 +75,7 @@ function App() {
     async (name, difficulty, code) => {
       const trimmedName = name.trim();
       if (!trimmedName) {
-        showAlert('Cannot start game with empty name.')
+        showAlert('Cannot start game with empty name.');
         console.warn('[App] Name is empty after trimming. Aborting start.');
         return;
       }
@@ -228,7 +228,9 @@ function App() {
   return (
     <div className="index-wrapper">
       <div className="scoreboard-wrapper">
-        <Scoreboard activeGame={activeGame} phase={phase} bidType={bidType} bids={bids} />
+        {loadGame && (
+          <Scoreboard activeGame={activeGame} phase={phase} bidType={bidType} bids={bids} />
+        )}
       </div>
 
       <div className="index-container">

@@ -1,0 +1,14 @@
+.ready-button {
+  background-color: #8ca62d;
+  color: #0a341f;
+  border: none;
+  border-radius: 12px;
+  height: 25px;
+  width: 25vw;
+  font-size: 1rem;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
