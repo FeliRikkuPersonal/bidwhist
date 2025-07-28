@@ -48,6 +48,7 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
     setShowAnimatedCards,
     setBidPhase,
     setShowFinalizeBid,
+    setShowFinalScore,
     animationQueue,
     setTeamATricks,
     setTeamBTricks,
@@ -63,15 +64,15 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
   } = usePositionContext();
 
 
-  const { 
-    gameId, 
-    players, 
-    setKitty, 
-    bids, 
-    winningPlayerName, 
-    setWinningBid, 
-    bidWinnerPos, 
-    setFinalScore 
+  const {
+    gameId,
+    players,
+    setKitty,
+    bids,
+    winningPlayerName,
+    setWinningBid,
+    bidWinnerPos,
+    setFinalScore
   } = useGameState();
 
   const [isOver, setIsOver] = useState(false); // Tracks if drag is over drop zone
@@ -177,7 +178,9 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
         await delay(800); // wait for animation
         setPlayedCardsByDirection((prev) => ({ ...prev, [direction]: card }));
         if (thisTurn != null && animation.currentTurnIndex === (viewerIndex + 3) % 4) {
-          throwAlert('Your turn', 'yourTurn');
+          if (animation.trickSize < 4) {
+            throwAlert('Your turn', 'yourTurn');
+          }
         }
       }
 
@@ -225,11 +228,12 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
               east: null,
               west: null,
             });
+            if (animation.currentTurnIndex === viewerIndex && animation.currentPhase !== 'END') {
+              throwAlert('Your turn', 'yourTurn');
+            }
           },
           cardList.length * 150 + 300
         );
-        const positions = Object.keys(backendPositions);
-        const viewerIndex = positions.indexOf(viewerPosition);
       }
 
       if (animation.type === 'CLEAR') {
@@ -263,14 +267,12 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
         } catch (err) {
           console.error('[CardPlayZone] Error updating card data:', err);
         }
-        const positions = Object.keys(backendPositions);
-        const viewerIndex = positions.indexOf(viewerPosition);
       }
 
       /* === SHOW_WINNER animation: (not implemented yet) === */
       if (animation.type === 'SHOW_WINNER') {
         setFinalScore(animation.finalScore);
-
+        setShowFinalScore(true);
       }
 
 

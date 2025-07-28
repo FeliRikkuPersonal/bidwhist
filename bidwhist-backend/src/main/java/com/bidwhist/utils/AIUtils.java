@@ -126,7 +126,8 @@ public class AIUtils {
 
             game.getCurrentTrick().add(validPlayedCard);
 
-            game.addAnimation(new Animation(validPlayedCard, game.getLeadSuit(), game.getCurrentTurnIndex()));
+            game.addAnimation(new Animation(validPlayedCard, game.getLeadSuit(), game.getCurrentTurnIndex(),
+                    game.getCurrentTrick().size()));
             game.setCurrentTurnIndex((game.getCurrentTurnIndex() + 1) % 4);
 
             if (game.getCurrentTrick().size() == 4) {
@@ -139,8 +140,9 @@ public class AIUtils {
                         "DEBUG: Trick won by " + winnerPlayer.getName() + " (Team " + winnerTeam + ")");
 
                 Book currentBook = new Book(game.getCurrentTrick(), winnerTeam);
+                game.setCurrentTurnIndex(winnerPlayer.getPosition().ordinal());
 
-                game.addAnimation(new Animation(currentBook, game.getCurrentTurnIndex()));
+                game.addAnimation(new Animation(currentBook, game.getCurrentTurnIndex(), game.getPhase()));
                 game.addAnimation(new Animation(AnimationType.UPDATE_CARDS));
 
                 game.getTeamTrickCounts().putIfAbsent(winnerTeam, 0);
@@ -149,19 +151,23 @@ public class AIUtils {
 
                 game.getCompletedTricks().add(currentBook);
                 game.getCurrentTrick().clear();
-                game.setCurrentTurnIndex(winnerPlayer.getPosition().ordinal());
 
                 if (game.getCompletedTricks().size() == 12) {
                     GameplayUtils.scoreHand(game);
-                    if (game.getTeamAScore() >= 7 ||
-                            game.getTeamBScore() >= 7 ||
-                            game.getTeamAScore() <= -7 ||
-                            game.getTeamAScore() <= -7) {
-                        game.setPhase(GamePhase.END);
+                    if (game.getPhase() == GamePhase.END) {
+                        int aScore = game.getTeamAScore();
+                        int bScore = game.getTeamBScore();
+                        if (aScore > bScore) {
+                            game.setFinalScore(aScore);
+                        } else if (bScore > aScore) {
+                            game.setFinalScore(bScore);
+                        }
+                        game.addAnimation(new Animation(AnimationType.SHOW_WINNER, game.getFinalScore()));
                     } else {
                         game.addAnimation(new Animation(AnimationType.CLEAR));
                         GameplayUtils.startNewHand(game);
                     }
+                    game.setBidWinnerPos(null);
                     return;
                 }
 
@@ -169,18 +175,6 @@ public class AIUtils {
                     autoPlayAITurns(game);
                 }
             }
-        }
-        if (game.getPhase() == GamePhase.END) {
-            int aScore = game.getTeamAScore();
-            int bScore = game.getTeamBScore();
-
-            if (aScore > bScore) {
-                game.setFinalScore(aScore);
-            } else if (bScore > aScore) {
-                game.setFinalScore(bScore);
-            }
-        
-        game.addAnimation(new Animation(AnimationType.SHOW_WINNER, game.getFinalScore()));
         }
     }
 

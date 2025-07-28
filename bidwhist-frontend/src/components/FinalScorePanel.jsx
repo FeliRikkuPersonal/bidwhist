@@ -17,20 +17,11 @@ import { useUIDisplay } from '../context/UIDisplayContext.jsx';
  */
 export default function FinalScorePanel({ onNewGame }) {
   const { finalScore, teamAScore, teamBScore } = useGameState();
-  const { showFinalScore, setShowFinalScore } = useUIDisplay();
+  const { showFinalScore } = useUIDisplay();
   const { viewerPosition } = usePositionContext();
   const savedMode = localStorage.getItem('mode');
   const savedGameId = localStorage.getItem('gameId');
   const API = import.meta.env.VITE_API_URL; // Server endpoint
-
-  useEffect(() => {
-    if (finalScore && finalScore > -1) {
-      setShowFinalScore(true);
-    } else {
-      setShowFinalScore(false);
-    }
-  }, [finalScore]);
-
 
   return (
     <div>

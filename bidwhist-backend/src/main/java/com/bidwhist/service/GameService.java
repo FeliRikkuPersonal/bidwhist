@@ -457,7 +457,8 @@ public class GameService {
         currentTrick.add(validPlayedCard);
         game.addPlayedCard(cardToPlay);
 
-        game.addAnimation(new Animation(validPlayedCard, game.getLeadSuit(),game.getCurrentPlayerIndex()));
+        game.addAnimation(new Animation(validPlayedCard, game.getLeadSuit(), game.getCurrentPlayerIndex(),
+                game.getCurrentTrick().size()));
         game.setCurrentTurnIndex((game.getCurrentTurnIndex() + 1) % 4);
 
         if (currentTrick.size() == 4) {
@@ -473,7 +474,7 @@ public class GameService {
             Book currentBook = new Book(currentTrick, winnerTeam);
             game.getCompletedTricks().add(currentBook);
 
-            game.addAnimation(new Animation(currentBook,game.getCurrentPlayerIndex()));
+            game.addAnimation(new Animation(currentBook, game.getCurrentPlayerIndex(), game.getPhase()));
             game.addAnimation(new Animation(AnimationType.UPDATE_CARDS));
 
             currentTrick.clear();
@@ -481,11 +482,15 @@ public class GameService {
 
             if (game.getCompletedTricks().size() == 12) {
                 GameplayUtils.scoreHand(game);
-                if (game.getTeamAScore() >= 7 ||
-                        game.getTeamBScore() >= 7 ||
-                        game.getTeamAScore() <= -7 ||
-                        game.getTeamAScore() <= -7) {
-                    game.setPhase(GamePhase.END);
+                if (game.getPhase() == GamePhase.END) {
+                    int aScore = game.getTeamAScore();
+                    int bScore = game.getTeamBScore();
+                    if (aScore > bScore) {
+                        game.setFinalScore(aScore);
+                    } else if (bScore > aScore) {
+                        game.setFinalScore(bScore);
+                    }
+                    game.addAnimation(new Animation(AnimationType.SHOW_WINNER, game.getFinalScore()));
                 } else {
                     game.addAnimation(new Animation(AnimationType.CLEAR));
                     GameplayUtils.startNewHand(game);
@@ -502,18 +507,6 @@ public class GameService {
         }
 
         GameStateResponse response = getGameStateForPlayer(game, request.getPlayer());
-
-        if (game.getPhase() == GamePhase.END) {
-            int aScore = game.getTeamAScore();
-            int bScore = game.getTeamBScore();
-
-            if (aScore > bScore) {
-                game.setFinalScore(aScore);
-            } else if (bScore > aScore) {
-                game.setFinalScore(bScore);
-            }
-            game.addAnimation(new Animation(AnimationType.SHOW_WINNER, game.getFinalScore()));
-        }
 
         return response;
     }
@@ -547,7 +540,7 @@ public class GameService {
         } else {
             games.remove(request.getGameId());
         }
-        
+
     }
 
     /*

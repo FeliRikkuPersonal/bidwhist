@@ -4,6 +4,7 @@ package com.bidwhist.dto;
 
 import com.bidwhist.model.Book;
 import com.bidwhist.model.Card;
+import com.bidwhist.model.GamePhase;
 import com.bidwhist.model.PlayedCard;
 import com.bidwhist.model.PlayerPos;
 import com.bidwhist.model.Suit;
@@ -33,18 +34,21 @@ public class Animation {
   @JsonProperty private String message;
   @JsonProperty private int currentTurnIndex;
   @JsonProperty private int finalScore;
+  @JsonProperty private int trickSize;
+  @JsonProperty private GamePhase currentPhase;
 
   public Animation() {}
 
   /*
    * Constructs a PLAY animation from a PlayedCard object.
    */
-  public Animation(PlayedCard playedCard, Suit leadSuit, int currentTurnIndex) {
+  public Animation(PlayedCard playedCard, Suit leadSuit, int currentTurnIndex, int trickSize) {
     this.type = AnimationType.PLAY;
     this.card = playedCard.getCard();
     this.player = playedCard.getPlayer();
     this.leadSuit = leadSuit;
     this.currentTurnIndex = currentTurnIndex;
+    this.trickSize = trickSize;
   }
 
   /*
@@ -59,11 +63,12 @@ public class Animation {
   /*
    * Constructs a COLLECT animation from a completed trick (Book).
    */
-  public Animation(Book trick, int currentTurnIndex) {
+  public Animation(Book trick, int currentTurnIndex, GamePhase currentPhase) {
     this.type = AnimationType.COLLECT;
     this.cardList = trick.getCards();
     this.winningTeam = trick.getWinningTeam();
     this.currentTurnIndex = currentTurnIndex;
+    this.currentPhase = currentPhase;
   }
 
   /*
