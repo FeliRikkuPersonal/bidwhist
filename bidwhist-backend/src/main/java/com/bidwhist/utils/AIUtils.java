@@ -189,6 +189,9 @@ public class AIUtils {
         List<Card> hand = aiPlayer.getHand().getCards();
         Difficulty difficulty = game.getDifficulty();
         Suit trumpSuit = game.getTrumpSuit();
+        PlayerPos bidWinner = game.getHighestBid().getPlayer();
+        FinalBid finalBid = game.getFinalBidCache().get(bidWinner);
+        boolean isNoTrump = finalBid != null && finalBid.isNo();
 
         if (difficulty == Difficulty.EASY) {
             return getLowestLegalCard(hand, currentTrick);
@@ -227,12 +230,20 @@ public class AIUtils {
 
         if (difficulty == Difficulty.HARD) {
             int trickIndex = currentTrick.size();
-            Suit leadSuit = currentTrick.stream()
-                    .map(PlayedCard::getCard)
-                    .filter(c -> !c.isJoker())
-                    .map(Card::getSuit)
-                    .findFirst()
-                    .orElse(null);
+            Suit leadSuit;
+            if (isNoTrump) {
+                // NO_TRUMP: skip jokers when determining lead suit
+                leadSuit = currentTrick.stream()
+                        .map(PlayedCard::getCard)
+                        .filter(c -> !JokerUtils.isJokerRank(c.getRank()))
+                        .map(Card::getSuit)
+                        .findFirst()
+                        .orElse(null);
+            } else {
+                // UPTOWN or DOWNTOWN: use the suit of the first played card (joker included)
+                leadSuit = currentTrick.isEmpty() ? null : currentTrick.get(0).getCard().getSuit();
+            }
+
             game.setLeadSuit(leadSuit);
             PlayedCard winningCard = trickIndex > 0 ? GameplayUtils.getWinningCard(currentTrick, trumpSuit) : null;
             Card currentWinning = winningCard != null ? winningCard.getCard() : null;
