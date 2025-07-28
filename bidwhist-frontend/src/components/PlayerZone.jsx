@@ -89,17 +89,8 @@ const PlayerZone = forwardRef(({ direction, name, revealHand, cards = [] }, ref)
     if (ref && typeof ref === 'object' && ref.current) {
       register(`zone-${direction}`, ref);
     }
-  }, [direction, register, ref, myTurn]);
+  }, [direction, register, ref]);
 
-  /*
-  * Show alert if it's player's turn
-  */
-
-  useEffect(() => {
-        if (myTurn) {
-      throwAlert('Your turn to play', 'info')
-    }
-  }, [myTurn])
 
   /**
    * Exposes getPosition() to parent via ref.
