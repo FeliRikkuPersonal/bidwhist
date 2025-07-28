@@ -39,7 +39,7 @@ public class GameplayUtils {
         game.setKitty(game.getDeck().getKitty().getCards());
         game.setPhase(GamePhase.BID);
         System.out.println("Current phase: " + game.getPhase());
-        game.addAnimation(new Animation(AnimationType.UPDATE_CARDS, game.getCurrentTurnIndex()));
+        game.addAnimation(new Animation(AnimationType.UPDATE_CARDS));
 
         Player nextBidder = game.getPlayers().get(game.getBidTurnIndex());
         if (nextBidder.isAI()) {

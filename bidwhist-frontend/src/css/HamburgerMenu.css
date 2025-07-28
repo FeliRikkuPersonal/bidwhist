@@ -1,0 +1,43 @@
+.hamburger-container {
+  position: fixed;
+}
+
+.hamburger-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 10px;
+}
+
+.bar {
+    border-radius: 10px;
+  width: 50px;
+  height: 6px;
+  margin: 8px;
+  background-color: white;
+  transition: 0.4s;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 15px;
+  min-width: 150px;
+  background-color: #0a341f;
+  border: 1px solid #ddd;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+}
+
+.dropdown-menu a {
+  padding: 10px 20px;
+  text-decoration: none;
+  color: white;
+  border-bottom: 1px solid #eee;
+}
+
+.dropdown-menu a:hover {
+  background-color: #f0f0f0;
+}

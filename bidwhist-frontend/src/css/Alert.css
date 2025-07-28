@@ -27,6 +27,15 @@
   background-color: #2196f3;
 }
 
+.alert.persist {
+  background-color: #2196f3;
+}
+
+.alert.yourTurn {
+  background-color: transparent;
+  font-weight: bold;
+}
+
 .close-btn {
   background: transparent;
   border: none;

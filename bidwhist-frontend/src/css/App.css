@@ -28,3 +28,16 @@
 .read-the-docs {
   color: #888;
 }
+
+.floating-app-layer {
+  position: fixed;
+  display: flex;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 100%;
+  z-index: 9000;
+  justify-content: last baseline;
+  align-items: baseline;
+  pointer-events: none;
+}

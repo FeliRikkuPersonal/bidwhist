@@ -80,7 +80,6 @@ export const GameStateProvider = ({ children }) => {
     if ('teamBScore' in response) setTeamBScore(response.teamBScore);
     if ('teamATricksWon' in response) setTeamATricksWon(response.teamATricksWon);
     if ('teamBTricksWon' in response) setTeamBTricksWon(response.teamBTricksWon);
-    if ('finalScore' in response) setFinalScore(response.finalScore);
   };
 
   /**

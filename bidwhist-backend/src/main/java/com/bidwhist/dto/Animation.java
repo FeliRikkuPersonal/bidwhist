@@ -32,6 +32,7 @@ public class Animation {
   @JsonProperty private String exitingPlayerName;
   @JsonProperty private String message;
   @JsonProperty private int currentTurnIndex;
+  @JsonProperty private int finalScore;
 
   public Animation() {}
 
@@ -85,12 +86,19 @@ public class Animation {
     this.currentTurnIndex = currentTurnIndex;
   }
 
+  /**
+   * Constructs a SHOW_WINNER animation.
+   */
+  public Animation(AnimationType type, int finalScore) {
+    this.type = type;
+    this.finalScore = finalScore;
+  }
+
   /*
    * Constructs a generic animation with the specified type only.
    */
-  public Animation(AnimationType type, int currentTurnIndex) {
+  public Animation(AnimationType type) {
     this.type = type;
-    this.currentTurnIndex = currentTurnIndex;
   }
 
   public String getId() {

@@ -63,8 +63,16 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
   } = usePositionContext();
 
 
-  const { gameId, players, setKitty, bids, winningPlayerName, setWinningBid, bidWinnerPos } =
-    useGameState();
+  const { 
+    gameId, 
+    players, 
+    setKitty, 
+    bids, 
+    winningPlayerName, 
+    setWinningBid, 
+    bidWinnerPos, 
+    setFinalScore 
+  } = useGameState();
 
   const [isOver, setIsOver] = useState(false); // Tracks if drag is over drop zone
   const [lastAnimation, setLastAnimation] = useState(null); // Prevents duplicate animation runs
@@ -82,7 +90,8 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
     if (!animationQueue || animationQueue.length === 0) return;
 
     const animation = animationQueue[0];
-    const thisTurn = animation.currentTurnIndex;
+    const thisTurn = animation?.currentTurnIndex !== undefined ? animation.currentTurnIndex : null;
+
 
     const positions = Object.keys(backendPositions);
     const viewerIndex = positions.indexOf(viewerPosition);
@@ -167,8 +176,8 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
 
         await delay(800); // wait for animation
         setPlayedCardsByDirection((prev) => ({ ...prev, [direction]: card }));
-        if (animation.currentTurnIndex == (viewerIndex + 3) % 4) {
-          throwAlert('Your turn', 'info');
+        if (thisTurn != null && animation.currentTurnIndex === (viewerIndex + 3) % 4) {
+          throwAlert('Your turn', 'yourTurn');
         }
       }
 
@@ -260,14 +269,14 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
 
       /* === SHOW_WINNER animation: (not implemented yet) === */
       if (animation.type === 'SHOW_WINNER') {
-        // TODO: implement winner reveal animation or panel
+        setFinalScore(animation.finalScore);
 
       }
 
 
-      /* === QUIT_GAME animation: (not implemented yet) === */
+      /* Player QUIT_GAME notification */
       if (animation.type === 'QUIT_GAME') {
-        // TODO: implement winner reveal animation or panel
+        throwAlert(animation, 'persist');
       }
 
       /* Notify backend that the animation has finished */

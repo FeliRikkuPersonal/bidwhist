@@ -4,6 +4,7 @@ import React, { useEffect, useCallback } from 'react';
 import './css/index.css';
 import './css/Card.css';
 import './css/Animations.css';
+import './css/App.css'
 import ModeSelector from './components/ModeSelector';
 import GameScreen from './components/GameScreen';
 import Scoreboard from './components/Scoreboard';
@@ -13,6 +14,7 @@ import { useGameState } from './context/GameStateContext.jsx';
 import { usePositionContext } from './context/PositionContext.jsx';
 import { useAlert } from './context/AlertContext.jsx';
 import { useThrowAlert } from './hooks/useThrowAlert.js';
+import HamburgerMenu from './components/HamburgerMenu.jsx';
 
 /*
  * Includes handling game start, updating game state from the backend, and rendering
@@ -39,8 +41,6 @@ function App() {
     setActiveGame,
     bidType,
     bids,
-    finalScore,
-    setFinalScore
   } = useGameState();
 
   const {
@@ -195,10 +195,6 @@ function App() {
         updateFromResponse(data);
         queueAnimationFromResponse(data);
         setMyTurn(currentTurnIndex === viewerIndex && phase === 'PLAY');
-        if ('finalScore' in data) {
-          setFinalScore(data.finalScore);
-          console.log(`Updated final score: ${finalScore}`);
-        }
       } catch (err) {
         console.error('Polling failed:', err);
       }
@@ -251,6 +247,9 @@ function App() {
             onStartGame={onStartGame}
           />
         )}
+      </div>
+      <div className="floating-app-layer">
+        <HamburgerMenu/>
       </div>
     </div>
   );

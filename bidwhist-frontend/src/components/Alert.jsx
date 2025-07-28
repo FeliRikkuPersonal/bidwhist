@@ -10,10 +10,18 @@ import '../css/Alert.css';
  *
  */
 const Alert = ({ message, type, onClose }) => {
+  let needsButton;
   /*
    * Automatically hides the alert after 5 seconds
    */
   useEffect(() => {
+    if (type === 'persist') {
+      needsButton = true;
+      return;
+    } else {
+      needsButton = false;
+    }
+
     const timer = setTimeout(() => {
       onClose();
     }, 5000);
@@ -27,9 +35,11 @@ const Alert = ({ message, type, onClose }) => {
   return (
     <div className={`alert ${type}`}>
       <span>{message}</span>
-      <button onClick={onClose} className="close-btn">
-        X
-      </button>
+      {needsButton &&
+        <button onClick={onClose} className="close-btn">
+          x
+        </button>
+      }
     </div>
   );
 };
