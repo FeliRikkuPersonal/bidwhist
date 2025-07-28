@@ -263,8 +263,6 @@ public class GameplayUtils {
         game.setTeamBTricksWon(0);
         game.getTeamTrickCounts().clear();
         game.getTeamScores().clear();
-        game.setFinalScore(-1);
-
         game.getDeck().shuffle();
         game.setShuffledDeck(game.getDeck().getCards());
         GameplayUtils.dealToPlayers(game);

@@ -13,10 +13,10 @@ import { useUIDisplay } from '../context/UIDisplayContext.jsx';
  *
  * @param {{ team: string, points: number }[]} scores - An array of team scores
  * @param {Function} onNewGame - Callback to trigger a new game (or close the panel)
- * @returns {JSX.Element} Final score modal if `finalScore` is true
+ * @returns {JSX.Element} Final score modal if `showFinalScore` is true
  */
 export default function FinalScorePanel({ onNewGame }) {
-  const { finalScore, teamAScore, teamBScore } = useGameState();
+  const { teamAScore, teamBScore } = useGameState();
   const { showFinalScore } = useUIDisplay();
   const { viewerPosition } = usePositionContext();
   const savedMode = localStorage.getItem('mode');

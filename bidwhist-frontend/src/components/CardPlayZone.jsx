@@ -72,7 +72,6 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
     winningPlayerName,
     setWinningBid,
     bidWinnerPos,
-    setFinalScore
   } = useGameState();
 
   const [isOver, setIsOver] = useState(false); // Tracks if drag is over drop zone
@@ -271,7 +270,6 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
 
       /* === SHOW_WINNER animation: (not implemented yet) === */
       if (animation.type === 'SHOW_WINNER') {
-        setFinalScore(animation.finalScore);
         setShowFinalScore(true);
       }
 

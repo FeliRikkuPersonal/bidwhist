@@ -51,8 +51,7 @@ public class GameState {
     private Map<Team, Integer> teamTrickCounts = new HashMap<>();
     private Map<Team, Integer> teamScores = new HashMap<>();
 
-    private int finalScore = -1;
-
+ 
     public GameState(String gameId) {
         this.room = new GameRoom(gameId);
         this.gameId = gameId;
@@ -371,12 +370,4 @@ public class GameState {
         this.teamScores = teamScores;
     }
 
-    public int getFinalScore() {
-        return finalScore;
-    }
-
-    public void setFinalScore(int newScore) {
-        this.finalScore = newScore;
-        System.out.println("[GameState] Setting final Score to " + newScore);
-    }
 }

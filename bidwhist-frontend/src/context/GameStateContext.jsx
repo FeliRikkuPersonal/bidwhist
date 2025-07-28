@@ -48,8 +48,6 @@ export const GameStateProvider = ({ children }) => {
   const [teamBScore, setTeamBScore] = useState(0);
   const [teamATricksWon, setTeamATricksWon] = useState(0);
   const [teamBTricksWon, setTeamBTricksWon] = useState(0);
-  const [finalScore, setFinalScore] = useState(false);
-
 
 
   /**
@@ -104,7 +102,6 @@ export const GameStateProvider = ({ children }) => {
       mode,
       difficulty,
       gameId,
-      finalScore,
     });
   };
 
@@ -161,8 +158,6 @@ export const GameStateProvider = ({ children }) => {
         setTeamATricksWon,
         teamBTricksWon,
         setTeamBTricksWon,
-        finalScore,
-        setFinalScore,
         activeGame,
         setActiveGame,
         updateFromResponse,

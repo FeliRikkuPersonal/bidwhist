@@ -41,3 +41,7 @@
   align-items: baseline;
   pointer-events: none;
 }
+
+.floating-app-layer .hamburger-wrapper {
+  pointer-events: auto;
+}

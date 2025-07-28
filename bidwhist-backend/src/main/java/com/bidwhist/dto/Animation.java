@@ -33,7 +33,6 @@ public class Animation {
   @JsonProperty private String exitingPlayerName;
   @JsonProperty private String message;
   @JsonProperty private int currentTurnIndex;
-  @JsonProperty private int finalScore;
   @JsonProperty private int trickSize;
   @JsonProperty private GamePhase currentPhase;
 
@@ -84,19 +83,10 @@ public class Animation {
   /*
    * Constructs a QUIT_GAME animation.
    */
-  public Animation(String playerName, int finalScore) {
+  public Animation(String playerName) {
     this.type = AnimationType.QUIT_GAME;
     this.exitingPlayerName = playerName;
     this.message = playerName + " has left the game. Game Over.";
-    this.finalScore = finalScore;
-  }
-
-  /**
-   * Constructs a SHOW_WINNER animation.
-   */
-  public Animation(AnimationType type, int finalScore) {
-    this.type = type;
-    this.finalScore = finalScore;
   }
 
   /*

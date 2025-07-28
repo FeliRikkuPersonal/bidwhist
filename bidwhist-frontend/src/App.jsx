@@ -249,7 +249,9 @@ function App() {
         )}
       </div>
       <div className="floating-app-layer">
-        <HamburgerMenu/>
+        <div className="hamburger-wrapper">
+          <HamburgerMenu />
+        </div>
       </div>
     </div>
   );

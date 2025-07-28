@@ -482,19 +482,14 @@ public class GameService {
 
             if (game.getCompletedTricks().size() == 12) {
                 GameplayUtils.scoreHand(game);
+
                 if (game.getPhase() == GamePhase.END) {
-                    int aScore = game.getTeamAScore();
-                    int bScore = game.getTeamBScore();
-                    if (aScore > bScore) {
-                        game.setFinalScore(aScore);
-                    } else if (bScore > aScore) {
-                        game.setFinalScore(bScore);
-                    }
-                    game.addAnimation(new Animation(AnimationType.SHOW_WINNER, game.getFinalScore()));
+                    game.addAnimation(new Animation(AnimationType.SHOW_WINNER));
                 } else {
                     game.addAnimation(new Animation(AnimationType.CLEAR));
                     GameplayUtils.startNewHand(game);
                 }
+
                 game.setBidWinnerPos(null);
                 return getGameStateForPlayer(game, request.getPlayer());
             }

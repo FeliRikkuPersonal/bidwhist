@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Game - Bid Whist User Guide</title>
+    <link href="../css/bootstrap.min.css" rel="stylesheet" />
+    <link href="../css/fontawesome.min.css" rel="stylesheet" />
+    <link href="../css/brands.min.css" rel="stylesheet" />
+    <link href="../css/solid.min.css" rel="stylesheet" />
+    <link href="../css/v4-font-face.min.css" rel="stylesheet" />
+    <link href="../css/base.css" rel="stylesheet" />
+    <link
+      id="hljs-light"
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css"
+    />
+    <link
+      id="hljs-dark"
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css"
+      disabled
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <script>
+      hljs.highlightAll();
+    </script>
+    <link href="../assets/stylesheets/glightbox.min.css" rel="stylesheet" />
+    <style>
+      html.glightbox-open {
+        overflow: initial;
+        height: 100%;
+      }
+      .gslide-title {
+        margin-top: 0px;
+        user-select: text;
+      }
+      .gslide-desc {
+        color: #666;
+        user-select: text;
+      }
+      .gslide-image img {
+        background: white;
+      }
+    </style>
+    <script src="../assets/javascripts/glightbox.min.js"></script>
+  </head>
+
+  <body>
+    <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+      <div class="container">
+        <a class="navbar-brand" href="../index.html">Bid Whist User Guide</a>
+        <!-- Expander button -->
+        <button
+          type="button"
+          class="navbar-toggler"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbar-collapse"
+          aria-controls="navbar-collapse"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Expanded navigation -->
+        <div id="navbar-collapse" class="navbar-collapse collapse">
+          <!-- Main navigation -->
+          <ul class="nav navbar-nav">
+            <li class="nav-item">
+              <a href="../index.html" class="nav-link">Home</a>
+            </li>
+            <li class="nav-item">
+              <a href="../about/index.html" class="nav-link">About</a>
+            </li>
+            <li class="nav-item">
+              <a href="./index.html" class="nav-link active" aria-current="page"
+                >Game</a
+              >
+            </li>
+            <li class="nav-item">
+              <a href="../rules/index.html" class="nav-link">Rules</a>
+            </li>
+          </ul>
+
+          <ul class="nav navbar-nav ms-md-auto">
+            <li class="nav-item">
+              <a rel="prev" href="../about/index.html" class="nav-link">
+                <i class="fa fa-arrow-left"></i> Previous
+              </a>
+            </li>
+            <li class="nav-item">
+              <a rel="next" href="../rules/index.html" class="nav-link">
+                Next <i class="fa fa-arrow-right"></i>
+              </a>
+            </li>
+            <li class="nav-item dropdown">
+              <button
+                id="theme-menu"
+                aria-expanded="false"
+                data-bs-toggle="dropdown"
+                data-bs-display="static"
+                aria-label="Toggle theme"
+                class="nav-link dropdown-toggle"
+              >
+                <i class="fa-solid fa-circle-half-stroke fa-fw"></i>
+                <span class="d-lg-none ms-2">Toggle theme</span>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                  <button
+                    class="dropdown-item d-flex align-items-center"
+                    data-bs-theme-value="light"
+                    aria-pressed="true"
+                  >
+                    <i class="fa-solid fa-sun fa-fw"></i>
+                    <span class="ms-2">Light</span>
+                    <i class="fa-solid fa-check ms-auto"></i>
+                  </button>
+                </li>
+                <li>
+                  <button
+                    class="dropdown-item d-flex align-items-center"
+                    data-bs-theme-value="dark"
+                    aria-pressed="false"
+                  >
+                    <i class="fa-solid fa-moon fa-fw"></i>
+                    <span class="ms-2">Dark</span>
+                    <i class="fa-solid fa-check ms-auto d-none"></i>
+                  </button>
+                </li>
+                <li>
+                  <button
+                    class="dropdown-item d-flex align-items-center"
+                    data-bs-theme-value="auto"
+                    aria-pressed="false"
+                  >
+                    <i class="fa-solid fa-circle-half-stroke fa-fw"></i>
+                    <span class="ms-2">Auto</span>
+                    <i class="fa-solid fa-check ms-auto d-none"></i>
+                  </button>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <script src="../js/darkmode.js"></script>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-md-3">
+          <div
+            class="navbar-expand-md bs-sidebar hidden-print affix"
+            role="complementary"
+          >
+            <div class="navbar-header">
+              <button
+                type="button"
+                class="navbar-toggler collapsed"
+                data-bs-toggle="collapse"
+                data-bs-target="#toc-collapse"
+                title="Table of Contents"
+              >
+                <span class="fa fa-angle-down"></span>
+              </button>
+            </div>
+
+            <div
+              id="toc-collapse"
+              class="navbar-collapse collapse card bg-body-tertiary"
+            >
+              <ul class="nav flex-column">
+                <li class="nav-item" data-bs-level="1">
+                  <a href="#getting-started" class="nav-link"
+                    >Getting Started</a
+                  >
+                  <ul class="nav flex-column">
+                    <li class="nav-item" data-bs-level="2">
+                      <a href="#environment-setup" class="nav-link"
+                        >Environment Setup</a
+                      >
+                      <ul class="nav flex-column"></ul>
+                    </li>
+                    <li class="nav-item" data-bs-level="2">
+                      <a href="#launching-the-game" class="nav-link"
+                        >Launching the Game</a
+                      >
+                      <ul class="nav flex-column"></ul>
+                    </li>
+                    <li class="nav-item" data-bs-level="2">
+                      <a href="#starting-a-single-player-game" class="nav-link"
+                        >Starting a Single Player Game</a
+                      >
+                      <ul class="nav flex-column"></ul>
+                    </li>
+                    <li class="nav-item" data-bs-level="2">
+                      <a href="#starting-a-multiplayer-game" class="nav-link"
+                        >Starting a Multiplayer Game</a
+                      >
+                      <ul class="nav flex-column"></ul>
+                    </li>
+                    <li class="nav-item" data-bs-level="2">
+                      <a href="#joining-a-multiplayer-game" class="nav-link"
+                        >Joining a Multiplayer Game</a
+                      >
+                      <ul class="nav flex-column"></ul>
+                    </li>
+                    <li class="nav-item" data-bs-level="2">
+                      <a href="#game-board-layout" class="nav-link"
+                        >Game Board Layout</a
+                      >
+                      <ul class="nav flex-column"></ul>
+                    </li>
+                    <li class="nav-item" data-bs-level="2">
+                      <a href="#players-turn" class="nav-link">Player's Turn</a>
+                      <ul class="nav flex-column"></ul>
+                    </li>
+                    <li class="nav-item" data-bs-level="2">
+                      <a href="#ending-the-round" class="nav-link"
+                        >Ending the round</a
+                      >
+                      <ul class="nav flex-column"></ul>
+                    </li>
+                    <li class="nav-item" data-bs-level="2">
+                      <a href="#next-round" class="nav-link">Next Round</a>
+                      <ul class="nav flex-column"></ul>
+                    </li>
+                    <li class="nav-item" data-bs-level="2">
+                      <a href="#ending-the-game" class="nav-link"
+                        >Ending the Game</a
+                      >
+                      <ul class="nav flex-column"></ul>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-9" role="main">
+          <h1 id="getting-started">Getting Started</h1>
+          <p>
+            Use the following user guide to learn how to use the application and
+            play Bid Whist!
+          </p>
+          <h2 id="environment-setup">Environment Setup</h2>
+          <ul>
+            <li>
+              Install Java (JDK 17+) <a href="https://jdk.java.net">Java JDK</a>
+            </li>
+            <li>
+              Install Maven and add <code>bin</code> to path
+              <a href="https://maven.apache.org">Maven</a>
+            </li>
+            <li>
+              Install Node.js (Vers 18+)
+              <a href="https://nodejs.org">Node.js</a>
+            </li>
+            <li>Build Project (Backend) <code>mvn clean package</code></li>
+            <li>
+              Run Application (Backend) <code>.\mvn spring-boot:run</code>
+            </li>
+            <li>
+              Install Dependencies (Frontend) <code>cd bidwhist-frontend</code>,
+              then <code>npm i</code>
+            </li>
+            <li>Run Server (Frontend) <code>npm run dev</code></li>
+          </ul>
+          <h2 id="launching-the-game">Launching the Game</h2>
+          <p>
+            Once the backend and frontend services are running, open a browser
+            and navigate to http://127.0.0.1:5173 or localhost:5173
+          </p>
+          <h2 id="starting-a-single-player-game">
+            Starting a Single Player Game
+          </h2>
+          <p>
+            The application defaults to a single player game, as can be seen at
+            the game's homepage
+          </p>
+          <p>
+            <a
+              class="glightbox"
+              href="../img/single_player_login.png"
+              data-type="image"
+              data-width="auto"
+              data-height="auto"
+              data-desc-position="bottom"
+              ><img alt="Bid Whist Main" src="../img/single_player_login.png"
+            /></a>
+          </p>
+          <div style="text-align: center">
+            <i>Figure 1: Single Player Welcome</i>
+          </div>
+
+          <ul>
+            <li>
+              To start the game, enter a name in the textfield that says "Enter
+              your name"
+            </li>
+            <li>
+              Select a difficulty level [Easy, Medium, or Hard] from the
+              drop-down menu
+            </li>
+            <li>Click <code>Start Game</code></li>
+          </ul>
+          <h2 id="starting-a-multiplayer-game">Starting a Multiplayer Game</h2>
+          <h4
+            id="please-note-multiplayer-is-only-available-through-the-website"
+          >
+            <strong
+              >Please note, multiplayer is only available through the
+              website.</strong
+            >
+          </h4>
+          <p>
+            After loading the homepage for the Bid Whist App, find the slider on
+            the welcome screen.
+          </p>
+          <figure>
+            <a
+              class="glightbox"
+              href="../img/slider.png"
+              data-type="image"
+              data-width="auto"
+              data-height="auto"
+              data-desc-position="bottom"
+              ><img align="center" alt="Slider" src="../img/slider.png"
+            /></a>
+            <figcaption>Figure 2: Game Mode Selector</figcaption>
+          </figure>
+          <p>Click this slider to switch to the multiplayer home page.</p>
+          <p>
+            <a
+              class="glightbox"
+              href="../img/multiplayer_login.png"
+              data-type="image"
+              data-width="auto"
+              data-height="auto"
+              data-desc-position="bottom"
+              ><img alt="MultiPlayer" src="../img/multiplayer_login.png"
+            /></a>
+          </p>
+          <ul>
+            <li>Like in Single Player mode: Enter your name</li>
+            <li>Click <code>Create Lobby</code></li>
+          </ul>
+          <h2 id="joining-a-multiplayer-game">Joining a Multiplayer Game</h2>
+          <p>
+            To join a multiplayer game, an autogenerated 6-character
+            Alphanumeric code is required.
+          </p>
+          <p>
+            <a
+              class="glightbox"
+              href="../img/join_mp_game.png"
+              data-type="image"
+              data-width="auto"
+              data-height="auto"
+              data-desc-position="bottom"
+              ><img alt="Create Lobby" src="../img/join_mp_game.png"
+            /></a>
+          </p>
+          <p>
+            This will be the same code that others will use to join the current
+            lobby. Any player will have access to the code while waiting to join
+            the game
+          </p>
+          <p>
+            <a
+              class="glightbox"
+              href="../img/waiting_mp.png"
+              data-type="image"
+              data-width="auto"
+              data-height="auto"
+              data-desc-position="bottom"
+              ><img alt="Waiting for Players" src="../img/waiting_mp.png"
+            /></a>
+          </p>
+          <h2 id="game-board-layout">Game Board Layout</h2>
+          <p>
+            Whether in Single Player or Multi-Player mode, the game will load
+            and deal 12 cards to each player.
+          </p>
+          <p>
+            <a
+              class="glightbox"
+              href="../img/game_start.png"
+              data-type="image"
+              data-width="auto"
+              data-height="auto"
+              data-desc-position="bottom"
+              ><img alt="Game Start" src="../img/game_start.png"
+            /></a>
+          </p>
+          <p>
+            The game board contains 4 sets of cards (hands), a zone for bidding
+            and playing cards, and a scoreboard. The bottom of the game board
+            contains the user's hand. These are the cards the user can play each
+            round.
+          </p>
+          <p>
+            When the game starts, the player must enter a bid (or how many hands
+            the player believes they can win given the current hand). Place a
+            number in the box under 'Place Your Bid' and press the
+            <code>Set Bid</code> button. Alternatively, players can press the
+            <code>Pass</code> or <code>Quit</code>.
+          </p>
+          <p>
+            The <code>Pass</code> Button registers a 0-bid to the game.
+            <code>Quit</code> will quit the game.
+          </p>
+          <p>
+            Once all players input their bids, the round begins. The top of the
+            Game board contains the scoreboard.
+          </p>
+          <p>The scoreboard consists of 3 sections:</p>
+          <ul>
+            <li>Team A's Score</li>
+            <li>
+              Game Phase/Information (Team with the winning bid, Trump Suit and
+              Direction, and Game Phase)
+            </li>
+            <li>Team B's Score</li>
+          </ul>
+          <p>
+            <a
+              class="glightbox"
+              href="../img/scoreboard.png"
+              data-type="image"
+              data-width="auto"
+              data-height="auto"
+              data-desc-position="bottom"
+              ><img alt="Scoreboard" src="../img/scoreboard.png"
+            /></a>
+          </p>
+          <h2 id="players-turn">Player's Turn</h2>
+          <p>
+            On the player's turn, drag and drop a card from the player's hand.
+            When starting to drag the card, a zone will appear on the board,
+            indicating where the card should be dropped at.
+          </p>
+          <p>
+            <a
+              class="glightbox"
+              href="../img/drag_zone.png"
+              data-type="image"
+              data-width="auto"
+              data-height="auto"
+              data-desc-position="bottom"
+              ><img alt="Drop Zone" src="../img/drag_zone.png"
+            /></a>
+          </p>
+          <h2 id="ending-the-round">Ending the round</h2>
+          <p>
+            The round ends after all players have played a card, and the team
+            with the highest winning card, wins the hand (called a trick), and
+            the round begins again. Won tricks are stored in the top left and
+            bottom right of the game board.
+          </p>
+          <ul>
+            <li>Bottom Right (1)—Team A's (Player's team) won tricks</li>
+            <li>Top Left (2)—Team B's won tricks.</li>
+          </ul>
+          <p>
+            <a
+              class="glightbox"
+              href="../img/won_books.png"
+              data-type="image"
+              data-width="auto"
+              data-height="auto"
+              data-desc-position="bottom"
+              ><img alt="Won Books" src="../img/won_books.png"
+            /></a>
+          </p>
+          <p>Play will continue until all cards have been played.</p>
+          <h2 id="next-round">Next Round</h2>
+          <p>
+            Once all cards have been played, the round starts over with a new
+            bidding phase. The scoreboard will update with team scores and
+            information as the game progresses through each round.
+          </p>
+          <p>
+            <a
+              class="glightbox"
+              href="../img/new_round.png"
+              data-type="image"
+              data-width="auto"
+              data-height="auto"
+              data-desc-position="bottom"
+              ><img alt="New Round" src="../img/new_round.png"
+            /></a>
+          </p>
+          <h2 id="ending-the-game">Ending the Game</h2>
+          <p>
+            Players will continue to play through the rounds until one team
+            reaches a score of 7.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <footer class="col-md-12">
+      <hr />
+      <p>
+        Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.
+      </p>
+    </footer>
+    <script src="../js/bootstrap.bundle.min.js"></script>
+    <script>
+      var base_url = "..",
+        shortcuts = { help: 191, next: 78, previous: 80, search: 83 };
+    </script>
+    <script src="../js/base.js"></script>
+
+    <div
+      class="modal"
+      id="mkdocs_keyboard_modal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="keyboardModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title" id="keyboardModalLabel">
+              Keyboard Shortcuts
+            </h4>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th style="width: 20%">Keys</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="help shortcut"><kbd>?</kbd></td>
+                  <td>Open this help</td>
+                </tr>
+                <tr>
+                  <td class="next shortcut"><kbd>n</kbd></td>
+                  <td>Next page</td>
+                </tr>
+                <tr>
+                  <td class="prev shortcut"><kbd>p</kbd></td>
+                  <td>Previous page</td>
+                </tr>
+                <tr>
+                  <td class="search shortcut"><kbd>s</kbd></td>
+                  <td>Search</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="modal-footer"></div>
+        </div>
+      </div>
+    </div>
+
+    <script id="init-glightbox">
+      const lightbox = GLightbox({
+        touchNavigation: true,
+        loop: false,
+        zoomable: true,
+        draggable: true,
+        openEffect: "zoom",
+        closeEffect: "zoom",
+        slideEffect: "slide",
+      });
+    </script>
+  </body>
+</html>
