@@ -52,9 +52,9 @@ public class GameService {
     }
 
     /*
-   * Starts a solo game with one human player and three AIs.
-   * Initializes player positions, shuffles the deck, assigns cards, and updates
-   * state.
+     * Starts a solo game with one human player and three AIs.
+     * Initializes player positions, shuffles the deck, assigns cards, and updates
+     * state.
      */
     public GameStateResponse startSoloGame(StartGameRequest request) {
         String playerName = request.getPlayerName();
@@ -99,8 +99,24 @@ public class GameService {
     }
 
     /*
-   * Starts a multiplayer game and registers the first player.
-   * Sets game status to waiting for additional players.
+     * Starts a new game with current players
+     */
+
+    public GameStateResponse startNewGame(QuitGameRequest request) {
+        GameState game = getGameById(request.getGameId());
+
+        if (game.getPhase() == GamePhase.END) {
+            GameplayUtils.startNewGame(game);
+        } else {
+            throw new IllegalStateException("Game has not ended");
+        }
+
+        return getGameStateForPlayer(game, request.getPlayer());
+    }
+
+    /*
+     * Starts a multiplayer game and registers the first player.
+     * Sets game status to waiting for additional players.
      */
     public GameStateResponse createMutliplayerGame(StartGameRequest request) {
         System.out.println("Staring new game for player: " + request.getPlayerName());
@@ -131,8 +147,8 @@ public class GameService {
     }
 
     /*
-   * Allows a player to join an existing game.
-   * If room is ready, triggers shuffle and deals cards.
+     * Allows a player to join an existing game.
+     * If room is ready, triggers shuffle and deals cards.
      */
     public GameStateResponse joinGame(JoinGameRequest request) {
         GameState game = getGameById(request.getGameId());
@@ -160,8 +176,8 @@ public class GameService {
     }
 
     /*
-   * Returns a GameStateResponse customized for a single player.
-   * Includes masked hands, phase info, team, and all visible public game state.
+     * Returns a GameStateResponse customized for a single player.
+     * Includes masked hands, phase info, team, and all visible public game state.
      */
     public GameStateResponse getGameStateForPlayer(GameState game, PlayerPos playerPosition) {
         List<PlayerView> playerViews = getMyPlayerViews(game, playerPosition);
@@ -192,13 +208,14 @@ public class GameService {
         response.setBidWinnerPos(game.getBidWinnerPos());
         response.setTeamAScore(game.getTeamAScore());
         response.setTeamBScore(game.getTeamBScore());
+        response.setFinalScore(game.getFinalScore());
 
         return response;
     }
 
     /*
-   * Submits a bid from a human player.
-   * Also triggers AI bidding logic and resolves winner if 4 bids exist.
+     * Submits a bid from a human player.
+     * Also triggers AI bidding logic and resolves winner if 4 bids exist.
      */
     public GameStateResponse submitBid(BidRequest request) {
         GameState game = getGameById(request.getGameId());
@@ -218,16 +235,19 @@ public class GameService {
         if (!bid.isPassed()) {
             InitialBid currentHighest = game.getHighestBid();
 
-            // Compares bid to select winner (if same value NO_TRUMP wins if isNO() otherwise first bidder wins)
+            // Compares bid to select winner (if same value NO_TRUMP wins if isNO()
+            // otherwise first bidder wins)
             if (currentHighest == null || bid.compareTo(currentHighest) > 0) {
                 game.setHighestBid(bid);
             }
 
-            /*if (currentHighest == null || bid.getValue() > currentHighest.getValue()) {
-                game.setHighestBid(bid);
-            } else if (bid.getValue() == currentHighest.getValue()) {
-                // Same-value bid — do nothing, keep earlier bid
-            }*/
+            /*
+             * if (currentHighest == null || bid.getValue() > currentHighest.getValue()) {
+             * game.setHighestBid(bid);
+             * } else if (bid.getValue() == currentHighest.getValue()) {
+             * // Same-value bid — do nothing, keep earlier bid
+             * }
+             */
         }
 
         int nextIndex = (game.getBidTurnIndex() + 1) % game.getPlayers().size();
@@ -244,12 +264,13 @@ public class GameService {
 
             game.setBidWinnerPos(winnerPos);
 
-            //NO_TRUMP Handling
+            // NO_TRUMP Handling
             if (game.getHighestBid().isNo()) {
                 game.setBidType(BidType.NO_TRUMP);
                 game.setTrumpSuit(null);
 
-                FinalBid finalBid = new FinalBid(game.getHighestBid().getPlayer(), game.getHighestBid().getValue(), BidType.NO_TRUMP, null);
+                FinalBid finalBid = new FinalBid(game.getHighestBid().getPlayer(), game.getHighestBid().getValue(),
+                        BidType.NO_TRUMP, null);
                 game.setWinningBidStats(finalBid);
 
                 if (winner.isAI()) {
@@ -291,8 +312,8 @@ public class GameService {
     }
 
     /*
-   * Finalizes the winning bid by the human player.
-   * Assigns trump suit and updates game state and kitty visibility.
+     * Finalizes the winning bid by the human player.
+     * Assigns trump suit and updates game state and kitty visibility.
      */
     public GameStateResponse getFinalBid(FinalBidRequest request) {
         GameState game = getGameById(request.getGameId());
@@ -326,8 +347,8 @@ public class GameService {
     }
 
     /*
-   * Applies the kitty and discards to the winner’s hand.
-   * Advances game to PLAY phase once done.
+     * Applies the kitty and discards to the winner’s hand.
+     * Advances game to PLAY phase once done.
      */
     public GameStateResponse applyKittyAndDiscards(KittyRequest request) {
         GameState game = getGameById(request.getGameId());
@@ -382,8 +403,8 @@ public class GameService {
     }
 
     /*
-   * Plays a card from a player and evaluates the trick.
-   * Validates legality, triggers animations, and handles trick scoring.
+     * Plays a card from a player and evaluates the trick.
+     * Validates legality, triggers animations, and handles trick scoring.
      */
     public GameStateResponse playCard(PlayRequest request) {
         System.out.println("[playCard]");
@@ -397,17 +418,17 @@ public class GameService {
         Player currentPlayer = PlayerUtils.getPlayerByPosition(request.getPlayer(), game.getPlayers());
         System.out.println(
                 "DEBUG: Current turn is player index "
-                + game.getCurrentTurnIndex()
-                + " ("
-                + currentPlayer.getName()
-                + ")");
+                        + game.getCurrentTurnIndex()
+                        + " ("
+                        + currentPlayer.getName()
+                        + ")");
         System.out.println(
                 "DEBUG: Player "
-                + request.getPlayer()
-                + " playing: "
-                + request.getCard().getRank()
-                + " of "
-                + request.getCard().getSuit());
+                        + request.getPlayer()
+                        + " playing: "
+                        + request.getCard().getRank()
+                        + " of "
+                        + request.getCard().getSuit());
 
         if (game.getCurrentTurnIndex() != request.getPlayer().ordinal()) {
             throw new IllegalStateException("It's not " + request.getPlayer() + "'s turn");
@@ -417,9 +438,9 @@ public class GameService {
         if (!currentPlayer.getHand().getCards().contains(cardToPlay)) {
             throw new IllegalArgumentException(
                     "Player does not have the specified card "
-                    + cardToPlay.getRank()
-                    + " of "
-                    + cardToPlay.getSuit());
+                            + cardToPlay.getRank()
+                            + " of "
+                            + cardToPlay.getSuit());
         }
 
         List<PlayedCard> currentTrick = game.getCurrentTrick();
@@ -462,13 +483,17 @@ public class GameService {
 
             if (game.getCompletedTricks().size() == 12) {
                 GameplayUtils.scoreHand(game);
-                if (game.getTeamAScore() >= 7 || game.getTeamBScore() <= -7) {
+                if (game.getTeamAScore() >= 7 ||
+                        game.getTeamBScore() >= 7 ||
+                        game.getTeamAScore() <= -7 ||
+                        game.getTeamAScore() <= -7) {
                     game.addAnimation(new Animation(AnimationType.SHOW_WINNER));
                     game.setPhase(GamePhase.END);
                 } else {
                     game.addAnimation(new Animation(AnimationType.CLEAR));
                     GameplayUtils.startNewHand(game);
                 }
+                game.setBidWinnerPos(null);
                 return getGameStateForPlayer(game, request.getPlayer());
             }
         }
@@ -479,11 +504,26 @@ public class GameService {
             AIUtils.autoPlayAITurns(game);
         }
 
-        return getGameStateForPlayer(game, request.getPlayer());
+        GameStateResponse response = getGameStateForPlayer(game, request.getPlayer());
+
+        if (game.getPhase() == GamePhase.END) {
+            int aScore = game.getTeamAScore();
+            int bScore = game.getTeamBScore();
+
+            if (aScore > bScore) {
+                game.setFinalScore(aScore);
+                response.setFinalScore(aScore);
+            } else if (bScore > aScore) {
+                game.setFinalScore(bScore);
+                response.setFinalScore(bScore);
+            }
+        }
+
+        return response;
     }
 
     /*
-   * Removes a single animation (by ID) from a player's animation queue.
+     * Removes a single animation (by ID) from a player's animation queue.
      */
     public void popAnimation(PopAnimationRequest request) {
         GameState game = getGameById(request.getGameId());
@@ -494,19 +534,26 @@ public class GameService {
     }
 
     /*
-   * Removes a person from a game.
+     * Removes a person from a game.
      */
     public void quitMyGame(QuitGameRequest request) {
         GameState game = getGameById(request.getGameId());
-        String player = PlayerUtils.getNameByPosition(request.getPlayer(), game.getPlayers());
+        String playerName = PlayerUtils.getNameByPosition(request.getPlayer(), game.getPlayers());
+        PlayerPos playerPos = request.getPlayer();
+        Player player = PlayerUtils.getPlayerByPosition(playerPos, game.getPlayers());
         if (request.getMode() == "multiplayer") {
-            game.addAnimation(new Animation(player));
+            game.addAnimation(new Animation(playerName));
+            game.getPlayers().remove(player);
+            if (game.getPlayers().size() == 0) {
+                games.remove(request.getGameId());
+            }
+        } else {
             games.remove(request.getGameId());
         }
     }
 
     /*
-   * Returns the latest game state for polling updates.
+     * Returns the latest game state for polling updates.
      */
     public GameStateResponse updateState(PollRequest request) {
         PlayerPos playerPosition = request.getPlayer();
@@ -516,7 +563,7 @@ public class GameService {
     }
 
     /*
-   * Retrieves a game instance from memory by its ID.
+     * Retrieves a game instance from memory by its ID.
      */
     public GameState getGameById(String gameId) {
         if (gameId == null) {
@@ -532,7 +579,7 @@ public class GameService {
     }
 
     /*
-   * Returns a HandResponse including player views and kitty for UI refresh.
+     * Returns a HandResponse including player views and kitty for UI refresh.
      */
     public HandResponse provideUpdatedCards(HandRequest request) {
         GameState game = getGameById(request.getGameId());
@@ -545,8 +592,8 @@ public class GameService {
     }
 
     /*
-   * Builds list of PlayerView objects for the requesting player.
-   * Hides other hands with placeholder cards.
+     * Builds list of PlayerView objects for the requesting player.
+     * Hides other hands with placeholder cards.
      */
     public List<PlayerView> getMyPlayerViews(GameState game, PlayerPos playerPosition) {
         List<PlayerView> playerViews = new ArrayList<>();
@@ -574,8 +621,8 @@ public class GameService {
     }
 
     /*
-   * Returns the correct kitty view for the player.
-   * Winning player sees the actual cards, others see hidden placeholders.
+     * Returns the correct kitty view for the player.
+     * Winning player sees the actual cards, others see hidden placeholders.
      */
     public List<Card> getMyKittyView(GameState game, PlayerPos playerPosition) {
         List<Card> myKittyView = new ArrayList<>(game.getKitty());

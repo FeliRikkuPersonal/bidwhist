@@ -34,6 +34,9 @@ export default function BidTypePanel({ closeBidTypePanel }) {
   const { showFinalizeBid, setShowFinalizeBid, setAwardKitty } = useUIDisplay();
   const throwAlert = useThrowAlert();
 
+  const savedMode = localStorage.getItem('mode');
+  const API = import.meta.env.VITE_API_URL; // Server endpoint
+
   const [direction, setDirection] = useState('UPTOWN');
   const [suit, setSuit] = useState('HEARTS');
 
@@ -130,7 +133,9 @@ export default function BidTypePanel({ closeBidTypePanel }) {
           <button className="index-button settings-button" onClick={finalizeBid}>
             Confirm
           </button>
-          <button className="index-button settings-button" onClick={handleQuit}>
+          <button className="index-button settings-button" 
+          onClick={() =>
+          handleQuit({viewerPosition, gameId, savedMode, API})}>
             Cancel
           </button>
         </div>

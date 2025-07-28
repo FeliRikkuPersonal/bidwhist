@@ -236,4 +236,38 @@ public class GameplayUtils {
         dealToPlayers(game);
     }
 
+    public static void startNewGame(GameState game) {
+        game.setPhase(GamePhase.START);
+        List<Player> players = game.getPlayers();
+
+        for (Player player : players) {
+            player.getHand().getCards().clear();
+        }
+        game.getDeck().clearKitty();
+        game.getKitty().clear();
+        game.setPhase(GamePhase.SHUFFLE);
+        game.setTrumpSuit(null);
+        game.getBids().clear();
+        game.setHighestBid(null);
+        game.setBidType(null);
+        game.getFinalBidCache().clear();
+        game.setWinningBid(null);
+        game.setBidWinnerPos(null);
+        game.getCurrentTrick().clear();
+        game.getCompletedTricks().clear();
+        game.setLeadSuit(null);
+        game.getPlayedCards().clear();
+        game.setTeamAScore(0);
+        game.setTeamBScore(0);
+        game.setTeamATricksWon(0);
+        game.setTeamBTricksWon(0);
+        game.getTeamTrickCounts().clear();
+        game.getTeamScores().clear();
+        game.setFinalScore(-1);
+
+        game.getDeck().shuffle();
+        game.setShuffledDeck(game.getDeck().getCards());
+        GameplayUtils.dealToPlayers(game);
+    }
+
 }

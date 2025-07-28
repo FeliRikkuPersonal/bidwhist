@@ -1,0 +1,47 @@
+.final-score-overlay {
+
+  background-color: red;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.final-score-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #2d4d2f; /* similar green tone */
+  padding: 2rem 3rem;
+  border-radius: 25px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  color: white;
+}
+
+.score-panel-text {
+  font-size: 18px;
+  margin: 10px 0;
+}
+
+.settings-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.score-button {
+  border-radius: 20px;
+  min-width: 100px;
+  color: white;
+  font-weight: normal;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.score-button:hover {
+  background-color: #729528;
+}

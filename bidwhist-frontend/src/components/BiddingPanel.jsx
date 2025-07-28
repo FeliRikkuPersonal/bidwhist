@@ -40,6 +40,8 @@ export default function BiddingPanel({ closeBidding, onBidPlaced }) {
     setShowFinalizeBid,
   } = useUIDisplay();
 
+  const savedMode = localStorage.getItem('mode');
+
   const throwAlert = useThrowAlert();
   const [bidValue, setBidValue] = useState('');
   const [isNo, setIsNo] = useState(false);
@@ -123,7 +125,10 @@ export default function BiddingPanel({ closeBidding, onBidPlaced }) {
           <button onClick={passBid} className="index-button settings-button">
             Pass
           </button>
-          <button onClick={handleQuit} className="index-button settings-button">
+          <button
+            onClick={() =>
+              handleQuit({ viewerPosition, gameId, savedMode, API })}
+            className="index-button settings-button">
             Quit
           </button>
         </div>

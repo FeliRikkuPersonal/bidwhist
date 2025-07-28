@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
 import { useZoneRefs } from '../context/RefContext.jsx';
 import { useUIDisplay } from '../context/UIDisplayContext.jsx';
+import { useThrowAlert } from '../hooks/useThrowAlert.js';
 
 import '../css/PlayerZone.css';
 import '../css/CardPlayZone.css';
@@ -37,6 +38,8 @@ const PlayerZone = forwardRef(({ direction, name, revealHand, cards = [] }, ref)
   const playRef = useRef();
   const zoneRef = useRef();
   const { register } = useZoneRefs();
+
+    const throwAlert = useThrowAlert();
 
   /**
    * Handles clicks on cards for both discard and regular play modes.
@@ -86,7 +89,17 @@ const PlayerZone = forwardRef(({ direction, name, revealHand, cards = [] }, ref)
     if (ref && typeof ref === 'object' && ref.current) {
       register(`zone-${direction}`, ref);
     }
-  }, [direction, register, ref]);
+  }, [direction, register, ref, myTurn]);
+
+  /*
+  * Show alert if it's player's turn
+  */
+
+  useEffect(() => {
+        if (myTurn) {
+      throwAlert('Your turn to play', 'info')
+    }
+  }, [myTurn])
 
   /**
    * Exposes getPosition() to parent via ref.

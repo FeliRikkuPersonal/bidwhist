@@ -1,7 +1,12 @@
 // src/components/FinalScorePanel.jsx
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useGameState } from '../context/GameStateContext';
+import handleQuit from '../utils/handleQuit.js';
+import { usePositionContext } from '../context/PositionContext';
+import '../css/FinalScorePanel.css'
+import '../css/index.css'
+import { useUIDisplay } from '../context/UIDisplayContext.jsx';
 
 /**
  * Displays the final score overlay at the end of a game.
@@ -10,32 +15,47 @@ import { useGameState } from '../context/GameStateContext';
  * @param {Function} onNewGame - Callback to trigger a new game (or close the panel)
  * @returns {JSX.Element} Final score modal if `finalScore` is true
  */
-export default function FinalScorePanel({ scores, onNewGame }) {
-  const { finalScore } = useGameState();
+export default function FinalScorePanel({ onNewGame }) {
+  const { finalScore, teamAScore, teamBScore } = useGameState();
+  const { showFinalScore, setShowFinalScore } = useUIDisplay();
+  const { viewerPosition } = usePositionContext();
+  const savedMode = localStorage.getItem('mode');
+  const savedGameId = localStorage.getItem('gameId');
+  const API = import.meta.env.VITE_API_URL; // Server endpoint
+
+  useEffect(() => {
+    if (finalScore && finalScore > -1) {
+      setShowFinalScore(true);
+    } else {
+      setShowFinalScore(false);
+    }
+  }, [finalScore]);
+
 
   return (
     <div>
-      {finalScore && (
-        <div className="final-score-overlay">
+      {showFinalScore && (
+    
           <div className="final-score-panel">
             <h2>Final Score</h2>
             <div className="score-panel-text">
-              Team 1 ({scores[0].team}): {scores[0].points}
+              Team A: {teamAScore}
             </div>
             <div className="score-panel-text">
-              Team 2 ({scores[1].team}): {scores[1].points}
+              Team B: {teamBScore}
             </div>
             <div className="settings-actions">
               <button className="index-button score-button" onClick={onNewGame}>
                 New Game
               </button>
-              <button className="index-button score-button" onClick={onNewGame}>
+              <button className="index-button score-button"
+                onClick={() =>
+                  handleQuit({ viewerPosition, savedGameId, savedMode, API })}>
                 Close
               </button>
-              {/* TODO: Separate `Close` into its own handler */}
             </div>
           </div>
-        </div>
+
       )}
     </div>
   );

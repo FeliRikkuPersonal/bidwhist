@@ -43,6 +43,7 @@ public class GameStateResponse {
   private int teamBScore = 0;
   private int teamATricksWon = 0;
   private int teamBTricksWon = 0;
+  private int finalScore;
 
   public GameStateResponse(
       List<Animation> animationQueue,
@@ -243,5 +244,13 @@ public class GameStateResponse {
 
   public void setBidWinnerPos(PlayerPos winnerPos) {
     this.bidWinnerPos = winnerPos;
+  }
+
+  public int getFinalScore() {
+    return finalScore;
+  }
+
+  public void setFinalScore(int score) {
+    this.finalScore = score;
   }
 }

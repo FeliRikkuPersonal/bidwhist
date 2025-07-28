@@ -82,11 +82,11 @@ public class AIUtils {
                 aiBid = AIUtils.generateAIBid(game, nextBidder);
                 System.out.println(
                         "DEBUG: "
-                        + nextBidder.getName()
-                        + " (AI) bids "
-                        + aiBid.getValue()
-                        + " is No?: "
-                        + aiBid.isNo());
+                                + nextBidder.getName()
+                                + " (AI) bids "
+                                + aiBid.getValue()
+                                + " is No?: "
+                                + aiBid.isNo());
             }
 
             game.addBid(aiBid);
@@ -114,11 +114,11 @@ public class AIUtils {
             Card chosenCard = chooseCardForAI(game, current, game.getCurrentTrick());
             System.out.println(
                     "DEBUG: "
-                    + current.getName()
-                    + " played card: "
-                    + chosenCard
-                    + " "
-                    + game.getCurrentTurnIndex());
+                            + current.getName()
+                            + " played card: "
+                            + chosenCard
+                            + " "
+                            + game.getCurrentTurnIndex());
 
             current.getHand().getCards().remove(chosenCard);
 
@@ -153,7 +153,10 @@ public class AIUtils {
 
                 if (game.getCompletedTricks().size() == 12) {
                     GameplayUtils.scoreHand(game);
-                    if (game.getTeamAScore() >= 7 || game.getTeamBScore() >= 7) {
+                    if (game.getTeamAScore() >= 7 ||
+                            game.getTeamBScore() >= 7 ||
+                            game.getTeamAScore() <= -7 ||
+                            game.getTeamAScore() <= -7) {
                         game.addAnimation(new Animation(AnimationType.SHOW_WINNER));
                         game.setPhase(GamePhase.END);
                     } else {
@@ -166,6 +169,16 @@ public class AIUtils {
                 if (winnerPlayer.isAI()) {
                     autoPlayAITurns(game);
                 }
+            }
+        }
+        if (game.getPhase() == GamePhase.END) {
+            int aScore = game.getTeamAScore();
+            int bScore = game.getTeamBScore();
+
+            if (aScore > bScore) {
+                game.setFinalScore(aScore);
+            } else if (bScore > aScore) {
+                game.setFinalScore(bScore);
             }
         }
     }
@@ -254,8 +267,9 @@ public class AIUtils {
                         .filter(c -> !JokerUtils.isJokerRank(c.getRank())) // Avoid jokers
                         .filter(
                                 c -> c.getSuit() == null
-                                || !c.getSuit().equals(trumpSuit)
-                                || CardUtils.allHigherTrumpCardsPlayed(c, game.getCompletedCards(), trumpSuit, game.getBidType() == BidType.NO_TRUMP))
+                                        || !c.getSuit().equals(trumpSuit)
+                                        || CardUtils.allHigherTrumpCardsPlayed(c, game.getCompletedCards(), trumpSuit,
+                                                game.getBidType() == BidType.NO_TRUMP))
                         .max(Comparator.comparingInt(c -> c.getRank().getValue()));
 
                 if (safeLead.isPresent()) {
@@ -308,8 +322,9 @@ public class AIUtils {
                             .filter(c -> c.getRank().getValue() >= Rank.QUEEN.getValue())
                             .filter(
                                     c -> c.getSuit() == null
-                                    || !c.getSuit().equals(trumpSuit)
-                                    || CardUtils.allHigherTrumpCardsPlayed(c, game.getCompletedCards(), trumpSuit, game.getBidType() == BidType.NO_TRUMP))
+                                            || !c.getSuit().equals(trumpSuit)
+                                            || CardUtils.allHigherTrumpCardsPlayed(c, game.getCompletedCards(),
+                                                    trumpSuit, game.getBidType() == BidType.NO_TRUMP))
                             .findFirst();
                     if (safeHigh.isPresent()) {
                         return safeHigh.get();
@@ -333,8 +348,9 @@ public class AIUtils {
                         .filter(c -> c.getRank().getValue() >= Rank.QUEEN.getValue())
                         .filter(
                                 c -> c.getSuit() == null
-                                || !c.getSuit().equals(trumpSuit)
-                                || CardUtils.allHigherTrumpCardsPlayed(c, game.getCompletedCards(), trumpSuit, game.getBidType() == BidType.NO_TRUMP))
+                                        || !c.getSuit().equals(trumpSuit)
+                                        || CardUtils.allHigherTrumpCardsPlayed(c, game.getCompletedCards(), trumpSuit,
+                                                game.getBidType() == BidType.NO_TRUMP))
                         .findFirst();
                 if (safeHigh.isPresent()) {
                     return safeHigh.get();
@@ -362,8 +378,9 @@ public class AIUtils {
                     Optional<Card> safeBurn = followSuit.stream()
                             .filter(
                                     c -> c.getSuit() == null
-                                    || !c.getSuit().equals(trumpSuit)
-                                    || CardUtils.allHigherTrumpCardsPlayed(c, game.getCompletedCards(), trumpSuit, game.getBidType() == BidType.NO_TRUMP))
+                                            || !c.getSuit().equals(trumpSuit)
+                                            || CardUtils.allHigherTrumpCardsPlayed(c, game.getCompletedCards(),
+                                                    trumpSuit, game.getBidType() == BidType.NO_TRUMP))
                             .max(Comparator.comparingInt(c -> c.getRank().getValue()));
                     if (safeBurn.isPresent()) {
                         return safeBurn.get();
@@ -393,8 +410,9 @@ public class AIUtils {
                     .filter(c -> c.getRank().getValue() >= Rank.QUEEN.getValue())
                     .filter(
                             c -> c.getSuit() == null
-                            || !c.getSuit().equals(trumpSuit)
-                            || CardUtils.allHigherTrumpCardsPlayed(c, game.getCompletedCards(), trumpSuit, game.getBidType() == BidType.NO_TRUMP))
+                                    || !c.getSuit().equals(trumpSuit)
+                                    || CardUtils.allHigherTrumpCardsPlayed(c, game.getCompletedCards(), trumpSuit,
+                                            game.getBidType() == BidType.NO_TRUMP))
                     .findFirst();
             if (safeHigh.isPresent()) {
                 return safeHigh.get();

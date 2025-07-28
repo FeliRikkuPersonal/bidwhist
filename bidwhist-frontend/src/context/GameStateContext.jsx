@@ -51,6 +51,7 @@ export const GameStateProvider = ({ children }) => {
   const [finalScore, setFinalScore] = useState(false);
 
 
+
   /**
    * Updates game state from a backend response object.
    * Uses key checks to update only the relevant parts.

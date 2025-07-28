@@ -16,30 +16,30 @@ import com.bidwhist.utils.PlayerUtils;
 
 public class GameState {
 
-  private final String gameId;
-  private final List<Player> players;
-  private final Deck deck;
-  private List<Card> kitty;
-  private int currentTurnIndex;
-  private GamePhase phase;
-  private Suit trumpSuit;
-  private final List<InitialBid> bids;
-  private int bidTurnIndex;
-  private InitialBid highestBid;
-  private BidType bidType;
-  private Map<PlayerPos, FinalBid> finalBidCache = new HashMap<>();
-  private FinalBid winningBid;
-  private String winningPlayerName;
-  private List<Card> shuffledDeck;
-  private PlayerPos firstBidder;
-  private Difficulty difficulty;
-  private GameRoom room;
-  private Map<PlayerPos, List<Animation>> animationList = new EnumMap<>(PlayerPos.class);
-  private PlayerPos bidWinnerPos;
+    private final String gameId;
+    private final List<Player> players;
+    private final Deck deck;
+    private List<Card> kitty;
+    private int currentTurnIndex;
+    private GamePhase phase;
+    private Suit trumpSuit;
+    private final List<InitialBid> bids;
+    private int bidTurnIndex;
+    private InitialBid highestBid;
+    private BidType bidType;
+    private Map<PlayerPos, FinalBid> finalBidCache = new HashMap<>();
+    private FinalBid winningBid;
+    private String winningPlayerName;
+    private List<Card> shuffledDeck;
+    private PlayerPos firstBidder;
+    private Difficulty difficulty;
+    private GameRoom room;
+    private Map<PlayerPos, List<Animation>> animationList = new EnumMap<>(PlayerPos.class);
+    private PlayerPos bidWinnerPos;
 
     private List<PlayedCard> currentTrick = new ArrayList<>();
     private List<Book> completedTricks = new ArrayList<>();
-  private Suit leadSuit;
+    private Suit leadSuit;
     private final List<Card> playedCards = new ArrayList<>();
     private int currentPlayerIndex;
 
@@ -50,6 +50,8 @@ public class GameState {
 
     private Map<Team, Integer> teamTrickCounts = new HashMap<>();
     private Map<Team, Integer> teamScores = new HashMap<>();
+
+    private int finalScore = -1;
 
     public GameState(String gameId) {
         this.room = new GameRoom(gameId);
@@ -86,10 +88,9 @@ public class GameState {
             return false;
         }
         return animations.removeIf(
-                animation
-                -> animationId != null
-                && animation.getId() != null
-                && animationId.trim().equalsIgnoreCase(animation.getId().trim()));
+                animation -> animationId != null
+                        && animation.getId() != null
+                        && animationId.trim().equalsIgnoreCase(animation.getId().trim()));
     }
 
     public void addPlayedCard(Card card) {
@@ -238,13 +239,13 @@ public class GameState {
         return (winningBid != null) ? winningBid.getType() : null;
     }
 
-  public PlayerPos getBidWinnerPos() {
-    return bidWinnerPos;
-  }
+    public PlayerPos getBidWinnerPos() {
+        return bidWinnerPos;
+    }
 
-  public void setBidWinnerPos(PlayerPos winnerPos) {
-    this.bidWinnerPos = winnerPos;
-  }
+    public void setBidWinnerPos(PlayerPos winnerPos) {
+        this.bidWinnerPos = winnerPos;
+    }
 
     public PlayerPos getWinningPlayerPos() {
         return winningBid.getPlayer();
@@ -280,13 +281,13 @@ public class GameState {
         this.currentTrick = currentTrick;
     }
 
-  public Suit getLeadSuit() {
-    return leadSuit;
-  }
+    public Suit getLeadSuit() {
+        return leadSuit;
+    }
 
-  public void setLeadSuit(Suit suit) {
-    this.leadSuit = suit;
-  }
+    public void setLeadSuit(Suit suit) {
+        this.leadSuit = suit;
+    }
 
     public List<Book> getCompletedTricks() {
         return completedTricks;
@@ -368,5 +369,14 @@ public class GameState {
 
     public void setTeamScores(Map<Team, Integer> teamScores) {
         this.teamScores = teamScores;
+    }
+
+    public int getFinalScore() {
+        return finalScore;
+    }
+
+    public void setFinalScore(int newScore) {
+        this.finalScore = newScore;
+        System.out.println("[GameState] Setting final Score to " + newScore);
     }
 }

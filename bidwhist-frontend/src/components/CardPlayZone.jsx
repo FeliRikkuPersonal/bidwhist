@@ -11,6 +11,7 @@ import AnimatedCard from './AnimatedCard';
 import PlayCardAnimation from '../animations/PlayCardAnimation.jsx';
 import BiddingPanel from './BiddingPanel';
 import BidTypePanel from './BidTypePanel.jsx';
+import FinalScorePanel from './FinalScorePanel.jsx';
 
 import { getPositionMap } from '../utils/PositionUtils';
 import { delay } from '../utils/TimeUtils';
@@ -73,6 +74,7 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
   const throwAlert = useThrowAlert();
   const localRef = useRef(); // Main container ref for sizing/layout
   const { register, get } = useZoneRefs(); // Shared card zone registry
+  const savedMode = localStorage.getItem('mode');
   const API = import.meta.env.VITE_API_URL; // Server endpoint
 
   /* Handles queued game animations like DEAL, PLAY, COLLECT, etc. */
@@ -125,6 +127,11 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
             setBidPhase
           );
         }, 50);
+
+        const viewerIndex = positions.indexOf(viewerPosition);
+        if (data.currentTurnIndex == viewerIndex) {
+          throwAlert('Your turn', 'info');
+        }
       }
 
       if (animation.type === 'PLAY') {
@@ -159,6 +166,11 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
 
         await delay(800); // wait for animation
         setPlayedCardsByDirection((prev) => ({ ...prev, [direction]: card }));
+
+        const viewerIndex = positions.indexOf(viewerPosition);
+        if (data.currentTurnIndex == viewerIndex) {
+          throwAlert('Your turn', 'info');
+        }
       }
 
       if (animation.type === 'COLLECT') {
@@ -208,6 +220,11 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
           },
           cardList.length * 150 + 300
         );
+
+        const viewerIndex = positions.indexOf(viewerPosition);
+        if (data.currentTurnIndex == viewerIndex) {
+          throwAlert('Your turn', 'info');
+        }
       }
 
       if (animation.type === 'CLEAR') {
@@ -241,12 +258,19 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
         } catch (err) {
           console.error('[CardPlayZone] Error updating card data:', err);
         }
+
+        const viewerIndex = positions.indexOf(viewerPosition);
+        if (data.currentTurnIndex == viewerIndex) {
+          throwAlert('Your turn', 'info');
+        }
       }
 
       /* === SHOW_WINNER animation: (not implemented yet) === */
       if (animation.type === 'SHOW_WINNER') {
         // TODO: implement winner reveal animation or panel
+
       }
+
 
       /* === QUIT_GAME animation: (not implemented yet) === */
       if (animation.type === 'QUIT_GAME') {
@@ -366,6 +390,30 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
     setIsOver(false);
   };
 
+  const handleNewGame = async () => {
+    try {
+      const res4 = await fetch(`${API}/game/newGame`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ player: viewerPosition, gameId, savedMode }),
+      });
+
+      const data = await res4.json();
+
+      if (res4.ok) {
+        updateFromResponse(data);
+        queueAnimationFromResponse(data);
+        setMyTurn(currentTurnIndex === viewerIndex && phase === 'PLAY');
+        setTeamATricks(0);
+        setTeamBTricks(0);
+      } else {
+        throwAlert('Failed to start new game.', 'error')
+      }
+    } catch (error) {
+      console.error('Network error:', error);
+    }
+  }
+
 
   return (
     <div ref={localRef} className="card-play-zone">
@@ -394,6 +442,9 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
       <div className="floating-card-layer">
         <BiddingPanel closeBidding={() => setShowBidding(false)} />
         <BidTypePanel closeBidTypePanel={() => setShowFinalizeBid(false)} />
+        <FinalScorePanel
+          onNewGame={handleNewGame}
+        />
 
         {Object.entries(playedCardsByDirection).map(([dir, card]) => {
           if (!card) return null;

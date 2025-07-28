@@ -80,6 +80,12 @@ public class GameController {
     gameService.quitMyGame(request);
   }
 
+    /* Ends game for single, leaves game for multiplayer */
+  @PostMapping("/newGame")
+  public void newGame(@RequestBody QuitGameRequest request) {
+    gameService.startNewGame(request);
+  }
+
   /* Removes the completed animation from the queue */
   @PostMapping("/pop-animation")
   public void popCompletedAnimation(@RequestBody PopAnimationRequest request) {

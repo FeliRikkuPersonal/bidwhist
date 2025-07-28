@@ -40,12 +40,13 @@ export function UIDisplayProvider({ children }) {
   const [teamATricks, setTeamATricks] = useLocalStorage('teamATricks', 0);
   const [teamBTricks, setTeamBTricks] = useLocalStorage('teamBTricks', 0);
   const [animatedCards, setAnimatedCards] = useLocalStorage('animatedCards', []);
-    const [playedCardsByDirection, setPlayedCardsByDirection] = useLocalStorage('playedCardsByDirection', {
-      north: null,
-      south: null,
-      east: null,
-      west: null,
-    }); // Visual state of cards on table by direction
+  const [showFinalScore, setShowFinalScore] = useLocalStorage('showFinalScore', false);
+  const [playedCardsByDirection, setPlayedCardsByDirection] = useLocalStorage('playedCardsByDirection', {
+    north: null,
+    south: null,
+    east: null,
+    west: null,
+  }); // Visual state of cards on table by direction
 
 
   const [animationQueue, setAnimationQueue] = useState([]);
@@ -89,6 +90,7 @@ export function UIDisplayProvider({ children }) {
       playedCard,
       teamATricks,
       teamBTricks,
+      showFinalScore
     });
   };
 
@@ -148,6 +150,8 @@ export function UIDisplayProvider({ children }) {
         setTeamATricks,
         teamBTricks,
         setTeamBTricks,
+        showFinalScore,
+        setShowFinalScore,
         setHandFor,
         queueAnimationFromResponse,
         debugLog,

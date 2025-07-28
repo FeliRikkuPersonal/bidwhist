@@ -26,6 +26,9 @@ export default function GameScreen({ bidType }) {
   const { gameId, updateFromResponse, players } = useGameState();
   const { positionToDirection, viewerPosition } = usePositionContext();
 
+  const savedMode = localStorage.getItem('mode');
+  const API = import.meta.env.VITE_API_URL; // Server endpoint
+
   const {
     handMap,
     awardKitty,
@@ -166,7 +169,9 @@ export default function GameScreen({ bidType }) {
 
         <div className="grid-item top-right">
           {bidType && (
-            <button className="index-button quit-button" onClick={handleQuit}>
+            <button className="index-button quit-button" 
+            onClick={() =>
+              handleQuit({viewerPosition, gameId, savedMode, API})}>
               Quit
             </button>
           )}

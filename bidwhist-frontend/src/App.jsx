@@ -39,6 +39,8 @@ function App() {
     setActiveGame,
     bidType,
     bids,
+    finalScore,
+    setFinalScore
   } = useGameState();
 
   const {
@@ -193,6 +195,10 @@ function App() {
         updateFromResponse(data);
         queueAnimationFromResponse(data);
         setMyTurn(currentTurnIndex === viewerIndex && phase === 'PLAY');
+        if ('finalScore' in data) {
+          setFinalScore(data.finalScore);
+          console.log(`Updated final score: ${finalScore}`);
+        }
       } catch (err) {
         console.error('Polling failed:', err);
       }
