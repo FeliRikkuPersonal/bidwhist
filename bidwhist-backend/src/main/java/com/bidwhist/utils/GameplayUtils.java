@@ -35,11 +35,11 @@ public class GameplayUtils {
         }
 
         game.getDeck().deal(game.getPlayers());
-        game.addAnimation(new Animation(game.getShuffledDeck()));
+        game.addAnimation(new Animation(game.getShuffledDeck(), game.getCurrentTurnIndex()));
         game.setKitty(game.getDeck().getKitty().getCards());
         game.setPhase(GamePhase.BID);
         System.out.println("Current phase: " + game.getPhase());
-        game.addAnimation(new Animation(AnimationType.UPDATE_CARDS));
+        game.addAnimation(new Animation(AnimationType.UPDATE_CARDS, game.getCurrentTurnIndex()));
 
         Player nextBidder = game.getPlayers().get(game.getBidTurnIndex());
         if (nextBidder.isAI()) {

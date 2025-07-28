@@ -31,59 +31,66 @@ public class Animation {
   @JsonProperty private Suit leadSuit;
   @JsonProperty private String exitingPlayerName;
   @JsonProperty private String message;
+  @JsonProperty private int currentTurnIndex;
 
   public Animation() {}
 
   /*
    * Constructs a PLAY animation from a PlayedCard object.
    */
-  public Animation(PlayedCard playedCard, Suit leadSuit) {
+  public Animation(PlayedCard playedCard, Suit leadSuit, int currentTurnIndex) {
     this.type = AnimationType.PLAY;
     this.card = playedCard.getCard();
     this.player = playedCard.getPlayer();
     this.leadSuit = leadSuit;
+    this.currentTurnIndex = currentTurnIndex;
   }
 
   /*
    * Constructs a DEAL animation with the full deck of cards.
    */
-  public Animation(List<Card> deck) {
+  public Animation(List<Card> deck, int currentTurnIndex) {
     this.type = AnimationType.DEAL;
     this.cardList = deck;
+    this.currentTurnIndex = currentTurnIndex;
   }
 
   /*
    * Constructs a COLLECT animation from a completed trick (Book).
    */
-  public Animation(Book trick) {
+  public Animation(Book trick, int currentTurnIndex) {
     this.type = AnimationType.COLLECT;
     this.cardList = trick.getCards();
     this.winningTeam = trick.getWinningTeam();
+    this.currentTurnIndex = currentTurnIndex;
   }
 
   /*
    * Constructs an UPDATE_CARDS animation for UI sync of all hands and kitty.
    */
-  public Animation(List<PlayerView> playerViews, List<Card> kittyView) {
+  public Animation(List<PlayerView> playerViews, List<Card> kittyView, int currentTurnIndex) {
     this.type = AnimationType.UPDATE_CARDS;
     this.playerViews = playerViews;
     this.kittyView = kittyView;
+    this.currentTurnIndex = currentTurnIndex;
   }
 
   /*
    * Constructs a QUIT_GAME animation.
    */
-  public Animation(String playerName) {
+  public Animation(String playerName, int currentTurnIndex) {
     this.type = AnimationType.QUIT_GAME;
     this.exitingPlayerName = playerName;
     this.message = playerName + " has left the game. Game Over.";
+    this.currentTurnIndex = currentTurnIndex;
   }
 
   /*
    * Constructs a generic animation with the specified type only.
    */
-  public Animation(AnimationType type) {
+  public Animation(AnimationType type, int currentTurnIndex) {
     this.type = type;
+    this.currentTurnIndex = currentTurnIndex;
   }
 
   public String getId() {

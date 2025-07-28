@@ -341,7 +341,7 @@ public class GameService {
         GameStateResponse response = getGameStateForPlayer(game, winnerPos);
         response.setKitty(game.getKitty());
         winner.getHand().getCards().addAll(game.getKitty());
-        game.addAnimation(new Animation(AnimationType.UPDATE_CARDS));
+        game.addAnimation(new Animation(AnimationType.UPDATE_CARDS, game.getCurrentTurnIndex()));
 
         return response;
     }
@@ -381,7 +381,7 @@ public class GameService {
             }
         }
 
-        game.addAnimation(new Animation(AnimationType.UPDATE_CARDS));
+        game.addAnimation(new Animation(AnimationType.UPDATE_CARDS, game.getCurrentTurnIndex()));
         PlayerPos winnerPos = game.getHighestBid().getPlayer();
 
         FinalBid winningBid = game.getWinningBid();
@@ -459,7 +459,7 @@ public class GameService {
         currentTrick.add(validPlayedCard);
         game.addPlayedCard(cardToPlay);
 
-        game.addAnimation(new Animation(validPlayedCard, game.getLeadSuit()));
+        game.addAnimation(new Animation(validPlayedCard, game.getLeadSuit(),game.getCurrentPlayerIndex()));
         game.setCurrentTurnIndex((game.getCurrentTurnIndex() + 1) % 4);
 
         if (currentTrick.size() == 4) {
@@ -475,8 +475,8 @@ public class GameService {
             Book currentBook = new Book(currentTrick, winnerTeam);
             game.getCompletedTricks().add(currentBook);
 
-            game.addAnimation(new Animation(currentBook));
-            game.addAnimation(new Animation(AnimationType.UPDATE_CARDS));
+            game.addAnimation(new Animation(currentBook,game.getCurrentPlayerIndex()));
+            game.addAnimation(new Animation(AnimationType.UPDATE_CARDS,game.getCurrentPlayerIndex()));
 
             currentTrick.clear();
             game.setCurrentTurnIndex(winner.getPosition().ordinal());
@@ -487,10 +487,10 @@ public class GameService {
                         game.getTeamBScore() >= 7 ||
                         game.getTeamAScore() <= -7 ||
                         game.getTeamAScore() <= -7) {
-                    game.addAnimation(new Animation(AnimationType.SHOW_WINNER));
+                    game.addAnimation(new Animation(AnimationType.SHOW_WINNER,game.getCurrentPlayerIndex()));
                     game.setPhase(GamePhase.END);
                 } else {
-                    game.addAnimation(new Animation(AnimationType.CLEAR));
+                    game.addAnimation(new Animation(AnimationType.CLEAR,game.getCurrentPlayerIndex()));
                     GameplayUtils.startNewHand(game);
                 }
                 game.setBidWinnerPos(null);
@@ -542,7 +542,7 @@ public class GameService {
         PlayerPos playerPos = request.getPlayer();
         Player player = PlayerUtils.getPlayerByPosition(playerPos, game.getPlayers());
         if (request.getMode() == "multiplayer") {
-            game.addAnimation(new Animation(playerName));
+            game.addAnimation(new Animation(playerName,game.getCurrentPlayerIndex()));
             game.getPlayers().remove(player);
             if (game.getPlayers().size() == 0) {
                 games.remove(request.getGameId());

@@ -53,7 +53,7 @@ export default function Scoreboard({ phase, bids }) {
             </div>
           ) : (
             <>
-              <BidZone phase={phase} bids={bids} />
+              <BidZone />
             </>
           )}
           <div className="phase-indicator">

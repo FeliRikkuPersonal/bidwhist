@@ -82,6 +82,11 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
     if (!animationQueue || animationQueue.length === 0) return;
 
     const animation = animationQueue[0];
+    const thisTurn = animation.currentTurnIndex;
+
+    const positions = Object.keys(backendPositions);
+    const viewerIndex = positions.indexOf(viewerPosition);
+
     if (!animation || animation.id === lastAnimation) return;
 
     setLastAnimation(animation.id);
@@ -128,10 +133,6 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
           );
         }, 50);
 
-        const viewerIndex = positions.indexOf(viewerPosition);
-        if (data.currentTurnIndex == viewerIndex) {
-          throwAlert('Your turn', 'info');
-        }
       }
 
       if (animation.type === 'PLAY') {
@@ -166,9 +167,7 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
 
         await delay(800); // wait for animation
         setPlayedCardsByDirection((prev) => ({ ...prev, [direction]: card }));
-
-        const viewerIndex = positions.indexOf(viewerPosition);
-        if (data.currentTurnIndex == viewerIndex) {
+        if (animation.currentTurnIndex == (viewerIndex + 3) % 4) {
           throwAlert('Your turn', 'info');
         }
       }
@@ -220,11 +219,8 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
           },
           cardList.length * 150 + 300
         );
-
+        const positions = Object.keys(backendPositions);
         const viewerIndex = positions.indexOf(viewerPosition);
-        if (data.currentTurnIndex == viewerIndex) {
-          throwAlert('Your turn', 'info');
-        }
       }
 
       if (animation.type === 'CLEAR') {
@@ -258,11 +254,8 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
         } catch (err) {
           console.error('[CardPlayZone] Error updating card data:', err);
         }
-
+        const positions = Object.keys(backendPositions);
         const viewerIndex = positions.indexOf(viewerPosition);
-        if (data.currentTurnIndex == viewerIndex) {
-          throwAlert('Your turn', 'info');
-        }
       }
 
       /* === SHOW_WINNER animation: (not implemented yet) === */

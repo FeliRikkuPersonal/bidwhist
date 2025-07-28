@@ -1,15 +1,20 @@
 import React from 'react';
+import { useGameState } from '../context/GameStateContext';
+import { usePositionContext } from '../context/PositionContext';
 import '../css/BidZone.css';
 
 /**
  * BidZone displays all player bids if the phase is BIDDING or KITTY.
  */
-export default function BidZone({ phase, bids }) {
-  const showPlayerBids = phase === 'BIDDING' || phase === 'KITTY';
+export default function BidZone() {
+  const { phase, bids } = useGameState(); // use context directly
+  const showPlayerBids = phase === 'BID' || phase === 'KITTY';
+  const { getNameFromPosition } = usePositionContext();
 
   function formatBid(bid) {
+    const name = getNameFromPosition(bid.player);
     if (bid.passed) return `${bid.player} passes`;
-    return `${bid.player} bids ${bid.value}${bid.isNo ? ' No' : ''}`;
+    return `${name} bids ${bid.value}${bid.isNo ? ' No' : ''}`;
   }
 
   return (
