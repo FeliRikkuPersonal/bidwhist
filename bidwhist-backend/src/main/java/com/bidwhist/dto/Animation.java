@@ -79,11 +79,11 @@ public class Animation {
   /*
    * Constructs a QUIT_GAME animation.
    */
-  public Animation(String playerName, int currentTurnIndex) {
+  public Animation(String playerName, int finalScore) {
     this.type = AnimationType.QUIT_GAME;
     this.exitingPlayerName = playerName;
     this.message = playerName + " has left the game. Game Over.";
-    this.currentTurnIndex = currentTurnIndex;
+    this.finalScore = finalScore;
   }
 
   /**

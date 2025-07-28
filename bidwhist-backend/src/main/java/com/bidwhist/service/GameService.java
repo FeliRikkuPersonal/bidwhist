@@ -208,8 +208,6 @@ public class GameService {
         response.setBidWinnerPos(game.getBidWinnerPos());
         response.setTeamAScore(game.getTeamAScore());
         response.setTeamBScore(game.getTeamBScore());
-        response.setFinalScore(game.getFinalScore());
-
         return response;
     }
 
@@ -511,10 +509,8 @@ public class GameService {
 
             if (aScore > bScore) {
                 game.setFinalScore(aScore);
-                response.setFinalScore(aScore);
             } else if (bScore > aScore) {
                 game.setFinalScore(bScore);
-                response.setFinalScore(bScore);
             }
             game.addAnimation(new Animation(AnimationType.SHOW_WINNER, game.getFinalScore()));
         }
