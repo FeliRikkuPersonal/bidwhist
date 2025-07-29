@@ -2,6 +2,7 @@ package com.bidwhist.utils;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 import com.bidwhist.bidding.BidType;
 import com.bidwhist.bidding.FinalBid;
@@ -51,7 +52,6 @@ public class GameplayUtils {
     /**
      * Determines which card is currently winning a trick.
      *
-     * <p>
      * It checks each card in the trick. Trump cards beat non-trump cards. If
      * both are trump or both are the lead suit, the higher rank wins.
      */
@@ -60,8 +60,16 @@ public class GameplayUtils {
             return null;
         }
 
+        // Determine lead suit from first non-null-suit card (skip jokers or undefined)
+        Suit leadSuit = trick.stream()
+                .map(PlayedCard::getCard)
+                .map(Card::getSuit)
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElse(null);
+
+        // Start with first card as placeholder winner
         PlayedCard winning = trick.get(0);
-        Suit leadSuit = winning.getCard().getSuit();
 
         for (PlayedCard pc : trick) {
             Card card = pc.getCard();
@@ -147,25 +155,49 @@ public class GameplayUtils {
             throw new IllegalArgumentException("Cannot determine trick winner: trick is empty.");
         }
 
-        Suit leadSuit = trick.stream()
+        // Step 1: Detect lead suit for lambda-safe usage
+        final Suit initialLeadSuit = trick.stream()
                 .map(PlayedCard::getCard)
                 .filter(c -> !c.isJoker())
                 .map(Card::getSuit)
                 .findFirst()
                 .orElse(null);
-        Suit trumpSuit = game.getTrumpSuit();
+
+        // Step 2: Declare mutable version separately (don’t reuse the lambda one!)
+        Suit leadSuitForComparison;
+
+        // Optional fallback for No Trump where joker leads
+        if (initialLeadSuit == null && game.getWinningBid() != null && game.getWinningBid().isNo()) {
+            leadSuitForComparison = trick.stream()
+                    .map(PlayedCard::getCard)
+                    .filter(c -> !c.isJoker())
+                    .map(Card::getSuit)
+                    .filter(Objects::nonNull)
+                    .findFirst()
+                    .orElse(null);
+        } else {
+            leadSuitForComparison = initialLeadSuit;
+        }
+
         BidType bidType = game.getBidType();
         boolean isNoBid = game.getWinningBid() != null && game.getWinningBid().isNo();
+        Suit trumpSuit = isNoBid ? null : game.getTrumpSuit();
 
         // Excludes jokers from being eligible to win if bidType == NO_TRUMP
         if (isNoBid) {
             return trick.stream()
-                    .filter(pc -> {
-                        Card c = pc.getCard();
-                        return !c.isJoker() && c.getSuit() == leadSuit;
-                    })
-                    .max(Comparator.comparing(pc -> pc.getCard().getRank().getValue()))
-                    .orElseThrow(() -> new IllegalStateException("No non-joker cards of lead suit found in NO_TRUMP bid"));
+                    .filter(pc -> !pc.getCard().isJoker()) // ❌ Exclude jokers (they can’t win)
+                    .filter(pc -> pc.getCard().getSuit() == leadSuitForComparison) // ✅ Only cards that match lead suit
+                    .max(Comparator.comparingInt(pc -> {
+                        int value = pc.getCard().getRank().getValue(); // get rank number (e.g., 2 → 2, King → 13)
+                        return bidType == BidType.DOWNTOWN ? (15 - value) : value;
+                        // ⬆️ If Downtown, invert the score (low wins). If Uptown, use normal rank.
+                    }))
+                    .orElseThrow(
+                            () -> new IllegalStateException(
+                                    "BUG: determineTrickWinner - No eligible non-joker cards of lead suit found in NO_TRUMP bid. "
+                                            +
+                                            "This should never happen in a legal game. Check suit-following enforcement and card assignments."));
         }
 
         /* DOWNTOWN: inverted rank values except ACE and JOKERs */
@@ -176,7 +208,7 @@ public class GameplayUtils {
                                     pc -> {
                                         Card c = pc.getCard();
                                         boolean isTrump = trumpSuit != null && c.getSuit() == trumpSuit;
-                                        boolean isLead = c.getSuit() == leadSuit;
+                                        boolean isLead = c.getSuit() == leadSuitForComparison;
                                         Rank rank = c.getRank();
                                         int rankValue;
 
@@ -198,7 +230,7 @@ public class GameplayUtils {
                                 pc -> {
                                     Card c = pc.getCard();
                                     boolean isTrump = trumpSuit != null && c.getSuit() == trumpSuit;
-                                    boolean isLead = c.getSuit() == leadSuit;
+                                    boolean isLead = c.getSuit() == leadSuitForComparison;
                                     int rankValue = c.getRank().getValue();
                                     return (isTrump ? 1000 : (isLead ? 100 : 0)) + rankValue;
                                 }))

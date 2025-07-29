@@ -175,7 +175,6 @@ public class AIUtils {
     /**
      * Selects the best card for the AI to play based on difficulty level.
      *
-     * <p>
      * - EASY: Plays the lowest legal card to keep logic simple. - MEDIUM: Leads
      * with the highest non-trump card or follows suit with the lowest. - HARD:
      * Evaluates trump, lead suit, partner position, and past tricks to choose:
@@ -183,7 +182,6 @@ public class AIUtils {
      * winning - The weakest card that can beat the current winner - A fallback
      * lowest card when no better play is found
      *
-     * <p>
      * Decision logic adjusts dynamically based on trick position, trump usage,
      * and potential to preserve strong cards for later rounds.
      */
