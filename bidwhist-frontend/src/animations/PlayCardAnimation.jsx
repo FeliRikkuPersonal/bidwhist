@@ -2,21 +2,28 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 
-/*
- *
- * PlayCardAnimation animates a card moving from a source DOM ref to a target DOM ref.
- * It calculates absolute screen positions and transitions the card accordingly.
- * Calls onComplete after animation is done.
- *
+/**
+ * Animates a card moving from a `fromRef` to a `toRef`.
+ * Calls `onComplete` when done.
  */
-export default function PlayCardAnimation({ card, fromRef, toRef, onComplete }) {
+export default function PlayCardAnimation({ card, fromRef, toRef, onComplete, direction }) {
   const [style, setStyle] = useState(null);
   const imgRef = useRef();
 
-  /*
-   * Initializes the animation: sets start and end positions based on fromRef and toRef
-   * Triggers transition to the target location
-   */
+  // Helper: Rotation angle based on direction
+  const getRotation = (dir) => {
+    switch (dir) {
+      case 'north':
+        return '180deg';
+      case 'east':
+        return '270deg';
+      case 'west':
+        return '90deg';
+      default:
+        return '0deg'; // south
+    }
+  };
+
   useEffect(() => {
     if (!fromRef?.current || !toRef?.current) return;
 
@@ -30,41 +37,41 @@ export default function PlayCardAnimation({ card, fromRef, toRef, onComplete }) 
     const fromY = fromRect.top + fromRect.height / 2 - container.top;
     const toX = toRect.left + toRect.width / 2 - container.left;
     const toY = toRect.top + toRect.height / 2 - container.top;
+    const rotation = getRotation(direction);
 
-    /* Set initial style at from position */
+    // Initial position without transition
     setStyle({
       position: 'absolute',
       left: fromX,
       top: fromY,
-      transform: 'translate(-50%, -50%)',
-      transition: 'left 0.6s ease, top 0.6s ease, opacity 0.3s ease',
+      transform: `translate(-50%, -50%) rotate(${rotation})`,
+      transition: 'none',
       zIndex: 20,
       opacity: 1,
     });
 
-    /* Trigger transition to target after initial frame */
-    requestAnimationFrame(() => {
-      void imgRef.current?.offsetWidth; // flush layout
-      setStyle((prev) => ({
-        ...prev,
+    // Animate to new position
+    const timeout = setTimeout(() => {
+      setStyle({
+        position: 'absolute',
         left: toX,
         top: toY,
-      }));
-    });
+        transform: `translate(-50%, -50%) rotate(${rotation})`,
+        transition: 'left 0.6s ease, top 0.6s ease',
+        zIndex: 20,
+        opacity: 1,
+      });
 
-    /* Invoke callback after animation completes */
-    const timeout = setTimeout(() => {
-      onComplete?.();
-    }, 700);
+      setTimeout(() => {
+        onComplete?.();
+      }, 650);
+    }, 10);
 
     return () => clearTimeout(timeout);
-  }, [fromRef, toRef, onComplete]);
+  }, [fromRef, toRef, onComplete, direction]);
 
   if (!style) return null;
 
-  /*
-   * Render the animated card image
-   */
   return (
     <img
       ref={imgRef}

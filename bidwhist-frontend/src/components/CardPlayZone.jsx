@@ -496,6 +496,15 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
           const x = playRect.left + playRect.width / 2 - containerRect.left;
           const y = playRect.top + playRect.height / 2 - containerRect.top;
 
+          const getRotation = (dir) => {
+            switch (dir) {
+              case 'north': return '180deg';
+              case 'east': return '270deg';
+              case 'west': return '90deg';
+              default: return '0deg';
+            }
+          };
+
           return (
             <img
               key={dir}
@@ -506,7 +515,7 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
                 position: 'absolute',
                 left: x,
                 top: y,
-                transform: 'translate(-50%, -50%)',
+                transform: `translate(-50%, -50%) rotate(${getRotation(dir)})`,
                 zIndex: 5,
               }}
             />
@@ -521,6 +530,7 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
               card={anim.card}
               fromRef={anim.fromRef}
               toRef={anim.toRef}
+              direction={anim.direction} // ← here
               onComplete={() => {
                 setPlayAnimations((prev) => prev.filter((a) => a.id !== anim.id));
                 setPlayedCardsByDirection((prev) => ({
