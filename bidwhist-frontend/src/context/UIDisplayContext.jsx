@@ -41,6 +41,7 @@ export function UIDisplayProvider({ children }) {
   const [teamBTricks, setTeamBTricks] = useLocalStorage('teamBTricks', 0);
   const [animatedCards, setAnimatedCards] = useLocalStorage('animatedCards', []);
   const [showFinalScore, setShowFinalScore] = useLocalStorage('showFinalScore', false);
+  const [key, setKey] = useState(0);
   const [playedCardsByDirection, setPlayedCardsByDirection] = useLocalStorage('playedCardsByDirection', {
     north: null,
     south: null,
@@ -56,14 +57,47 @@ export function UIDisplayProvider({ children }) {
   const [myTurn, setMyTurn] = useState(false);
 
   const { setLeadSuit } = useGameState();
+
+  /**
+   * Clear context for new game
+   */
+  const clearUIContext = () => {
+    setHandMap({north: [], south: [], east:[], west:[]});
+    setShowBidding(false);
+    setPlayedCardPosition(null);
+    setShowAnimatedCards(true);
+    setShowFinalizeBid(false);
+    setDiscardPile([]);
+    setTeamATricks(0)
+    setTeamBTricks(0)
+    setAnimatedCards([]);
+    setShowHands(false);
+    setShowFinalScore(false);
+    setPlayedCardsByDirection({north: null, south: null, east: null, west: null,});
+    setPlayedCard(null)
+    setSelectedCard([]);
+    setMyTurn(false);
+  }
+
+
   /**
    * Updates the animation queue from a backend response.
    * Used during polling to prepare card animations.
    */
-  const queueAnimationFromResponse = (response) => {
-    if ('animationQueue' in response) setAnimationQueue(response.animationQueue);
-    if ('leadSuit' in response) setLeadSuit(response.leadSuit);
-  };
+const queueAnimationFromResponse = (response, sessionKey) => {
+  if ('animationQueue' in response) {
+    const taggedQueue = response.animationQueue.map(anim => ({
+      ...anim,
+      sessionKey, // tag each animation with the current UI session key
+    }));
+
+    setAnimationQueue(taggedQueue);
+  }
+
+  if ('leadSuit' in response) {
+    setLeadSuit(response.leadSuit);
+  }
+};
 
   /**
    * Logs the current UI context state to the console for debugging purposes.
@@ -152,9 +186,12 @@ export function UIDisplayProvider({ children }) {
         setTeamBTricks,
         showFinalScore,
         setShowFinalScore,
+        key,
+        setKey,
         setHandFor,
         queueAnimationFromResponse,
         debugLog,
+        clearUIContext,
       }}
     >
       {children}

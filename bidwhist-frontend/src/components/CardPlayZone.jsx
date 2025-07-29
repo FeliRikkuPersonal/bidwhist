@@ -15,6 +15,8 @@ import FinalScorePanel from './FinalScorePanel.jsx';
 
 import { getPositionMap } from '../utils/PositionUtils';
 import { delay } from '../utils/TimeUtils';
+import { startNewGame } from '../utils/gameApi'; // adjust path
+
 
 import { dealCardsClockwise } from '../animations/DealAnimation';
 
@@ -50,8 +52,11 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
     setShowFinalizeBid,
     setShowFinalScore,
     animationQueue,
+    setMyTurn,
     setTeamATricks,
     setTeamBTricks,
+    key,
+    setKey,
   } = useUIDisplay();
 
 
@@ -72,6 +77,8 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
     winningPlayerName,
     setWinningBid,
     bidWinnerPos,
+    forcedBid,
+    setForcedBid,
   } = useGameState();
 
   const [isOver, setIsOver] = useState(false); // Tracks if drag is over drop zone
@@ -82,7 +89,7 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
   const throwAlert = useThrowAlert();
   const localRef = useRef(); // Main container ref for sizing/layout
   const { register, get } = useZoneRefs(); // Shared card zone registry
-  const savedMode = localStorage.getItem('mode');
+  const savedMode = JSON.parse(localStorage.getItem('mode'));
   const API = import.meta.env.VITE_API_URL; // Server endpoint
 
   /* Handles queued game animations like DEAL, PLAY, COLLECT, etc. */
@@ -90,8 +97,13 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
     if (!animationQueue || animationQueue.length === 0) return;
 
     const animation = animationQueue[0];
-    const thisTurn = animation?.currentTurnIndex !== undefined ? animation.currentTurnIndex : null;
+    if ('sessionKey' in animation && animation.sessionKey !== key) {
+      console.log('[SKIP] Animation from old session:', animation.sessionKey, 'Expected:', key);
+      return;
+    }
 
+
+    const thisTurn = animation?.currentTurnIndex !== undefined ? animation.currentTurnIndex : null;
 
     const positions = Object.keys(backendPositions);
     const viewerIndex = positions.indexOf(viewerPosition);
@@ -129,6 +141,8 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
         const positionMap = getPositionMap(backendPositions, viewerPosition);
 
         setTimeout(() => {
+          setShowAnimatedCards(true);
+          setShowHands(false);
           dealCardsClockwise(
             playerPositions,
             cards,
@@ -138,7 +152,10 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
             deckPosition,
             setAnimatedCards,
             setShowAnimatedCards,
-            setBidPhase
+            setBidPhase,
+            key,
+            setPlayedCardsByDirection,
+            setShowHands,
           );
         }, 50);
 
@@ -147,7 +164,7 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
       if (animation.type === 'PLAY') {
         const { card, player } = animation;
         const direction = positionToDirection[player];
-        const fromRef = get(`card-origin-${direction}`);
+        const fromRef = get(`zone-${direction}`);
         const toRef = get(`play-${direction}`);
 
         console.log('PLAY animation triggered');
@@ -171,8 +188,10 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
             fromRef,
             toRef,
             direction,
+            sessionKey: key,
           },
         ]);
+
 
         await delay(800); // wait for animation
         setPlayedCardsByDirection((prev) => ({ ...prev, [direction]: card }));
@@ -190,13 +209,19 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
 
         for (let card of cardList) {
           const dir = positionToDirection[card.owner];
-          const from = get(`play-${dir}`);
-          const to = targetRef;
+          const from = deckPosition;
+          const toRect = targetRef?.current?.getBoundingClientRect?.();
+          const parentRect = document.querySelector('.floating-card-layer')?.getBoundingClientRect();
 
-          if (!from?.current || !to?.current) {
-            console.warn('Missing ref for trick collect animation:', { from, to });
+          if (!from || !toRect || !parentRect) {
+            console.warn('Missing ref or bounds for trick collect animation:', { from, toRect, parentRect });
             continue;
           }
+
+          const to = {
+            x: toRect.left + toRect.width / 2 - parentRect.left,
+            y: toRect.top + toRect.height / 2 - parentRect.top,
+          };
 
           setAnimatedCards((prev) => [
             ...prev,
@@ -346,12 +371,25 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
     register(`CardPlayZone-${direction}`, localRef);
   }, [viewerPosition, positionToDirection, register]);
 
+  /* Check if first 3 players passed  */
+  useEffect(() => {
+    if (bids?.length === 3 && !forcedBid) {
+      const bidOne = bids[0]?.value === 0;
+      const bidTwo = bids[1]?.value === 0;
+      const bidThree = bids[2]?.value === 0;
+      const allPass = bidOne && bidTwo && bidThree && bids?.length < 4;
+
+      if (allPass) {
+        throwAlert('After 3 passed bids, final player must bid.', 'info');
+        setForcedBid(true);
+      }
+    }
+  }, [bids, forcedBid]);
+
   /* Triggers Finalize Bid panel if bidding phase is complete and viewer won */
   useEffect(() => {
     const bidsComplete = bids?.length === 4;
-    console.log(`Bid length = ${bids?.length}`);
     const iWonBid = bidWinnerPos === viewerPosition;
-    console.log(`Winner Positions: ${bidWinnerPos} Player Position ${viewerPosition}`);
     setShowFinalizeBid(bidsComplete && iWonBid);
   }, [bids, winningPlayerName, bidWinnerPos, playerName]);
 
@@ -393,28 +431,27 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
   };
 
   const handleNewGame = async () => {
-    try {
-      const res4 = await fetch(`${API}/game/newGame`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ player: viewerPosition, gameId, savedMode }),
-      });
+    setKey(prev => prev + 1);
 
-      const data = await res4.json();
+    const { success, gameData, isMyTurn, message } = await startNewGame({
+      viewerPosition,
+      gameId,
+      savedMode,
+      API,
+      sessionKey: key,
+    });
 
-      if (res4.ok) {
-        updateFromResponse(data);
-        queueAnimationFromResponse(data);
-        setMyTurn(currentTurnIndex === viewerIndex && phase === 'PLAY');
-        setTeamATricks(0);
-        setTeamBTricks(0);
-      } else {
-        throwAlert('Failed to start new game.', 'error')
-      }
-    } catch (error) {
-      console.error('Network error:', error);
+    if (success) {
+      updateFromResponse(gameData);
+      queueAnimationFromResponse(gameData, key);
+      setMyTurn(isMyTurn);
+      setTeamATricks(0);
+      setTeamBTricks(0);
+    } else {
+      throwAlert(message, 'error');
     }
-  }
+  };
+
 
 
   return (
@@ -476,26 +513,30 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
           );
         })}
 
-        {playAnimations.map((anim) => (
-          <PlayCardAnimation
-            key={anim.id}
-            card={anim.card}
-            fromRef={anim.fromRef}
-            toRef={anim.toRef}
-            onComplete={() => {
-              setPlayAnimations((prev) => prev.filter((a) => a.id !== anim.id));
-              setPlayedCardsByDirection((prev) => ({
-                ...prev,
-                [anim.direction]: anim.card,
-              }));
-            }}
-          />
-        ))}
+        {playAnimations
+          .filter((anim) => anim.sessionKey === key)
+          .map((anim) => (
+            <PlayCardAnimation
+              key={anim.id}
+              card={anim.card}
+              fromRef={anim.fromRef}
+              toRef={anim.toRef}
+              onComplete={() => {
+                setPlayAnimations((prev) => prev.filter((a) => a.id !== anim.id));
+                setPlayedCardsByDirection((prev) => ({
+                  ...prev,
+                  [anim.direction]: anim.card,
+                }));
+              }}
+            />
+          ))}
 
         {showAnimatedCards &&
-          animatedCards.map((card, i) => (
-            <AnimatedCard key={card.id} card={card} from={card.from} to={card.to} zIndex={i} />
-          ))}
+          animatedCards
+
+            .map((card, i) => (
+              <AnimatedCard key={card.id} card={card} from={card.from} to={card.to} zIndex={i} />
+            ))}
       </div>
     </div>
   );

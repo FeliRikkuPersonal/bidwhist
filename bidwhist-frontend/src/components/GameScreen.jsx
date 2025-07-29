@@ -1,6 +1,6 @@
 // src/components/GameScreen.jsx
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useMemo } from 'react';
 import '../css/GameScreen.css';
 import '../css/Card.css';
 import '../css/PlayerZone.css';
@@ -23,10 +23,11 @@ import handleQuit from '../utils/handleQuit.js';
  * @returns {JSX.Element} The full game screen layout
  */
 export default function GameScreen({ bidType }) {
-  const { gameId, updateFromResponse, players } = useGameState();
-  const { positionToDirection, viewerPosition } = usePositionContext();
 
-  const savedMode = localStorage.getItem('mode');
+  const { gameId, updateFromResponse, players, clearGameStateContext } = useGameState();
+  const { positionToDirection, viewerPosition, clearUIContext } = usePositionContext();
+
+  const savedMode = JSON.parse(localStorage.getItem('mode'));
   const API = import.meta.env.VITE_API_URL; // Server endpoint
 
   const {
@@ -47,6 +48,10 @@ export default function GameScreen({ bidType }) {
   const yourTrickRef = useRef();
   const theirTrickRef = useRef();
   const southZoneRef = useRef();
+  const northZoneRef = useRef();
+  const eastZoneRef = useRef();
+  const westZoneRef = useRef();
+
 
   /**
    * Retrieves player props for a given direction (e.g., north, south).
@@ -79,21 +84,23 @@ export default function GameScreen({ bidType }) {
     };
   };
 
-  const playerProps = {
+  const playerProps = useMemo(() => ({
     north: getPlayerProps('north'),
     west: getPlayerProps('west'),
     east: getPlayerProps('east'),
     south: getPlayerProps('south'),
-  };
+  }), [players, positionToDirection, handMap]);
 
   /**
-   * Registers the south zone ref for animation positioning.
+   * Registers the zone refs for animation positioning.
    */
-  useEffect(() => {
-    if (southZoneRef.current) {
-      register('zone-south', southZoneRef);
-    }
-  }, [southZoneRef]);
+useEffect(() => {
+  if (southZoneRef.current) register('zone-south', southZoneRef);
+  if (northZoneRef.current) register('zone-north', northZoneRef);
+  if (eastZoneRef.current) register('zone-east', eastZoneRef);
+  if (westZoneRef.current) register('zone-west', westZoneRef);
+}, [register]);
+
 
   /**
    * Submits selected cards as discards (must be 6).
@@ -163,22 +170,22 @@ export default function GameScreen({ bidType }) {
           </div>
         </div>
 
-        <div className="grid-item top-center">
+        <div className="grid-item top-center" ref={northZoneRef}>
           <PlayerZone {...playerProps.north.props} />
         </div>
 
         <div className="grid-item top-right">
           {bidType && (
-            <button className="index-button quit-button" 
-            onClick={() =>
-              handleQuit({viewerPosition, gameId, savedMode, API})}>
+            <button className="index-button quit-button"
+              onClick={() =>
+                handleQuit({ viewerPosition, gameId, savedMode, API, clearUIContext, clearGameStateContext })}>
               Quit
             </button>
           )}
         </div>
 
         {/* Middle row */}
-        <div className="grid-item middle-left">
+        <div className="grid-item middle-left" ref={westZoneRef}>
           <PlayerZone {...playerProps.west.props} />
         </div>
 
@@ -191,15 +198,15 @@ export default function GameScreen({ bidType }) {
           />
         </div>
 
-        <div className="grid-item middle-right">
+        <div className="grid-item middle-right" ref={eastZoneRef}>
           <PlayerZone {...playerProps.east.props} />
         </div>
 
         {/* Bottom row */}
         <div className="grid-item bottom-left">{awardKitty && 'Select 6 cards to discard'}</div>
 
-        <div className="grid-item bottom-center">
-          <PlayerZone ref={southZoneRef} dropZoneRef={dropZoneRef} {...playerProps.south.props} />
+        <div className="grid-item bottom-center" ref={southZoneRef}>
+          <PlayerZone dropZoneRef={dropZoneRef} {...playerProps.south.props} />
         </div>
 
         <div className="grid-item bottom-right">

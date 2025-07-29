@@ -25,6 +25,7 @@ export const GameStateProvider = ({ children }) => {
   const [mode, setMode] = useLocalStorage('mode', 'single');
   const [difficulty, setDifficulty] = useLocalStorage('difficulty', 'EASY');
   const [activeGame, setActiveGame] = useLocalStorage('activeGame', false);
+  const [forcedBid, setForcedBid] = useLocalStorage('foredBid', false);
 
   const [players, setPlayers] = useState([]); // List<PlayerView>
   const [currentTurnIndex, setCurrentTurnIndex] = useState(0);
@@ -48,6 +49,29 @@ export const GameStateProvider = ({ children }) => {
   const [teamBScore, setTeamBScore] = useState(0);
   const [teamATricksWon, setTeamATricksWon] = useState(0);
   const [teamBTricksWon, setTeamBTricksWon] = useState(0);
+
+  /**
+   * Clear game state data for new game
+   */
+  const clearGameStateContext = () => {
+    setKitty([]);
+    setTrumpSuit(null);
+    setBidType(null);
+    setWinningPlayerName(null);
+    setHighestBid(null);
+    setShuffledDeck([]);
+    setBids([]);
+    setBidWinnerPos(null);
+    setWinningBid(null);
+    setCurrentTrick([]);
+    setLeadSuit(null)
+    setCompletedTricks([]);
+    setTeamAScore(0);
+    setTeamBScore(0);
+    setTeamATricksWon(0);
+    setTeamBTricksWon(0);
+    setForcedBid(false);
+  }
 
 
   /**
@@ -160,6 +184,9 @@ export const GameStateProvider = ({ children }) => {
         setTeamBTricksWon,
         activeGame,
         setActiveGame,
+        forcedBid,
+        setForcedBid,
+        clearGameStateContext,
         updateFromResponse,
         debugLog,
       }}

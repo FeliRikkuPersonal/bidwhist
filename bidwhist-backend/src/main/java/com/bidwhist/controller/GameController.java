@@ -30,7 +30,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/game")
 public class GameController {
 
-  @Autowired private GameService gameService;
+  @Autowired
+  private GameService gameService;
 
   /* Starts a single-player game session */
   @PostMapping("/start")
@@ -80,10 +81,10 @@ public class GameController {
     gameService.quitMyGame(request);
   }
 
-    /* Ends game for single, leaves game for multiplayer */
+  /* Ends game for single, leaves game for multiplayer */
   @PostMapping("/newGame")
-  public void newGame(@RequestBody QuitGameRequest request) {
-    gameService.startNewGame(request);
+  public GameStateResponse newGame(@RequestBody QuitGameRequest request) {
+    return gameService.startNewGame(request);
   }
 
   /* Removes the completed animation from the queue */

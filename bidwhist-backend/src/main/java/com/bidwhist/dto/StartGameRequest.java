@@ -16,14 +16,16 @@ public class StartGameRequest {
   private String gameId;
   private String playerName;
   private Difficulty difficulty;
+  private int sessionKey;
 
   /* Required for JSON deserialization (used by frameworks like Jackson) */
   public StartGameRequest() {}
 
   /* Constructor for multiplayer games (player joins with gameId and name) */
-  public StartGameRequest(String gameId, String playerName) {
+  public StartGameRequest(String gameId, String playerName, int sessionKey) {
     this.gameId = gameId;
     this.playerName = playerName;
+    this.sessionKey = sessionKey;
   }
 
   /* Constructor for single-player games (includes difficulty) */
@@ -51,5 +53,13 @@ public class StartGameRequest {
 
   public void setDifficulty(Difficulty difficulty) {
     this.difficulty = difficulty;
+  }
+
+  public int getSessionKey() {
+    return sessionKey;
+  }
+
+  public void setSessionKey(int sessionKey) {
+    this.sessionKey = sessionKey;
   }
 }

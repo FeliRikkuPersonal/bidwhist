@@ -25,10 +25,12 @@ export default function BiddingPanel({ closeBidding, onBidPlaced }) {
     bids,
     setBids,
     bidTurnIndex,
-    currentTurnIndex,
     setCurrentTurnIndex,
     setFirstBidder,
     setPhase,
+    clearGameStateContext,
+    forcedBid,
+    setForcedBid,
   } = useGameState();
 
   const {
@@ -37,10 +39,10 @@ export default function BiddingPanel({ closeBidding, onBidPlaced }) {
     setBidPhase,
     showBidding,
     setShowBidding,
-    setShowFinalizeBid,
+    clearUIContext,
   } = useUIDisplay();
 
-  const savedMode = localStorage.getItem('mode');
+  const savedMode = JSON.parse(localStorage.getItem('mode'));
 
   const throwAlert = useThrowAlert();
   const [bidValue, setBidValue] = useState('');
@@ -85,6 +87,7 @@ export default function BiddingPanel({ closeBidding, onBidPlaced }) {
       isNo,
       isPassed: false,
     });
+    setForcedBid(false);
   };
 
   const passBid = () => {
@@ -122,12 +125,14 @@ export default function BiddingPanel({ closeBidding, onBidPlaced }) {
           <button onClick={placeBid} className="index-button settings-button">
             Set Bid
           </button>
-          <button onClick={passBid} className="index-button settings-button">
-            Pass
-          </button>
+          {!forcedBid &&
+            <button onClick={passBid} className="index-button settings-button">
+              Pass
+            </button>
+          }
           <button
             onClick={() =>
-              handleQuit({ viewerPosition, gameId, savedMode, API })}
+              handleQuit({ viewerPosition, gameId, savedMode, API, clearUIContext, clearGameStateContext })}
             className="index-button settings-button">
             Quit
           </button>

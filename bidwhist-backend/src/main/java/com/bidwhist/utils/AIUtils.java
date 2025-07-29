@@ -127,7 +127,7 @@ public class AIUtils {
             game.getCurrentTrick().add(validPlayedCard);
 
             game.addAnimation(new Animation(validPlayedCard, game.getLeadSuit(), game.getCurrentTurnIndex(),
-                    game.getCurrentTrick().size()));
+                    game.getCurrentTrick().size(), game.getSessionKey()));
             game.setCurrentTurnIndex((game.getCurrentTurnIndex() + 1) % 4);
 
             if (game.getCurrentTrick().size() == 4) {
@@ -142,8 +142,8 @@ public class AIUtils {
                 Book currentBook = new Book(game.getCurrentTrick(), winnerTeam);
                 game.setCurrentTurnIndex(winnerPlayer.getPosition().ordinal());
 
-                game.addAnimation(new Animation(currentBook, game.getCurrentTurnIndex(), game.getPhase()));
-                game.addAnimation(new Animation(AnimationType.UPDATE_CARDS));
+                game.addAnimation(new Animation(currentBook, game.getCurrentTurnIndex(), game.getPhase(), game.getSessionKey()));
+                game.addAnimation(new Animation(AnimationType.UPDATE_CARDS, game.getSessionKey()));
 
                 game.getTeamTrickCounts().putIfAbsent(winnerTeam, 0);
                 game.getTeamTrickCounts().put(winnerTeam, game.getTeamTrickCounts().get(winnerTeam) + 1);
@@ -156,9 +156,9 @@ public class AIUtils {
                     GameplayUtils.scoreHand(game);
 
                     if (game.getPhase() == GamePhase.END) {
-                        game.addAnimation(new Animation(AnimationType.SHOW_WINNER));
+                        game.addAnimation(new Animation(AnimationType.SHOW_WINNER, game.getSessionKey()));
                     } else {
-                        game.addAnimation(new Animation(AnimationType.CLEAR));
+                        game.addAnimation(new Animation(AnimationType.CLEAR, game.getSessionKey()));
                         GameplayUtils.startNewHand(game);
                     }
                     game.setBidWinnerPos(null);

@@ -7,6 +7,7 @@ import { usePositionContext } from '../context/PositionContext';
 import { clearAllGameData } from '../utils/ClearData';
 import { useAlert } from '../context/AlertContext';
 import { useThrowAlert } from '../hooks/useThrowAlert';
+import { useUIDisplay } from '../context/UIDisplayContext';
 
 /**
  * ModeSelector allows the user to:
@@ -19,10 +20,11 @@ import { useThrowAlert } from '../hooks/useThrowAlert';
  * @returns {JSX.Element} Game mode selection interface
  */
 function ModeSelector({ onStartGame }) {
-  const { setGameId, mode, setMode, difficulty, setDifficulty } = useGameState();
+  const { setGameId, mode, setMode, difficulty, setDifficulty, clearGameStateContext } = useGameState();
   const { setPlayerName, setViewerPosition, setViewerTeam } = usePositionContext();
   const { showAlert } = useAlert();
   const throwAlert = useThrowAlert();
+  const { clearUIContext } = useUIDisplay();
 
   const [newPlayerName, setNewPlayerName] = useState('');
   const [lobbyCode, setLobbyCode] = useState('');
@@ -31,20 +33,23 @@ function ModeSelector({ onStartGame }) {
   /**
    * Starts a single-player game using a generated lobby code.
    */
-  const handleStart = () => {
-    const trimmedName = newPlayerName.trim();
-    if (!trimmedName) {
-      showAlert('Cannot start game with empty name.')
-      return;
-    }
+const handleStart = async () => {
+  const trimmedName = newPlayerName.trim();
+  if (!trimmedName) {
+    showAlert('Cannot start game with empty name.');
+    return;
+  }
 
-    const code = Math.random().toString(36).substring(2, 8).toUpperCase();
-    clearAllGameData()
-    setPlayerName(trimmedName);
-    setMode('single');
-    setGameId(code);
-    onStartGame(trimmedName, difficulty, code);
-  };
+  const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+
+  await clearAllGameData({clearUIContext, clearGameStateContext}); // wait for the cleanup to finish
+
+  setPlayerName(trimmedName);
+  setMode('single');  
+  setGameId(code);
+  onStartGame(trimmedName, difficulty, code);
+};
+
 
   /**
    * Joins an existing multiplayer game via POST request to /game/join.
@@ -104,6 +109,7 @@ function ModeSelector({ onStartGame }) {
         body: JSON.stringify({
           gameId: code,
           playerName: newPlayerName.trim(),
+          sessionKey: 0,
         }),
       });
 

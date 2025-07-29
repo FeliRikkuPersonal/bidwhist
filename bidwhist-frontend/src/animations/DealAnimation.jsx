@@ -28,8 +28,19 @@ export function dealCardsClockwise(
   deckPosition,
   setAnimatedCards,
   setShowAnimatedCards,
-  setBidPhase
+  setBidPhase,
+  sessionKey,
+  setPlayedCardsByDirection,
+  setShowHands,
 ) {
+
+  setPlayedCardsByDirection({
+  north: null,
+  south: null,
+  east: null,
+  west: null,
+});
+
   const totalCards = cards.length;
   const delayPerCard = 120; /* milliseconds between each card */
 
@@ -73,6 +84,7 @@ export function dealCardsClockwise(
             ...card,
             from: deckPosition,
             to: { x: toX, y: toY },
+            sessionKey,
           },
         ]);
       }, index * delayPerCard);
@@ -88,6 +100,7 @@ export function dealCardsClockwise(
         onComplete();
         setShowAnimatedCards(false);
         setBidPhase(true);
+        setShowHands(true);
       },
       totalCards * delayPerCard + 500
     );

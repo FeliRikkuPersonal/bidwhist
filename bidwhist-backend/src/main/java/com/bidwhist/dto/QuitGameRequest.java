@@ -11,6 +11,7 @@ public class QuitGameRequest {
   private PlayerPos player;
   private String gameId;
   private String mode;
+  private int sessionKey;
 
   public PlayerPos getPlayer() {
     return player;
@@ -22,5 +23,9 @@ public class QuitGameRequest {
 
   public String getMode() {
     return mode;
+  }
+
+  public int getSessionKey() {
+    return sessionKey;
   }
 }

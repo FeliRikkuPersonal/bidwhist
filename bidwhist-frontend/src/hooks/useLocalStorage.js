@@ -1,3 +1,5 @@
+// src/hooks/useLocalStorage.js
+
 import { useState, useEffect } from 'react';
 
 export function useLocalStorage(key, initialValue) {
@@ -13,9 +15,13 @@ export function useLocalStorage(key, initialValue) {
 
   useEffect(() => {
     try {
-      localStorage.setItem(key, JSON.stringify(value));
+      if (value === null || value === undefined) {
+        localStorage.removeItem(key);
+      } else {
+        localStorage.setItem(key, JSON.stringify(value));
+      }
     } catch (err) {
-      console.error(`Failed to set localStorage key "${key}":`, err);
+      console.error(`Failed to update localStorage key "${key}":`, err);
     }
   }, [key, value]);
 

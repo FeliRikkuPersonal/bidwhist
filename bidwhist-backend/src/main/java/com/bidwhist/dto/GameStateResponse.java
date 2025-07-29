@@ -20,6 +20,7 @@ import java.util.List;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class GameStateResponse {
+  private String gameId;
   private List<PlayerView> players;
   private List<Card> kitty;
   private int currentTurnIndex;
@@ -181,6 +182,10 @@ public class GameStateResponse {
     return animationQueue;
   }
 
+  public String getGameId() {
+    return gameId;
+  }
+
   public void setHighestBid(InitialBid highestBid) {
     this.highestBid = highestBid;
   }
@@ -243,6 +248,10 @@ public class GameStateResponse {
 
   public void setBidWinnerPos(PlayerPos winnerPos) {
     this.bidWinnerPos = winnerPos;
+  }
+
+  public void setGameId(String id) {
+    this.gameId = id;
   }
 
 }

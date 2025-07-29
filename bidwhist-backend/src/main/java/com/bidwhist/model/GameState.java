@@ -36,6 +36,7 @@ public class GameState {
     private GameRoom room;
     private Map<PlayerPos, List<Animation>> animationList = new EnumMap<>(PlayerPos.class);
     private PlayerPos bidWinnerPos;
+    private int sessionKey;
 
     private List<PlayedCard> currentTrick = new ArrayList<>();
     private List<Book> completedTricks = new ArrayList<>();
@@ -51,7 +52,6 @@ public class GameState {
     private Map<Team, Integer> teamTrickCounts = new HashMap<>();
     private Map<Team, Integer> teamScores = new HashMap<>();
 
- 
     public GameState(String gameId) {
         this.room = new GameRoom(gameId);
         this.gameId = gameId;
@@ -78,7 +78,9 @@ public class GameState {
         }
         for (List<Animation> queue : animationList.values()) {
             queue.add(animation);
+
         }
+        System.out.println(animation.getType().toString() + " animation added.");
     }
 
     public boolean removeAnimationById(PlayerPos player, String animationId) {
@@ -368,6 +370,14 @@ public class GameState {
 
     public void setTeamScores(Map<Team, Integer> teamScores) {
         this.teamScores = teamScores;
+    }
+
+    public void setSessionKey(int key) {
+        this.sessionKey = key;
+    }
+
+    public int getSessionKey() {
+        return sessionKey;
     }
 
 }

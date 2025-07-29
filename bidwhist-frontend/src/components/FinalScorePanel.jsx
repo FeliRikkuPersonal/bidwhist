@@ -16,36 +16,36 @@ import { useUIDisplay } from '../context/UIDisplayContext.jsx';
  * @returns {JSX.Element} Final score modal if `showFinalScore` is true
  */
 export default function FinalScorePanel({ onNewGame }) {
-  const { teamAScore, teamBScore } = useGameState();
-  const { showFinalScore } = useUIDisplay();
+  const { teamAScore, teamBScore, clearGameStateContext } = useGameState();
+  const { showFinalScore, clearUIContext } = useUIDisplay();
   const { viewerPosition } = usePositionContext();
-  const savedMode = localStorage.getItem('mode');
-  const savedGameId = localStorage.getItem('gameId');
+  const savedMode = JSON.parse(localStorage.getItem('mode'));
+  const savedGameId = JSON.parse(localStorage.getItem('gameId'));
   const API = import.meta.env.VITE_API_URL; // Server endpoint
 
   return (
     <div>
       {showFinalScore && (
-    
-          <div className="final-score-panel">
-            <h2>Final Score</h2>
-            <div className="score-panel-text">
-              Team A: {teamAScore}
-            </div>
-            <div className="score-panel-text">
-              Team B: {teamBScore}
-            </div>
-            <div className="settings-actions">
-              <button className="index-button score-button" onClick={onNewGame}>
-                New Game
-              </button>
-              <button className="index-button score-button"
-                onClick={() =>
-                  handleQuit({ viewerPosition, savedGameId, savedMode, API })}>
-                Close
-              </button>
-            </div>
+
+        <div className="final-score-panel">
+          <h2>Final Score</h2>
+          <div className="score-panel-text">
+            Team A: {teamAScore}
           </div>
+          <div className="score-panel-text">
+            Team B: {teamBScore}
+          </div>
+          <div className="settings-actions">
+            <button className="index-button score-button" onClick={onNewGame}>
+              New Game
+            </button>
+            <button className="index-button score-button"
+              onClick={() =>
+                handleQuit({ viewerPosition, savedGameId, savedMode, API, clearUIContext, clearGameStateContext })}>
+              Close
+            </button>
+          </div>
+        </div>
 
       )}
     </div>

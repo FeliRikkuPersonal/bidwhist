@@ -62,6 +62,7 @@ function App() {
     showLobby,
     setShowLobby,
     queueAnimationFromResponse,
+    key,
   } = useUIDisplay();
 
   const throwAlert = useThrowAlert();
@@ -91,6 +92,7 @@ function App() {
             playerName: trimmedName,
             difficulty,
             gameId: code,
+            sessionKey: 0,
           }),
         });
         setActiveGame(true);
@@ -193,7 +195,7 @@ function App() {
         const viewerIndex = positions.indexOf(viewerPosition);
 
         updateFromResponse(data);
-        queueAnimationFromResponse(data);
+        queueAnimationFromResponse(data, key);
         setMyTurn(currentTurnIndex === viewerIndex && phase === 'PLAY');
       } catch (err) {
         console.error('Polling failed:', err);
@@ -237,7 +239,7 @@ function App() {
 
       <div className="index-container">
         {loadGame ? (
-          <GameScreen bidType={bidType} />
+          <GameScreen key={key} bidType={bidType} />
         ) : showLobby ? (
           <LobbyScreen gameId={gameId} playerName={playerName} />
         ) : (

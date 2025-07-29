@@ -48,7 +48,7 @@ public class GameServiceTest {
     @Test
     void testMultiplayerGameStart() {
         GameService gameService = new GameService(new DeckService());
-        GameStateResponse gameState = gameService.createMutliplayerGame(new StartGameRequest("gameId", "player1"));
+        GameStateResponse gameState = gameService.createMutliplayerGame(new StartGameRequest("gameId", "player1", 1));
         assertTrue(gameState.getPlayers().size() == 1);
         assertTrue(gameService.getGameById("gameId").getRoom().getPlayers().size() == 1);
         assertTrue(gameService.getGameById("gameId").getRoom().getStatus() == RoomStatus.WAITING_FOR_PLAYERS);
@@ -59,7 +59,7 @@ public class GameServiceTest {
     @Test
     void testPlayerJoiningRoom() {
         GameService gameService = new GameService(new DeckService());
-        gameService.createMutliplayerGame(new StartGameRequest("gameId", "player1"));
+        gameService.createMutliplayerGame(new StartGameRequest("gameId", "player1", 1));
         GameStateResponse joinState = gameService.joinGame(new JoinGameRequest("player2", "gameId"));
         GameState gameData = gameService.getGameById("gameId");
         assertTrue(gameData.getRoom().getPlayers().size() == 2);
@@ -69,7 +69,7 @@ public class GameServiceTest {
     @Test
     void testBiddingAndEvaluation() {
         GameService gameService = new GameService(new DeckService());
-        gameService.createMutliplayerGame(new StartGameRequest("gameId", "player1"));
+        gameService.createMutliplayerGame(new StartGameRequest("gameId", "player1", 1));
         GameState gameState = gameService.getGameById("gameId");
         gameService.joinGame(new JoinGameRequest("player2", "gameId"));
         gameService.joinGame(new JoinGameRequest("player3", "gameId"));

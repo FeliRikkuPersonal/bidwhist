@@ -7,9 +7,11 @@
  * - settings (mode, difficulty)
  * - showGameScreen / activeGame (so resume flow is possible)
  */
-export function clearCurrentGameData() {
+export async function clearCurrentGameData({ clearUIContext, clearGameStateContext }) {
+  if (clearUIContext) clearUIContext();
+  if (clearGameStateContext) clearGameStateContext();
+
   const keysToClear = [
-    // UIDisplayContext
     'handMap',
     'showBidding',
     'bidPhase',
@@ -17,11 +19,13 @@ export function clearCurrentGameData() {
     'showFinalizeBid',
     'awardKitty',
     'discardPile',
-    'animationQueue',
     'teamATricks',
     'teamBTricks',
-
-    // GameStateContext
+    'showFinalScore',
+    'animatedCards',
+    'showHands',
+    'showGameScreen',
+    'playedCardsByDirection',
     'kitty',
   ];
 
@@ -29,13 +33,11 @@ export function clearCurrentGameData() {
   console.log('[🧹 Cleared current game session data]');
 }
 
-/**
- * Removes all persisted game data, including player identity, UI layout, and settings.
- * Use this when fully leaving the game or logging out.
- */
-export function clearAllGameData() {
+export async function clearAllGameData({ clearUIContext, clearGameStateContext }) {
+  if (clearUIContext) clearUIContext();
+  if (clearGameStateContext) clearGameStateContext();
+
   const keysToClear = [
-    // UIDisplayContext
     'showGameScreen',
     'showLobby',
     'loadGame',
@@ -55,20 +57,15 @@ export function clearAllGameData() {
     'ShowAnimatedCards',
     'showHands',
     'showShuffle',
-    // PositionContext
     'playerName',
     'viewerPosition',
     'viewerTeam',
     'backendPositions',
-
-    // GameStateContext
     'kitty',
-    'mode',
     'difficulty',
     'activeGame',
   ];
 
   keysToClear.forEach((key) => localStorage.removeItem(key));
   console.log('[🧨 Cleared all game data]');
-
 }
