@@ -27,7 +27,7 @@ public class GameplayUtils {
         if (game.getPhase() != GamePhase.SHUFFLE) {
             throw new IllegalStateException("Can only deal after shuffle.");
         }
-
+        game.addAnimation(new Animation(AnimationType.HIDE_HANDS, game.getSessionKey()));
         game.getDeck().deal(game.getPlayers());
         game.addAnimation(new Animation(game.getShuffledDeck(), game.getCurrentTurnIndex(), game.getSessionKey()));
         game.setKitty(game.getDeck().getKitty().getCards());

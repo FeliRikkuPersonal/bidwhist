@@ -9,13 +9,21 @@ import '../css/Alert.css';
  */
 const Alert = ({ message, type, onClose }) => {
   const needsButton = type === 'persist';
+  const shortNotice = type === 'yourturn';
+  let timer;
 
   useEffect(() => {
     if (needsButton) return;
 
-    const timer = setTimeout(() => {
-      onClose();
-    }, 5000);
+    if (shortNotice) {
+      const timer = setTimeout(() => {
+        onClose();
+      }, 3000);
+    } else {
+      const timer = setTimeout(() => {
+        onClose();
+      }, 5000);
+    }
 
     return () => clearTimeout(timer);
   }, [message, onClose, needsButton]);

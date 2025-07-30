@@ -144,7 +144,7 @@ public class AIUtils {
                 game.setCurrentTurnIndex(winnerPlayer.getPosition().ordinal());
 
                 game.addAnimation(
-                        new Animation(currentBook, game.getCurrentTurnIndex(), game.getPhase(), game.getSessionKey()));
+                        new Animation(currentBook, winnerPlayer.getPosition().ordinal(), game.getPhase(), game.getSessionKey()));
                 game.addAnimation(new Animation(AnimationType.UPDATE_CARDS, game.getSessionKey()));
 
                 game.getTeamTrickCounts().putIfAbsent(winnerTeam, 0);

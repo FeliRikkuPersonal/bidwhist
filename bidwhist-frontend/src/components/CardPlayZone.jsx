@@ -266,6 +266,10 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
         setWinningBid(null);
       }
 
+      if (animation.type == 'HIDE_HANDS') {
+        setShowHands(false);
+      }
+
       if (animation.type === 'UPDATE_CARDS') {
         try {
           const res = await fetch(`${API}/game/update-cards`, {

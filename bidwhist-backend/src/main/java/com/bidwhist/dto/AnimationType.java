@@ -7,6 +7,7 @@ public enum AnimationType {
   PLAY,
   COLLECT,
   CLEAR,
+  HIDE_HANDS,
   UPDATE_CARDS,
   SHOW_WINNER,
   QUIT_GAME

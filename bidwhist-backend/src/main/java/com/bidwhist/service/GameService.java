@@ -194,6 +194,7 @@ public class GameService {
         List<Card> myKittyView = getMyKittyView(game, playerPosition);
         List<Player> players = game.getPlayers();
         Team myTeam = game.getTeamByPlayerPos(players, playerPosition);
+        List<Card> shuffledDeck = getMyShuffledDeck(game, playerPosition);
 
         GameStateResponse response = new GameStateResponse(
                 game.getAnimationList().getOrDefault(playerPosition, new ArrayList<>()),
@@ -201,7 +202,7 @@ public class GameService {
                 myKittyView,
                 game.getCurrentTurnIndex(),
                 game.getPhase(),
-                game.getShuffledDeck(),
+                shuffledDeck,
                 playerPosition,
                 game.getFirstBidder(),
                 game.getBidTurnIndex());
@@ -485,14 +486,14 @@ public class GameService {
 
             Book currentBook = new Book(currentTrick, winnerTeam);
             game.getCompletedTricks().add(currentBook);
-
-            game.addAnimation(new Animation(currentBook, game.getCurrentPlayerIndex(), game.getPhase(), game.getSessionKey()));
-            game.addAnimation(new Animation(AnimationType.UPDATE_CARDS, game.getSessionKey()));
+            game.setCurrentTurnIndex(winner.getPosition().ordinal());
+            game.addAnimation(
+                    new Animation(currentBook, winner.getPosition().ordinal(), game.getPhase(), game.getSessionKey()));
 
             currentTrick.clear();
-            game.setCurrentTurnIndex(winner.getPosition().ordinal());
-
-            if (game.getCompletedTricks().size() == 12) {
+            if (game.getCompletedTricks().size() != 12) {
+                game.addAnimation(new Animation(AnimationType.UPDATE_CARDS, game.getSessionKey()));
+            } else if (game.getCompletedTricks().size() == 12) {
                 GameplayUtils.scoreHand(game);
 
                 if (game.getPhase() == GamePhase.END) {
@@ -641,5 +642,15 @@ public class GameService {
         }
 
         return myKittyView;
+    }
+
+    public List<Card> getMyShuffledDeck(GameState game, PlayerPos playerPosition) {
+        List<Card> myShuffledDeck = new ArrayList<>(game.getShuffledDeck());
+
+        for (int i = 0; i < myShuffledDeck.size(); i++) {
+            myShuffledDeck.set(i, new Card(null, null));
+        }
+
+        return myShuffledDeck;
     }
 }
