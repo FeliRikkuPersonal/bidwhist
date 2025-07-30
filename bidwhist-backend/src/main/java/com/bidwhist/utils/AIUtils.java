@@ -24,6 +24,7 @@ import com.bidwhist.model.PlayerPos;
 import com.bidwhist.model.Rank;
 import com.bidwhist.model.Suit;
 import com.bidwhist.model.Team;
+import com.bidwhist.utils.HandUtils;
 
 public class AIUtils {
 
@@ -132,7 +133,7 @@ public class AIUtils {
 
             if (game.getCurrentTrick().size() == 4) {
                 System.out.println("DEBUG: Trick complete. Evaluating winner...");
-                PlayedCard winner = GameplayUtils.determineTrickWinner(game, game.getCurrentTrick());
+                PlayedCard winner = HandUtils.determineTrickWinner(game, game.getCurrentTrick());
 
                 Player winnerPlayer = PlayerUtils.getPlayerByPosition(winner.getPlayer(), game.getPlayers());
                 Team winnerTeam = winnerPlayer.getTeam();
@@ -142,7 +143,8 @@ public class AIUtils {
                 Book currentBook = new Book(game.getCurrentTrick(), winnerTeam);
                 game.setCurrentTurnIndex(winnerPlayer.getPosition().ordinal());
 
-                game.addAnimation(new Animation(currentBook, game.getCurrentTurnIndex(), game.getPhase(), game.getSessionKey()));
+                game.addAnimation(
+                        new Animation(currentBook, game.getCurrentTurnIndex(), game.getPhase(), game.getSessionKey()));
                 game.addAnimation(new Animation(AnimationType.UPDATE_CARDS, game.getSessionKey()));
 
                 game.getTeamTrickCounts().putIfAbsent(winnerTeam, 0);
@@ -189,331 +191,111 @@ public class AIUtils {
         List<Card> hand = aiPlayer.getHand().getCards();
         Difficulty difficulty = game.getDifficulty();
         Suit trumpSuit = game.getTrumpSuit();
-        PlayerPos bidWinner = game.getHighestBid().getPlayer();
-        FinalBid finalBid = game.getFinalBidCache().get(bidWinner);
-        boolean isNoTrump = finalBid != null && finalBid.isNo();
+        PlayerPos aiPlayerPosition = aiPlayer.getPosition();
+        boolean isNoTrump = game.getWinningBid().isNo();
 
         if (difficulty == Difficulty.EASY) {
-            return getLowestLegalCard(hand, currentTrick);
-        }
+            Card easyCard = getEasyAIMove(hand, currentTrick);
+            game.addPlayedCard(easyCard);
+            return easyCard;
+        } else
 
         if (difficulty == Difficulty.MEDIUM) {
-            if (currentTrick.isEmpty()) {
-                return hand.stream()
-                        .filter(
-                                c -> c.getSuit() != null && (trumpSuit == null || !c.getSuit().equals(trumpSuit)))
-                        .max(Comparator.comparingInt(c -> c.getRank().getValue()))
-                        .orElse(hand.get(0));
-            }
-
-            Suit leadSuit = currentTrick.stream()
-                    .map(PlayedCard::getCard)
-                    .filter(c -> !c.isJoker())
-                    .map(Card::getSuit)
-                    .findFirst()
-                    .orElse(null);
-            game.setLeadSuit(leadSuit);
-            List<Card> sameSuit = hand.stream()
-                    .filter(c -> c.getSuit() != null && c.getSuit().equals(leadSuit))
-                    .collect(Collectors.toList());
-
-            if (!sameSuit.isEmpty()) {
-                return sameSuit.stream()
-                        .min(Comparator.comparingInt(c -> c.getRank().getValue()))
-                        .orElse(sameSuit.get(0));
-            }
-
-            return hand.stream()
-                    .min(Comparator.comparingInt(c -> c.getRank().getValue()))
-                    .orElse(hand.get(0));
-        }
+            Card mediumCard = getMediumAIMove(game, aiPlayerPosition, hand, currentTrick);
+            game.addPlayedCard(mediumCard);
+            return mediumCard;
+        } else
 
         if (difficulty == Difficulty.HARD) {
-            int trickIndex = currentTrick.size();
-            Suit leadSuit;
-            if (isNoTrump) {
-                // NO_TRUMP: skip jokers when determining lead suit
-                leadSuit = currentTrick.stream()
-                        .map(PlayedCard::getCard)
-                        .filter(c -> !JokerUtils.isJokerRank(c.getRank()))
-                        .map(Card::getSuit)
-                        .findFirst()
-                        .orElse(null);
-            } else {
-                // UPTOWN or DOWNTOWN: use the suit of the first played card (joker included)
-                leadSuit = currentTrick.isEmpty() ? null : currentTrick.get(0).getCard().getSuit();
-            }
-
-            game.setLeadSuit(leadSuit);
-            PlayedCard winningCard = trickIndex > 0 ? GameplayUtils.getWinningCard(currentTrick, trumpSuit) : null;
-            Card currentWinning = winningCard != null ? winningCard.getCard() : null;
-
-            if (leadSuit != null
-                    && hand.stream().anyMatch(c -> c.getSuit() != null && c.getSuit().equals(leadSuit))) {
-                // Ensure at least one card of leadSuit is played
-                List<Card> legalFollowSuit = hand.stream()
-                        .filter(c -> c.getSuit() != null && c.getSuit().equals(leadSuit))
-                        .collect(Collectors.toList());
-
-                return legalFollowSuit.stream()
-                        .min(Comparator.comparingInt(c -> c.getRank().getValue()))
-                        .orElse(hand.get(0));
-            }
-
-            if (trickIndex == 0) {
-                Optional<Card> safeLead = hand.stream()
-                        .filter(c -> !JokerUtils.isJokerRank(c.getRank())) // Avoid jokers
-                        .filter(
-                                c -> c.getSuit() == null
-                                        || !c.getSuit().equals(trumpSuit)
-                                        || CardUtils.allHigherTrumpCardsPlayed(c, game.getCompletedCards(), trumpSuit,
-                                                game.getBidType() == BidType.NO_TRUMP))
-                        .max(Comparator.comparingInt(c -> c.getRank().getValue()));
-
-                if (safeLead.isPresent()) {
-                    return safeLead.get();
-                }
-
-                Map<Suit, List<Card>> bySuit = hand.stream()
-                        .filter(c -> c.getSuit() != null)
-                        .collect(Collectors.groupingBy(Card::getSuit));
-
-                Optional<Card> lead = bySuit.entrySet().stream()
-                        .filter(e -> e.getValue().size() >= 2)
-                        .flatMap(e -> e.getValue().stream())
-                        .max(Comparator.comparingInt(c -> c.getRank().getValue()));
-                if (lead.isPresent()) {
-                    return lead.get();
-                }
-
-                return hand.stream()
-                        .filter(
-                                c -> c.getSuit() != null && (trumpSuit == null || !c.getSuit().equals(trumpSuit)))
-                        .max(Comparator.comparingInt(c -> c.getRank().getValue()))
-                        .orElse(hand.get(0));
-            }
-
-            if (trickIndex == 3 && winningCard != null && currentWinning != null) {
-                PlayerPos partner = aiPlayer.getPosition().getPartner();
-                boolean partnerWinning = winningCard.getPlayer() != null && winningCard.getPlayer().equals(partner);
-
-                if (partnerWinning) {
-                    List<Card> follow = hand.stream()
-                            .filter(c -> c.getSuit() != null && c.getSuit().equals(leadSuit))
-                            .collect(Collectors.toList());
-                    if (!follow.isEmpty()) {
-                        return follow.stream()
-                                .min(Comparator.comparingInt(c -> c.getRank().getValue()))
-                                .orElse(follow.get(0));
-                    }
-
-                    List<Card> trumps = hand.stream()
-                            .filter(c -> c.getSuit() != null && c.getSuit().equals(trumpSuit))
-                            .collect(Collectors.toList());
-                    if (!trumps.isEmpty()) {
-                        return trumps.stream()
-                                .min(Comparator.comparingInt(c -> c.getRank().getValue()))
-                                .orElse(trumps.get(0));
-                    }
-
-                    Optional<Card> safeHigh = hand.stream()
-                            .filter(c -> c.getRank().getValue() >= Rank.QUEEN.getValue())
-                            .filter(
-                                    c -> c.getSuit() == null
-                                            || !c.getSuit().equals(trumpSuit)
-                                            || CardUtils.allHigherTrumpCardsPlayed(c, game.getCompletedCards(),
-                                                    trumpSuit, game.getBidType() == BidType.NO_TRUMP))
-                            .findFirst();
-                    if (safeHigh.isPresent()) {
-                        return safeHigh.get();
-                    }
-
-                    return hand.stream()
-                            .min(Comparator.comparingInt(c -> c.getRank().getValue()))
-                            .orElse(hand.get(0));
-                }
-
-                List<Card> winningCards = hand.stream()
-                        .filter(c -> c != null && canBeat(c, currentWinning, trumpSuit, leadSuit))
-                        .sorted(Comparator.comparingInt(c -> c.getRank().getValue()))
-                        .collect(Collectors.toList());
-
-                if (!winningCards.isEmpty()) {
-                    return winningCards.get(0);
-                }
-
-                Optional<Card> safeHigh = hand.stream()
-                        .filter(c -> c.getRank().getValue() >= Rank.QUEEN.getValue())
-                        .filter(
-                                c -> c.getSuit() == null
-                                        || !c.getSuit().equals(trumpSuit)
-                                        || CardUtils.allHigherTrumpCardsPlayed(c, game.getCompletedCards(), trumpSuit,
-                                                game.getBidType() == BidType.NO_TRUMP))
-                        .findFirst();
-                if (safeHigh.isPresent()) {
-                    return safeHigh.get();
-                }
-
-                return hand.stream()
-                        .min(Comparator.comparingInt(c -> c.getRank().getValue()))
-                        .orElse(hand.get(0));
-            }
-
-            List<Card> followSuit = hand.stream()
-                    .filter(c -> c.getSuit() != null)
-                    .filter(c -> leadSuit != null && c.getSuit().equals(leadSuit))
-                    .collect(Collectors.toList());
-
-            if (!followSuit.isEmpty()) {
-                if (currentWinning != null) {
-                    Optional<Card> beatCard = followSuit.stream()
-                            .filter(c -> canBeat(c, currentWinning, trumpSuit, leadSuit))
-                            .min(Comparator.comparingInt(c -> c.getRank().getValue()));
-                    if (beatCard.isPresent()) {
-                        return beatCard.get();
-                    }
-
-                    Optional<Card> safeBurn = followSuit.stream()
-                            .filter(
-                                    c -> c.getSuit() == null
-                                            || !c.getSuit().equals(trumpSuit)
-                                            || CardUtils.allHigherTrumpCardsPlayed(c, game.getCompletedCards(),
-                                                    trumpSuit, game.getBidType() == BidType.NO_TRUMP))
-                            .max(Comparator.comparingInt(c -> c.getRank().getValue()));
-                    if (safeBurn.isPresent()) {
-                        return safeBurn.get();
-                    }
-                }
-
-                // Fallback if can't beat or burn: play lowest legal card in lead suit
-                return followSuit.stream()
-                        .min(Comparator.comparingInt(c -> c.getRank().getValue()))
-                        .orElse(followSuit.get(0));
-            }
-
-            List<Card> trumpCards = hand.stream()
-                    .filter(c -> c.getSuit() != null && c.getSuit().equals(trumpSuit))
-                    .collect(Collectors.toList());
-
-            if (!trumpCards.isEmpty() && currentWinning != null) {
-                Optional<Card> winningTrump = trumpCards.stream()
-                        .filter(c -> canBeat(c, currentWinning, trumpSuit, leadSuit))
-                        .min(Comparator.comparingInt(c -> c.getRank().getValue()));
-                if (winningTrump.isPresent()) {
-                    return winningTrump.get();
-                }
-            }
-
-            Optional<Card> safeHigh = hand.stream()
-                    .filter(c -> c.getRank().getValue() >= Rank.QUEEN.getValue())
-                    .filter(
-                            c -> c.getSuit() == null
-                                    || !c.getSuit().equals(trumpSuit)
-                                    || CardUtils.allHigherTrumpCardsPlayed(c, game.getCompletedCards(), trumpSuit,
-                                            game.getBidType() == BidType.NO_TRUMP))
-                    .findFirst();
-            if (safeHigh.isPresent()) {
-                return safeHigh.get();
-            }
-
-            return hand.stream()
-                    .min(Comparator.comparingInt(c -> c.getRank().getValue()))
-                    .orElse(hand.get(0));
+            Card hardCard = getHardAIMove(game, aiPlayer, hand, currentTrick);
+            game.addPlayedCard(hardCard);
+            return hardCard;
         }
-
-        return hand.get(0); // fallback
     }
 
     /**
-     * Checks if the AI's partner is currently winning the trick.
-     *
-     * <p>
-     * Finds the current winning card and compares its player to the AI’s
-     * partner.
+     * Returns a "dumb" AI move for Easy difficulty.
+     * - If leading: play the highest card (no strategy)
+     * - If following: play the lowest legal card (follow suit if possible)
      */
-    @SuppressWarnings("unused")
-    public static boolean isPartnerWinning(List<PlayedCard> trick, PlayerPos aiPos, Suit trumpSuit) {
-        if (trick.size() < 2) {
-            return false; // Partner hasn't played yet
-        }
-        PlayerPos partner = aiPos.getPartner();
-
-        // Find the winning card in the current trick
-        PlayedCard winningCard = GameplayUtils.getWinningCard(trick, trumpSuit);
-        if (winningCard == null) {
-            return false;
-        }
-
-        return winningCard.getPlayer().equals(partner);
-    }
-
-    /**
-     * Checks if the challenger card can beat the current winning card.
-     *
-     * <p>
-     * Trump beats non-trump. Otherwise, the higher card of the same suit wins.
-     * If suits differ and neither is trump, the lead suit may still win if
-     * higher.
-     */
-    public static boolean canBeat(Card challenger, Card currentWinning, Suit trumpSuit, Suit leadSuit) {
-        Suit challengerSuit = challenger.getSuit();
-        Suit winningSuit = currentWinning.getSuit();
-
-        boolean challengerIsTrump = trumpSuit != null && trumpSuit.equals(challengerSuit);
-        boolean winningIsTrump = trumpSuit != null && trumpSuit.equals(winningSuit);
-
-        // Trump beats non-trump
-        if (challengerIsTrump && !winningIsTrump) {
-            return true;
-        }
-        if (!challengerIsTrump && winningIsTrump) {
-            return false;
-        }
-
-        // Same suit: compare values
-        if (challengerSuit == winningSuit) {
-            return challenger.getRank().getValue() > currentWinning.getRank().getValue();
-        }
-
-        // Lead suit but different from winning (no trump involved)
-        if (!challengerIsTrump
-                && !winningIsTrump
-                && challengerSuit == leadSuit
-                && winningSuit == leadSuit) {
-            return challenger.getRank().getValue() > currentWinning.getRank().getValue();
-        }
-
-        return false;
-    }
-
-    /*
-     * Selects the lowest legal card to play.
-     * Prefers matching lead suit if available.
-     */
-    public static Card getLowestLegalCard(List<Card> hand, List<PlayedCard> trick) {
-        if (trick.isEmpty()) {
+    public static Card getEasyAIMove(List<Card> hand, List<PlayedCard> trick) {
+        if (trick == null || trick.isEmpty()) {
+            // AI is leading — play highest card
             return hand.stream()
-                    .min(Comparator.comparingInt(c -> c.getRank().getValue()))
+                    .max(Comparator.comparingInt(c -> c.getRank().getValue()))
                     .orElse(hand.get(0));
         }
 
+        // Determine lead suit (first non-joker with a suit)
         Suit leadSuit = trick.stream()
                 .map(PlayedCard::getCard)
-                .filter(c -> !c.isJoker())
+                .filter(c -> !c.isJoker() && c.getSuit() != null)
                 .map(Card::getSuit)
                 .findFirst()
                 .orElse(null);
-        List<Card> sameSuit = hand.stream().filter(c -> c.getSuit() == leadSuit).collect(Collectors.toList());
 
-        if (!sameSuit.isEmpty()) {
-            return sameSuit.stream()
+        // Try to follow suit
+        List<Card> matchingSuit = hand.stream()
+                .filter(c -> c.getSuit() != null && c.getSuit().equals(leadSuit))
+                .collect(Collectors.toList());
+
+        if (!matchingSuit.isEmpty()) {
+            // Play lowest card in lead suit
+            return matchingSuit.stream()
                     .min(Comparator.comparingInt(c -> c.getRank().getValue()))
-                    .orElse(sameSuit.get(0));
+                    .orElse(matchingSuit.get(0));
         }
 
+        // No matching suit — discard lowest card
         return hand.stream()
                 .min(Comparator.comparingInt(c -> c.getRank().getValue()))
                 .orElse(hand.get(0));
+    }
+
+/**
+ * Determines the Medium AI's move based on the current game state.
+ *
+ * - If leading: plays the highest-ranked card in hand.
+ * - If following:
+ *    - Plays the lowest legal non-trump card if partner is winning or cannot win the trick.
+ *    - Otherwise, attempts to win with the highest legal card.
+ *
+ * Prioritizes safe play and avoids wasting strong cards when unnecessary.
+ */
+    public static Card getMediumAIMove(GameState game, PlayerPos player, List<Card> hand, List<PlayedCard> trick) {
+        if (trick.isEmpty()) {
+            return HandUtils.getHighestRankedCard(game, hand);
+        }
+
+        Suit trumpSuit = game.getTrumpSuit();
+        PlayedCard winningCard = HandUtils.getWinningCard(trick, trumpSuit);
+
+        if (HandUtils.partnerIsWinning(player, winningCard) || !HandUtils.canWinTrick(game, trick, hand)) {
+            return HandUtils.getLowestLegalNonTrumpCard(game, trick, hand);
+        }
+        
+        return HandUtils.getHighestLegalCard(game, trick, hand);
+    }
+    
+    /**
+     * 
+     * @param hand
+     * @param trick
+     * @return
+     */
+    public static Card getHardAIMove(GameState game, PlayerPos player, List<Card> hand, List<PlayedCard> trick) {
+        Difficulty difficulty = game.getDifficulty();
+        Suit trumpSuit = game.getTrumpSuit();
+        boolean isNoTrump = game.getWinningBid().isNo();
+    
+        
+        if (trick.isEmpty()) {
+                Card highestTrump = HandUtils.getHighestOfSuit(game, hand, trumpSuit);
+                if (highestTrump != null && 
+                        HandUtils.allHigherCardsPlayed(highestTrump, game.getPlayedCards(), trumpSuit, isNoTrump)){
+                    
+                }
+            }
     }
 
     /*
@@ -543,5 +325,4 @@ public class AIUtils {
 
         autoPlayAITurns(game);
     }
-
 }

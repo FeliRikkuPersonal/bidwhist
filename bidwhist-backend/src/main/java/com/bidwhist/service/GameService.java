@@ -41,6 +41,7 @@ import com.bidwhist.utils.AIUtils;
 import com.bidwhist.utils.CardUtils;
 import com.bidwhist.utils.GameplayUtils;
 import com.bidwhist.utils.PlayerUtils;
+import com.bidwhist.utils.HandUtils;
 
 @Service
 public class GameService {
@@ -443,6 +444,7 @@ public class GameService {
         }
 
         Card cardToPlay = request.getCard();
+        game.addPlayedCard(cardToPlay);
         if (!currentPlayer.getHand().getCards().contains(cardToPlay)) {
             throw new IllegalArgumentException(
                     "Player does not have the specified card "
@@ -472,7 +474,7 @@ public class GameService {
         game.setCurrentTurnIndex((game.getCurrentTurnIndex() + 1) % 4);
 
         if (currentTrick.size() == 4) {
-            PlayedCard winningPlay = GameplayUtils.determineTrickWinner(game, currentTrick);
+            PlayedCard winningPlay = HandUtils.determineTrickWinner(game, currentTrick);
             Player winner = PlayerUtils.getPlayerByPosition(winningPlay.getPlayer(), game.getPlayers());
             Team winnerTeam = winner.getTeam();
             System.out.println("DEBUG: Trick won by " + winner.getName() + " (Team " + winnerTeam + ")");
