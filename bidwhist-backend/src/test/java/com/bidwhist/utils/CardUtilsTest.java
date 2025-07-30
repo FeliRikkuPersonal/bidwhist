@@ -65,10 +65,13 @@ class CardUtilsTest {
                 new Card(Suit.SPADES, Rank.KING),
                 new Card(Suit.SPADES, Rank.ACE),
                 new Card(Suit.SPADES, Rank.JOKER_S),
-                new Card(Suit.SPADES, Rank.JOKER_B)
-        );
+                new Card(Suit.SPADES, Rank.JOKER_B));
+        List<Card> hand = List.of(
+                new Card(Suit.SPADES, Rank.ACE),
+                new Card(Suit.SPADES, Rank.THREE),
+                new Card(Suit.HEARTS, Rank.TEN));
 
-        boolean result = HandUtils.allHigherCardsPlayed(candidate, played, Suit.SPADES, false);
+        boolean result = HandUtils.allHigherCardsPlayed(candidate, played, hand, Suit.SPADES, false);
         assertTrue(result);
     }
 
@@ -79,8 +82,12 @@ class CardUtilsTest {
                 new Card(Suit.SPADES, Rank.QUEEN),
                 new Card(Suit.SPADES, Rank.KING) // missing ACE, JOKER_S, JOKER_B
         );
+        List<Card> hand = List.of(
+                new Card(Suit.SPADES, Rank.ACE),
+                new Card(Suit.SPADES, Rank.THREE),
+                new Card(Suit.HEARTS, Rank.TEN));
 
-        boolean result = HandUtils.allHigherCardsPlayed(candidate, played, Suit.SPADES, false);
+        boolean result = HandUtils.allHigherCardsPlayed(candidate, played, hand, Suit.SPADES, false);
         assertFalse(result);
     }
 
@@ -90,18 +97,25 @@ class CardUtilsTest {
         List<Card> played = List.of(
                 new Card(Suit.HEARTS, Rank.QUEEN),
                 new Card(Suit.HEARTS, Rank.KING),
-                new Card(Suit.HEARTS, Rank.ACE)
-        );
+                new Card(Suit.HEARTS, Rank.ACE));
+        List<Card> hand = List.of(
+                new Card(Suit.SPADES, Rank.ACE),
+                new Card(Suit.SPADES, Rank.THREE),
+                new Card(Suit.HEARTS, Rank.TEN));
 
-        boolean result = HandUtils.allHigherCardsPlayed(candidate, played, Suit.SPADES, false);
+        boolean result = HandUtils.allHigherCardsPlayed(candidate, played, hand, Suit.SPADES, false);
         assertFalse(result);
     }
 
     @Test
     void testAllHigherTrumpCardsPlayed_false_onNullInput() {
+                List<Card> hand = List.of(
+                new Card(Suit.SPADES, Rank.ACE),
+                new Card(Suit.SPADES, Rank.THREE),
+                new Card(Suit.HEARTS, Rank.TEN));
         List<Card> played = new ArrayList<>();
-        assertFalse(HandUtils.allHigherCardsPlayed(null, List.of(), Suit.SPADES,false));
-        assertFalse(HandUtils.allHigherCardsPlayed(new Card(Suit.SPADES, Rank.JACK), played, Suit.SPADES,false));
-        assertFalse(HandUtils.allHigherCardsPlayed(new Card(Suit.SPADES, Rank.TEN), List.of(), null,false));
+        assertFalse(HandUtils.allHigherCardsPlayed(null, List.of(), hand, Suit.SPADES, false));
+        assertFalse(HandUtils.allHigherCardsPlayed(new Card(Suit.SPADES, Rank.JACK), played, hand, Suit.SPADES, false));
+        assertFalse(HandUtils.allHigherCardsPlayed(new Card(Suit.SPADES, Rank.TEN), List.of(), hand, null, false));
     }
 }

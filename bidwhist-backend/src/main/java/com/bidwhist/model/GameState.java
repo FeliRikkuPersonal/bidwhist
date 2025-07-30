@@ -37,6 +37,7 @@ public class GameState {
     private Map<PlayerPos, List<Animation>> animationList = new EnumMap<>(PlayerPos.class);
     private PlayerPos bidWinnerPos;
     private int sessionKey;
+    private Map<PlayerPos, Map<Suit, Boolean>> suitVoidMap = new EnumMap<>(PlayerPos.class);
 
     private List<PlayedCard> currentTrick = new ArrayList<>();
     private List<Book> completedTricks = new ArrayList<>();
@@ -70,6 +71,14 @@ public class GameState {
         for (PlayerPos pos : PlayerPos.values()) {
             animationList.put(pos, new ArrayList<>());
         }
+        for (PlayerPos pos : PlayerPos.values()) {
+            Map<Suit, Boolean> suitMap = new EnumMap<>(Suit.class);
+            for (Suit suit : Suit.values()) {
+                suitMap.put(suit, false); // assume all suits are still held
+            }
+            suitVoidMap.put(pos, suitMap);
+        }
+
     }
 
     public void addAnimation(Animation animation) {
@@ -378,6 +387,14 @@ public class GameState {
 
     public int getSessionKey() {
         return sessionKey;
+    }
+
+    public void setSuitVoidMap(Map<PlayerPos, Map<Suit, Boolean>> map) {
+        suitVoidMap = map;
+    }
+
+    public Map<PlayerPos, Map<Suit, Boolean>> getSuitVoidMap() {
+        return suitVoidMap;
     }
 
 }

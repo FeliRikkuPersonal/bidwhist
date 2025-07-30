@@ -23,15 +23,13 @@ public class AIUtilsTest {
                 new Card(Suit.SPADES, Rank.ACE),
                 new Card(Suit.SPADES, Rank.KING),
                 new Card(Suit.HEARTS, Rank.TEN),
-                new Card(Suit.CLUBS, Rank.TWO)
-        )));
+                new Card(Suit.CLUBS, Rank.TWO))));
 
         List<Player> players = List.of(
                 aiPlayer,
-                new Player("Human", false,  PlayerPos.P4, Team.B),
+                new Player("Human", false, PlayerPos.P4, Team.B),
                 new Player("AI Bot 2", true, PlayerPos.P1, Team.A),
-                new Player("AI Bot 3", true, PlayerPos.P2, Team.B)
-        );
+                new Player("AI Bot 3", true, PlayerPos.P2, Team.B));
 
         game = new GameState("gameId");
         for (Player player : players) {
@@ -48,7 +46,7 @@ public class AIUtilsTest {
 
     @Test
     void testProcessAllBids_runsUntilHumanTurn() {
-        game.setBidTurnIndex(0); 
+        game.setBidTurnIndex(0);
         AIUtils.processAllBids(game);
         assertTrue(game.getBids().size() >= 1);
         assertEquals(PlayerPos.P4, game.getPlayers().get(game.getBidTurnIndex()).getPosition());
@@ -59,23 +57,25 @@ public class AIUtilsTest {
         List<Card> hand = List.of(
                 new Card(Suit.SPADES, Rank.ACE),
                 new Card(Suit.SPADES, Rank.THREE),
-                new Card(Suit.HEARTS, Rank.TEN)
-        );
+                new Card(Suit.HEARTS, Rank.TEN));
 
         List<PlayedCard> trick = List.of(
-                new PlayedCard(PlayerPos.P1, new Card(Suit.SPADES, Rank.FIVE))
-        );
+                new PlayedCard(PlayerPos.P1, new Card(Suit.SPADES, Rank.FIVE)));
 
-        Card result = AIUtils.getLowestLegalCard(hand, trick);
+        Card result = HandUtils.getLowestLegalCard(game, trick, hand);
         assertEquals(Rank.THREE, result.getRank());
     }
 
     @Test
     void testCanBeat_logicWorksCorrectly() {
-        Card winning = new Card(Suit.HEARTS, Rank.KING);
-        Card challenger = new Card(Suit.HEARTS, Rank.ACE);
+        List<Card> hand = List.of(
+                new Card(Suit.SPADES, Rank.ACE),
+                new Card(Suit.SPADES, Rank.THREE),
+                new Card(Suit.HEARTS, Rank.TEN));
 
-        boolean result = AIUtils.canBeat(challenger, winning, null, Suit.HEARTS);
+        List<PlayedCard> trick = List.of(
+                new PlayedCard(PlayerPos.P1, new Card(Suit.SPADES, Rank.FIVE)));
+        boolean result = HandUtils.canWinTrick(game, trick, hand);
         assertTrue(result);
     }
 

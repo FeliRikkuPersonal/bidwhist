@@ -54,7 +54,7 @@ class GameplayUtilsTest {
                 new PlayedCard(PlayerPos.P3, new Card(Suit.SPADES, Rank.ACE))
         );
 
-        PlayedCard winner = GameplayUtils.getWinningCard(trick, Suit.HEARTS);
+        PlayedCard winner = HandUtils.getWinningCard(trick, Suit.HEARTS);
         assertEquals(PlayerPos.P2, winner.getPlayer());
     }
 
@@ -67,7 +67,7 @@ class GameplayUtilsTest {
                 new PlayedCard(PlayerPos.P3, new Card(Suit.SPADES, Rank.ACE))
         );
 
-        PlayedCard winner = GameplayUtils.determineTrickWinner(game, trick);
+        PlayedCard winner = HandUtils.determineTrickWinner(game, trick);
         assertEquals(PlayerPos.P2, winner.getPlayer()); // trump wins
     }
 
@@ -80,7 +80,7 @@ class GameplayUtilsTest {
                 new PlayedCard(PlayerPos.P3, new Card(Suit.SPADES, Rank.FOUR))
         );
 
-        PlayedCard winner = GameplayUtils.determineTrickWinner(game, trick);
+        PlayedCard winner = HandUtils.determineTrickWinner(game, trick);
         assertEquals(PlayerPos.P1, winner.getPlayer()); // downtown reverses rank order
     }
 
@@ -95,7 +95,7 @@ class GameplayUtilsTest {
                 new PlayedCard(PlayerPos.P3, new Card(Suit.HEARTS, Rank.ACE))
         );
 
-        PlayedCard winner = GameplayUtils.determineTrickWinner(game, trick);
+        PlayedCard winner = HandUtils.determineTrickWinner(game, trick);
         assertEquals(PlayerPos.P2, winner.getPlayer()); // highest of lead suit wins
     }
 
