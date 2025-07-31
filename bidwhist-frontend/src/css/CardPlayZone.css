@@ -22,9 +22,9 @@
 .drop-zone {
   position: absolute;
   bottom: 0;
-  width: 80px;
-  height: 120px;
-  border: 2px dashed transparent;
+  width: 100px;
+  height: 140px;
+  border: 3px dashed transparent;
   margin: auto;
   left: 50%;
   transform: translateX(-50%);
