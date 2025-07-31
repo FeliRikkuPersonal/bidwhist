@@ -3,22 +3,43 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { PositionProvider, usePositionContext } from '../PositionContext';
+import { AlertProvider } from '../../context/AlertContext';
+import { RefProvider } from '../../context/RefContext';
+import { UIDisplayProvider } from '../../context/UIDisplayContext';
 import { vi } from 'vitest';
 import '@testing-library/jest-dom';
 
-/* 🧪 Mock the useGameState hook to supply players */
-vi.mock('../GameStateContext', () => ({
-  useGameState: () => ({
-    players: [
-      { name: 'Alice', position: 'P1', team: 'A' },
-      { name: 'Bob', position: 'P2', team: 'B' },
-      { name: 'Carol', position: 'P3', team: 'A' },
-      { name: 'Dave', position: 'P4', team: 'B' },
-    ],
-  }),
-}));
+// ✅ Mock GameStateContext with both useGameState and GameStateProvider
+vi.mock('../GameStateContext', async () => {
+  return {
+    useGameState: () => ({
+      players: [
+        { name: 'Alice', position: 'P1', team: 'A' },
+        { name: 'Bob', position: 'P2', team: 'B' },
+        { name: 'Carol', position: 'P3', team: 'A' },
+        { name: 'Dave', position: 'P4', team: 'B' },
+      ],
+    }),
+    GameStateProvider: ({ children }) => <>{children}</>,
+  };
+});
 
-/* 🧪 Component to test context values */
+// ✅ Inline test-only AllProviders to avoid dependency on broken shared one
+const AllProviders = ({ children }) => {
+  return (
+    <AlertProvider>
+      <RefProvider>
+        <UIDisplayProvider>
+          <PositionProvider>
+            {children}
+          </PositionProvider>
+        </UIDisplayProvider>
+      </RefProvider>
+    </AlertProvider>
+  );
+};
+
+/* 🧪 Test component to inspect values from PositionContext */
 const TestComponent = () => {
   const {
     setViewerPosition,
@@ -56,9 +77,9 @@ const TestComponent = () => {
 describe('PositionContext', () => {
   it('provides correct direction mapping and team assignment', async () => {
     render(
-      <PositionProvider>
+      <AllProviders>
         <TestComponent />
-      </PositionProvider>
+      </AllProviders>
     );
 
     expect(await screen.findByTestId('south')).toHaveTextContent('Alice');
@@ -73,15 +94,15 @@ describe('PositionContext', () => {
     expect(screen.getByTestId('clockwiseSouth')).toHaveTextContent('south');
   });
 
-  it('throws if used outside provider', () => {
-    const ConsoleError = console.error;
-    console.error = () => {}; // suppress React error log
+it('returns null if usePositionContext is used outside provider', () => {
+  let contextValue;
+  const BrokenConsumer = () => {
+    contextValue = usePositionContext();
+    return null;
+  };
 
-    expect(() => {
-      const { usePositionContext } = require('../PositionContext');
-      usePositionContext();
-    }).toThrow();
+  render(<BrokenConsumer />);
+  expect(contextValue).toBeNull();
+});
 
-    console.error = ConsoleError;
-  });
 });

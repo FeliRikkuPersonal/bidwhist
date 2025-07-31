@@ -67,6 +67,7 @@ class HandEvaluatorTest {
 
     @Test
     void testGetForcedMinimumBidReturnsValidBid() {
+        GameState game = new GameState("test");
         Player player = new Player("myName", false, PlayerPos.P1, Team.A);
         Hand hand = new Hand();
         hand.addCard(new Card(Suit.HEARTS, Rank.ACE));
@@ -74,9 +75,10 @@ class HandEvaluatorTest {
         hand.addCard(new Card(Suit.HEARTS, Rank.QUEEN));
         hand.addCard(new Card(Suit.HEARTS, Rank.JACK));
         player.setHand(hand);
+        game.addPlayer(player);
 
         HandEvaluator evaluator = new HandEvaluator(player);
-        FinalBid forced = evaluator.getForcedMinimumBid(PlayerPos.P1);
+        FinalBid forced = evaluator.getForcedMinimumBid(game, PlayerPos.P1);
         assertNotNull(forced);
         assertEquals(4, forced.getValue());
         assertNotNull(forced.getSuit());

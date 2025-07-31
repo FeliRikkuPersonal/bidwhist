@@ -1,15 +1,20 @@
 // src/components/_tests_/AnimatedCard.test.jsx
 
 import React from 'react';
-import { render, screen, act } from '@testing-library/react';
+import { render, screen, act, cleanup } from '@testing-library/react';
 import AnimatedCard from '../AnimatedCard';
-import { usePositionContext } from '../../context/PositionContext';
 import * as CardUtils from '../../utils/CardUtils';
+import { vi, describe, test, expect, beforeEach, afterEach } from 'vitest';
+import { usePositionContext } from '../../context/PositionContext';
 
-/* 🧪 Mock viewer context */
-vi.mock('../../context/PositionContext', () => ({
-  usePositionContext: vi.fn()
-}));
+/* 🧪 Preserve real module, only mock usePositionContext */
+vi.mock('../../context/PositionContext', async () => {
+  const actual = await vi.importActual('../../context/PositionContext');
+  return {
+    ...actual,
+    usePositionContext: vi.fn()
+  };
+});
 
 /* 🧪 Mock getCardImage */
 vi.mock('../../utils/CardUtils', () => ({
@@ -29,6 +34,12 @@ describe('AnimatedCard component', () => {
     CardUtils.getCardImage.mockReturnValue(mockImageSrc);
   });
 
+  afterEach(() => {
+    vi.clearAllTimers();
+    vi.clearAllMocks();
+    cleanup();
+  });
+
   test('renders the card at the initial position', () => {
     render(<AnimatedCard card={mockCard} from={from} to={to} />);
     const cardImg = screen.getByAltText('Animated card');
@@ -39,9 +50,9 @@ describe('AnimatedCard component', () => {
 
   test('moves the card to the destination and calls onComplete', () => {
     const onComplete = vi.fn();
+
     render(<AnimatedCard card={mockCard} from={from} to={to} onComplete={onComplete} />);
 
-    // Wait for the useEffect + setTimeout
     act(() => {
       vi.advanceTimersByTime(700);
     });
@@ -49,6 +60,6 @@ describe('AnimatedCard component', () => {
     const cardImg = screen.getByAltText('Animated card');
     expect(cardImg).toHaveStyle(`left: ${to.x}px`);
     expect(cardImg).toHaveStyle(`top: ${to.y}px`);
-    expect(onComplete).toHaveBeenCalled();
+    expect(onComplete).toHaveBeenCalledTimes(1);
   });
 });

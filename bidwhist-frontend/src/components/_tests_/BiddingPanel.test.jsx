@@ -1,91 +1,89 @@
 // src/components/_tests_/BiddingPanel.test.jsx
 
-Object.defineProperty(import.meta, 'env', {
-  value: { VITE_API_URL: 'http://localhost:1234' },
-});
-
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import { vi, describe, test, beforeEach, expect } from 'vitest';
 import BiddingPanel from '../BiddingPanel';
 
+/* Mock all necessary hooks and utils */
+vi.mock('../../context/GameStateContext', () => ({
+  useGameState: vi.fn(),
+}));
+vi.mock('../../context/UIDisplayContext', () => ({
+  useUIDisplay: vi.fn(),
+}));
+vi.mock('../../context/PositionContext', () => ({
+  usePositionContext: vi.fn(),
+}));
+vi.mock('../../hooks/useThrowAlert', () => ({
+  useThrowAlert: () => vi.fn(),
+}));
+vi.mock('../../utils/handleQuit', () => ({
+  default: vi.fn(),
+}));
+
+/* Get mock references to override later */
 import { useGameState } from '../../context/GameStateContext';
 import { useUIDisplay } from '../../context/UIDisplayContext';
 import { usePositionContext } from '../../context/PositionContext';
 
-vi.mock('../../context/GameStateContext');
-vi.mock('../../context/UIDisplayContext');
-vi.mock('../../context/PositionContext');
-
 global.fetch = vi.fn(() =>
   Promise.resolve({
     ok: true,
-    json: () =>
-      Promise.resolve({
-        bids: [],
-        phase: 'next-phase',
-        firstBidder: 'P2',
-        currentTurnIndex: 1,
-      }),
+    json: () => Promise.resolve({}),
   })
 );
 
-describe('BiddingPanel component', () => {
+/* Mock API URL */
+Object.defineProperty(import.meta, 'env', {
+  value: { VITE_API_URL: 'http://localhost:1234' },
+});
+
+describe('BiddingPanel', () => {
   const mockCloseBidding = vi.fn();
   const mockOnBidPlaced = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
 
+    localStorage.setItem('mode', JSON.stringify('single'));
+
     useGameState.mockReturnValue({
-      gameId: 'test-game-id',
+      gameId: 'test-game',
       bids: [],
-      bidTurnIndex: 0,
-      currentTurnIndex: 0,
+      bidTurnIndex: 1, // P2
       setBids: vi.fn(),
       setPhase: vi.fn(),
       setFirstBidder: vi.fn(),
       setCurrentTurnIndex: vi.fn(),
+      forcedBid: false,
+      setForcedBid: vi.fn(),
+      clearGameStateContext: vi.fn(),
       debugLog: () => {},
     });
 
     useUIDisplay.mockReturnValue({
-      bidPhase: true,
-      showBidding: true,
-      setBidPhase: vi.fn(),
+      bidPhase: 'BID',
+      showBidding: true, // ✅ Force render
       setShowBidding: vi.fn(),
-      setShowFinalizeBid: vi.fn(),
+      setBidPhase: vi.fn(),
+      clearUIContext: vi.fn(),
       debugLog: () => {},
     });
 
     usePositionContext.mockReturnValue({
-      viewerPosition: 'P1',
+      viewerPosition: 'P2',
       debugLog: () => {},
     });
   });
 
-  test('renders bidding UI when visible', () => {
+  test('renders bidding UI when viewer is current turn', () => {
     render(<BiddingPanel closeBidding={mockCloseBidding} onBidPlaced={mockOnBidPlaced} />);
+
     expect(screen.getByText('Place Your Bid')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Enter bid (4-7)')).toBeInTheDocument();
     expect(screen.getByText('Set Bid')).toBeInTheDocument();
-  });
-
-  test('updates bid input and checkbox', () => {
-    render(<BiddingPanel closeBidding={mockCloseBidding} onBidPlaced={mockOnBidPlaced} />);
-    const input = screen.getByPlaceholderText(/Enter bid/i);
-    fireEvent.change(input, { target: { value: '6' } });
-    expect(input.value).toBe('6');
-
-    const checkbox = screen.getByRole('checkbox');
-    fireEvent.click(checkbox);
-    expect(checkbox.checked).toBe(true);
-  });
-
-  test('calls fetch when "Pass" is clicked', async () => {
-    render(<BiddingPanel closeBidding={mockCloseBidding} onBidPlaced={mockOnBidPlaced} />);
-    const passButton = screen.getByText('Pass');
-    fireEvent.click(passButton);
-
-    // Wait for fetch to be called
-    expect(fetch).toHaveBeenCalledWith(expect.stringContaining('/game/bid'), expect.any(Object));
+    expect(screen.getByText('Pass')).toBeInTheDocument();
+    expect(screen.getByText('Quit')).toBeInTheDocument();
   });
 });

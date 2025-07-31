@@ -2,8 +2,13 @@
 
 package com.bidwhist.utils;
 
+import java.util.Comparator;
+
 import com.bidwhist.bidding.BidType;
 import com.bidwhist.model.Card;
+import com.bidwhist.model.GameState;
+import com.bidwhist.model.Rank;
+import com.bidwhist.model.Suit;
 
 public class CardUtils {
 
@@ -27,29 +32,26 @@ public class CardUtils {
 
   /**
    * Compares two cards according to bid type (UPTOWN, DOWNTOWN, or NO_TRUMP).
-   *
-   * @param thisCard The card being evaluated as greater.
-   * @param thatCard The card being compared against.
-   * @param bidType  The current bid type, which affects rank comparisons.
-   * @return true if thisCard is considered greater than thatCard under the
-   *         bidType rules.
    */
-  public static boolean isGreaterThan(Card thisCard, Card thatCard, BidType bidType) {
-    if (thisCard == null || thatCard == null || thisCard.getRank() == null || thatCard.getRank() == null) {
-      return false; // Or throw IllegalArgumentException
-    }
+public static Comparator<Card> getCardComparator(GameState game) {
+  BidType bidType = game.getBidType();
+  boolean isNo = game.getWinningBid() != null && game.getWinningBid().isNo();
+  Suit trumpSuit = isNo ? null : game.getTrumpSuit();
 
-    int thisVal = thisCard.getRank().getValue();
-    int thatVal = thatCard.getRank().getValue();
+  Comparator<Rank> rankComparator = Rank.rankComparator(bidType, isNo);
 
-    if (bidType == BidType.DOWNTOWN) {
-      // Lower cards win, except for special handling (already handled in your game
-      // rules)
-      return thisVal < thatVal;
-    }
+  return (a, b) -> {
+    // Trump suit check (ignored in No Trump)
+    boolean aTrump = trumpSuit != null && trumpSuit.equals(a.getSuit());
+    boolean bTrump = trumpSuit != null && trumpSuit.equals(b.getSuit());
 
-    // UPTOWN and default
-    return thisVal > thatVal;
-  }
+    if (aTrump && !bTrump) return -1;
+    if (!aTrump && bTrump) return 1;
+
+    // Let rankComparator handle all card comparisons, including jokers
+    return rankComparator.compare(a.getRank(), b.getRank());
+  };
+}
+
 
 }

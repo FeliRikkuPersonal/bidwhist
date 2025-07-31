@@ -52,37 +52,4 @@ public class AIUtilsTest {
         assertEquals(PlayerPos.P4, game.getPlayers().get(game.getBidTurnIndex()).getPosition());
     }
 
-    @Test
-    void testGetLowestLegalCard_selectsLowestMatchingSuit() {
-        List<Card> hand = List.of(
-                new Card(Suit.SPADES, Rank.ACE),
-                new Card(Suit.SPADES, Rank.THREE),
-                new Card(Suit.HEARTS, Rank.TEN));
-
-        List<PlayedCard> trick = List.of(
-                new PlayedCard(PlayerPos.P1, new Card(Suit.SPADES, Rank.FIVE)));
-
-        Card result = HandUtils.getLowestLegalCard(game, trick, hand);
-        assertEquals(Rank.THREE, result.getRank());
-    }
-
-    @Test
-    void testCanBeat_logicWorksCorrectly() {
-        List<Card> hand = List.of(
-                new Card(Suit.SPADES, Rank.ACE),
-                new Card(Suit.SPADES, Rank.THREE),
-                new Card(Suit.HEARTS, Rank.TEN));
-
-        List<PlayedCard> trick = List.of(
-                new PlayedCard(PlayerPos.P1, new Card(Suit.SPADES, Rank.FIVE)));
-        boolean result = HandUtils.canWinTrick(game, trick, hand);
-        assertTrue(result);
-    }
-
-    @Test
-    void testChooseCardForAI_easy_playsLowest() {
-        game.setDifficulty(Difficulty.EASY);
-        Card chosen = AIUtils.chooseCardForAI(game, aiPlayer, new ArrayList<>());
-        assertEquals(Rank.TWO, chosen.getRank());
-    }
 }

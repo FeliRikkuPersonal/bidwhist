@@ -5,7 +5,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, test, expect, vi } from 'vitest';
 import { AlertProvider, useAlert } from '../AlertContext';
 
-// Mock Alert component to track props
+// ✅ Mock Alert component to track props without triggering real behavior
 vi.mock('../../components/Alert', () => ({
   default: ({ message, type, onClose }) => (
     <div data-testid="mock-alert">
@@ -15,7 +15,7 @@ vi.mock('../../components/Alert', () => ({
   )
 }));
 
-/* Dummy consumer to call showAlert */
+// ✅ Minimal consumer to test context behavior
 const AlertTester = () => {
   const { showAlert } = useAlert();
   return (

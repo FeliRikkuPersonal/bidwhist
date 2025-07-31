@@ -5,6 +5,7 @@ import { render, screen } from '@testing-library/react';
 import { RefProvider, useZoneRefs } from '../RefContext';
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
+import { AllProviders } from '../../test-utils/AllProviders';
 
 const TestComponent = () => {
     const myRef = useRef(null);
@@ -33,9 +34,9 @@ const TestComponent = () => {
 describe('RefContext', () => {
     it('registers and retrieves refs correctly', () => {
         render(
-            <RefProvider>
+            <AllProviders>
                 <TestComponent />
-            </RefProvider>
+            </AllProviders>
         );
 
         const button = screen.getByText('Trigger Get');
@@ -54,12 +55,14 @@ describe('RefContext', () => {
             return null;
         }
 
+        // ❌ REMOVE AllProviders — we want it outside RefProvider
         expect(() => render(<TestThrowsOutsideProvider />)).toThrow(
             'useZoneRefs must be used within a RefProvider'
         );
 
         console.error = originalError;
     });
+
 
 
     it('warns when trying to register invalid ref', () => {
@@ -73,9 +76,9 @@ describe('RefContext', () => {
         };
 
         render(
-            <RefProvider>
+            <AllProviders>
                 <InvalidRefComponent />
-            </RefProvider>
+            </AllProviders>
         );
 
         expect(warnSpy).toHaveBeenCalledWith(

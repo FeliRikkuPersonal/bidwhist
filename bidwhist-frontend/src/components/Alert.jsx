@@ -5,28 +5,22 @@ import '../css/Alert.css';
 
 /*
  * Alert displays a temporary message with a style based on type ("success", "error", etc).
- * It auto-dismisses after 5 seconds and includes a manual close button.
+ * It auto-dismisses after 5 seconds and includes a manual close button if type is 'persist'.
  */
 const Alert = ({ message, type, onClose }) => {
   const needsButton = type === 'persist';
   const shortNotice = type === 'yourturn';
-  let timer;
 
   useEffect(() => {
     if (needsButton) return;
 
-    if (shortNotice) {
-      const timer = setTimeout(() => {
-        onClose();
-      }, 3000);
-    } else {
-      const timer = setTimeout(() => {
-        onClose();
-      }, 5000);
-    }
+    const timeout = shortNotice ? 3000 : 5000;
+    const timer = setTimeout(() => {
+      onClose();
+    }, timeout);
 
     return () => clearTimeout(timer);
-  }, [message, onClose, needsButton]);
+  }, [message, onClose, needsButton, shortNotice]);
 
   return (
     <div className={`alert ${type}`}>

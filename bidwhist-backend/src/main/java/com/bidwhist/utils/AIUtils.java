@@ -3,11 +3,7 @@ package com.bidwhist.utils;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
-import com.bidwhist.bidding.BidType;
 import com.bidwhist.bidding.FinalBid;
 import com.bidwhist.bidding.HandEvaluator;
 import com.bidwhist.bidding.InitialBid;
@@ -21,10 +17,8 @@ import com.bidwhist.model.GameState;
 import com.bidwhist.model.PlayedCard;
 import com.bidwhist.model.Player;
 import com.bidwhist.model.PlayerPos;
-import com.bidwhist.model.Rank;
 import com.bidwhist.model.Suit;
 import com.bidwhist.model.Team;
-import com.bidwhist.utils.HandUtils;
 
 public class AIUtils {
 
@@ -76,7 +70,7 @@ public class AIUtils {
 
             if (isFinalBidder && passedCount == 3) {
                 HandEvaluator aiHandEval = new HandEvaluator(nextBidder);
-                aiFinalBid = aiHandEval.getForcedMinimumBid(nextBidder.getPosition());
+                aiFinalBid = aiHandEval.getForcedMinimumBid(game, nextBidder.getPosition());
                 aiBid = aiFinalBid.getInitialBid();
                 game.getFinalBidCache().put(nextBidder.getPosition(), aiFinalBid);
             } else {
@@ -128,7 +122,7 @@ public class AIUtils {
             game.getCurrentTrick().add(validPlayedCard);
 
             game.addAnimation(new Animation(validPlayedCard, game.getLeadSuit(), game.getCurrentTurnIndex(),
-                    game.getCurrentTrick().size(), game.getSessionKey()));
+                    game.getCurrentTrick().size(), game.getSessionKey(), game));
             game.setCurrentTurnIndex((game.getCurrentTurnIndex() + 1) % 4);
 
             if (game.getCurrentTrick().size() == 4) {
@@ -246,7 +240,7 @@ public class AIUtils {
 
         List<Card> playableHand = HandUtils.getPlayableHand(game, trick, hand);
         Suit trumpSuit = game.getTrumpSuit();
-        PlayedCard winningCard = HandUtils.getWinningCard(trick, trumpSuit);
+        PlayedCard winningCard = HandUtils.determineTrickWinner(game, trick);
 
         if (HandUtils.partnerIsWinning(player, winningCard) || !HandUtils.canWinTrick(game, trick, playableHand)) {
             return HandUtils.getLowestLegalNonTrumpCard(game, trick, playableHand);
@@ -270,7 +264,7 @@ public class AIUtils {
         if (trick.isEmpty()) {
             Card highestTrump = HandUtils.getHighestOfSuit(game, hand, trumpSuit);
             if (highestTrump != null && 
-                    HandUtils.allHigherCardsPlayed(highestTrump, playedCardList, hand, trumpSuit, isNoTrump) &&
+                    HandUtils.allHigherCardsPlayed(highestTrump, playedCardList, hand, trumpSuit, game.getBidType(), isNoTrump) &&
                     !HandUtils.areOpponentsSuitVoid(game, player, trumpSuit)
                 ){
                 return highestTrump; // Drain opponent's trump cards
@@ -282,7 +276,7 @@ public class AIUtils {
         } else {
             List<Card> playableHand = HandUtils.getPlayableHand(game, trick, hand);
             Suit leadSuit = HandUtils.getLeadSuit(game, trick);
-            PlayedCard winningCard = HandUtils.getWinningCard(trick, trumpSuit);
+            PlayedCard winningCard = HandUtils.determineTrickWinner(game, trick);
             Suit winningCardSuit = winningCard.getCard().getSuit();
             boolean wasCut = !winningCard.getCard().getSuit().equals(leadSuit);
             Card canBeatCard = null;
@@ -297,7 +291,7 @@ public class AIUtils {
                 // Partner is winning
                 if (HandUtils.partnerIsWinning(player, winningCard)) {
                     if (wasCut || 
-                            HandUtils.allHigherCardsPlayed(winningCard.getCard(), playedCardList, hand, winningCardSuit, isNoTrump)) {
+                            HandUtils.allHigherCardsPlayed(winningCard.getCard(), playedCardList, hand, winningCardSuit, game.getBidType(), isNoTrump)) {
                         return HandUtils.getLowestLegalNonTrumpCard(game, trick, playableHand);
                     } else if (trickIsWinnable) {
                         return HandUtils.getHighestLegalCard(game, trick, playableHand);
@@ -318,11 +312,11 @@ public class AIUtils {
                                 }
                             } else {
                                 // Go for win if no card is higher
-                                if (HandUtils.allHigherCardsPlayed(canBeatCard, playedCardList, hand, leadSuit, isNoTrump)) {
+                                if (HandUtils.allHigherCardsPlayed(canBeatCard, playedCardList, hand, leadSuit, game.getBidType(), isNoTrump)) {
                                     return canBeatCard;
                                 } else {
                                     // Play lowest winner
-                                    return HandUtils.getNextHigherCard(winningCard.getCard(), playableHand);
+                                    return HandUtils.getNextHigherCard(game, winningCard.getCard(), playableHand);
                                 }
                             }
                         }
@@ -343,7 +337,7 @@ public class AIUtils {
                     // Partner is Winning
                     if (HandUtils.partnerIsWinning(player, winningCard)) {
                         // Higher cards are in play
-                        if (!HandUtils.allHigherCardsPlayed(winningCard.getCard(), playedCardList, hand, winningCardSuit, isNoTrump)) {
+                        if (!HandUtils.allHigherCardsPlayed(winningCard.getCard(), playedCardList, hand, winningCardSuit, game.getBidType(), isNoTrump)) {
                             return canBeatCard;
                         } else {
                             // find throw away card
@@ -359,10 +353,10 @@ public class AIUtils {
                         if (!HandUtils.partnerHasPlayed(player, trick)){ 
                             // Not cut possible
                             if (leadSuit.equals(trumpSuit)) {
-                                if (HandUtils.allHigherCardsPlayed(canBeatCard, playedCardList, hand, winningCardSuit, isNoTrump)) {
+                                if (HandUtils.allHigherCardsPlayed(canBeatCard, playedCardList, hand, winningCardSuit, game.getBidType(), isNoTrump)) {
                                     return canBeatCard;
                                 } else {
-                                    return HandUtils.getNextHigherCard(winningCard.getCard(), hand);
+                                    return HandUtils.getNextHigherCard(game, winningCard.getCard(), hand);
                                 }
                                 // Lead and trump don't match suits
                             } else {

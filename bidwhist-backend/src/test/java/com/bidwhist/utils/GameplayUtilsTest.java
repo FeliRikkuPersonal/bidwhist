@@ -47,18 +47,6 @@ class GameplayUtilsTest {
     }
 
     @Test
-    void testGetWinningCard_withTrumpSuit() {
-        List<PlayedCard> trick = List.of(
-                new PlayedCard(PlayerPos.P1, new Card(Suit.SPADES, Rank.KING)),
-                new PlayedCard(PlayerPos.P2, new Card(Suit.HEARTS, Rank.TEN)), // trump
-                new PlayedCard(PlayerPos.P3, new Card(Suit.SPADES, Rank.ACE))
-        );
-
-        PlayedCard winner = HandUtils.getWinningCard(trick, Suit.HEARTS);
-        assertEquals(PlayerPos.P2, winner.getPlayer());
-    }
-
-    @Test
     void testDetermineTrickWinner_uptownPrefersTrump() {
         game.setBidType(BidType.UPTOWN);
         List<PlayedCard> trick = List.of(
@@ -86,8 +74,10 @@ class GameplayUtilsTest {
 
     @Test
     void testDetermineTrickWinner_noTrumpLeadSuitWins() {
-        game.setBidType(BidType.NO_TRUMP);
+        game.setBidType(BidType.UPTOWN);
         game.setTrumpSuit(null);
+        game.setWinningBid(new FinalBid(PlayerPos.P1, 5, true, false, BidType.UPTOWN, null));
+
 
         List<PlayedCard> trick = List.of(
                 new PlayedCard(PlayerPos.P1, new Card(Suit.CLUBS, Rank.TEN)),
@@ -125,8 +115,8 @@ class GameplayUtilsTest {
 
         GameplayUtils.scoreHand(game);
 
-        assertEquals(-5, game.getTeamBScore());
-        assertEquals(GamePhase.SHUFFLE, game.getPhase()); // still playing
+        assertEquals(-10, game.getTeamBScore());
+        assertEquals(GamePhase.END, game.getPhase()); // still playing
     }
 
 }

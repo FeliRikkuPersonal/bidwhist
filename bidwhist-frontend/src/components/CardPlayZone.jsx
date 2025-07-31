@@ -72,6 +72,7 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
   const {
     gameId,
     players,
+    setPlayers,
     setKitty,
     bids,
     winningPlayerName,
@@ -101,7 +102,6 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
       console.log('[SKIP] Animation from old session:', animation.sessionKey, 'Expected:', key);
       return;
     }
-
 
     const thisTurn = animation?.currentTurnIndex !== undefined ? animation.currentTurnIndex : null;
 
@@ -200,7 +200,12 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
             throwAlert('Your turn', 'yourTurn');
           }
         }
+        if (animation?.hide === 'hide') {
+          setShowHands(false);
+        }
       }
+
+
 
       if (animation.type === 'COLLECT') {
         const { cardList, winningTeam } = animation;
@@ -252,7 +257,7 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
               east: null,
               west: null,
             });
-            if (animation.currentTurnIndex === viewerIndex && animation.currentPhase !== 'END') {
+            if (animation.currentTurnIndex === viewerIndex && animationQueue.some(anim => anim.type === 'SHOW_WINNER')) {
               throwAlert('Your turn', 'yourTurn');
             }
           },
@@ -447,6 +452,7 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
 
     if (success) {
       updateFromResponse(gameData);
+      setShowFinalScore(false);
       queueAnimationFromResponse(gameData, key);
       setMyTurn(isMyTurn);
       setTeamATricks(0);

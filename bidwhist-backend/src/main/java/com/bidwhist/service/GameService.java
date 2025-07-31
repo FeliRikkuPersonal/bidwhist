@@ -471,7 +471,7 @@ public class GameService {
         game.addPlayedCard(cardToPlay);
 
         game.addAnimation(new Animation(validPlayedCard, game.getLeadSuit(), game.getCurrentPlayerIndex(),
-                game.getCurrentTrick().size(), game.getSessionKey()));
+                game.getCurrentTrick().size(), game.getSessionKey(), game));
         game.setCurrentTurnIndex((game.getCurrentTurnIndex() + 1) % 4);
 
         if (currentTrick.size() == 4) {

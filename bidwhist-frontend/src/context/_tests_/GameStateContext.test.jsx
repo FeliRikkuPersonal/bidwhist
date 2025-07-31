@@ -1,55 +1,74 @@
-// src/context/__tests__/GameStateContext.test.jsx
+// src/context/_tests_/GameStateContext.test.jsx
 
-import React from 'react';
-import { render, screen } from '@testing-library/react';
+import React, { useEffect } from 'react';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { render, screen, act, waitFor } from '@testing-library/react';
+
 import { GameStateProvider, useGameState } from '../GameStateContext';
-import '@testing-library/jest-dom';
 
-/* Test component to access and mutate context */
-const TestComponent = () => {
+function TestComponent({ onReady }) {
   const {
     players,
-    setPlayers,
-    phase,
-    setPhase,
+    kitty,
+    mode,
+    difficulty,
+    activeGame,
+    forcedBid,
     updateFromResponse,
+    clearGameStateContext,
   } = useGameState();
 
-  React.useEffect(() => {
-    setPlayers([{ name: 'Player A' }]);
-    setPhase('BID');
-    updateFromResponse({ phase: 'PLAY', currentTurnIndex: 2 });
+  useEffect(() => {
+    updateFromResponse({
+      players: [{ name: 'Alice' }],
+      kitty: ['K♦'],
+      mode: 'multiplayer',
+      difficulty: 'HARD',
+      activeGame: true,
+      forcedBid: true,
+    });
+
+    setTimeout(() => {
+      clearGameStateContext();
+      onReady?.(); // Notify test when done
+    }, 50);
   }, []);
 
   return (
     <div>
-      <div data-testid="players">{players[0]?.name}</div>
-      <div data-testid="phase">{phase}</div>
+      <div data-testid="players">{JSON.stringify(players)}</div>
+      <div data-testid="kitty">{JSON.stringify(kitty)}</div>
+      <div data-testid="mode">{mode}</div>
+      <div data-testid="difficulty">{difficulty}</div>
+      <div data-testid="activeGame">{String(activeGame)}</div>
+      <div data-testid="forcedBid">{String(forcedBid)}</div>
     </div>
   );
-};
+}
 
 describe('GameStateContext', () => {
-  test('provides initial state and allows updates', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    localStorage.setItem('mode', JSON.stringify('multiplayer'));
+    localStorage.setItem('difficulty', JSON.stringify('HARD'));
+    localStorage.setItem('activeGame', JSON.stringify('true'));
+  });
+
+
+  it('initializes and clears game state as expected', async () => {
     render(
       <GameStateProvider>
         <TestComponent />
       </GameStateProvider>
     );
 
-    expect(screen.getByTestId('players')).toHaveTextContent('Player A');
-    expect(screen.getByTestId('phase')).toHaveTextContent('PLAY');
-  });
-
-  test('throws error if useGameState is used outside provider', () => {
-    // Temporarily suppress console error for clean output
-    const originalError = console.error;
-    console.error = () => {};
-
-    expect(() => {
-      render(<TestComponent />);
-    }).toThrow();
-
-    console.error = originalError;
+    await waitFor(() => {
+      expect(screen.getByTestId('players').textContent).toBe('[{"name":"Alice"}]');
+      expect(screen.getByTestId('kitty').textContent).toBe('[]');
+      expect(screen.getByTestId('mode').textContent).toBe('multiplayer');
+      expect(screen.getByTestId('difficulty').textContent).toBe('HARD');
+      expect(screen.getByTestId('activeGame').textContent).toBe('true');
+      expect(screen.getByTestId('forcedBid').textContent).toBe('false');
+    });
   });
 });

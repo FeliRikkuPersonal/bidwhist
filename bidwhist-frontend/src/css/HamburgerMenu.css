@@ -10,7 +10,7 @@
 }
 
 .bar {
-    border-radius: 10px;
+  border-radius: 10px;
   width: 50px;
   height: 6px;
   margin: 8px;
@@ -20,6 +20,7 @@
 
 .dropdown-menu {
   position: absolute;
+  cursor: pointer;
   top: 100%;
   left: 15px;
   min-width: 150px;

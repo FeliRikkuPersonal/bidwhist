@@ -3,21 +3,25 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import GameScreen from '../GameScreen';
+import { AllProviders } from '../../test-utils/AllProviders';
+import React from 'react';
 
-// ✅ Mock *before* importing the component
+// ✅ Mock GameStateContext with hook AND provider
 vi.mock('../../context/GameStateContext', () => ({
   useGameState: () => ({
     gameId: 'abc123',
     updateFromResponse: vi.fn(),
     players: [
-      { position: 'N', name: 'Alice' },
-      { position: 'S', name: 'Bob' },
-      { position: 'E', name: 'Charlie' },
-      { position: 'W', name: 'Dana' },
+      { position: 'N', name: 'Alice', team: 'A' },
+      { position: 'S', name: 'Bob', team: 'A' },
+      { position: 'E', name: 'Charlie', team: 'B' },
+      { position: 'W', name: 'Dana', team: 'B' },
     ],
   }),
+  GameStateProvider: ({ children }) => <div>{children}</div>,
 }));
 
+// ✅ Mock PositionContext with hook AND provider
 vi.mock('../../context/PositionContext', () => ({
   usePositionContext: () => ({
     viewerPosition: 'S',
@@ -28,8 +32,18 @@ vi.mock('../../context/PositionContext', () => ({
       W: 'west',
     },
   }),
+  PositionProvider: ({ children }) => <div>{children}</div>,
 }));
 
+// ✅ Mock AlertContext with hook AND provider
+vi.mock('../../context/AlertContext', () => ({
+  useAlert: () => ({
+    showAlert: vi.fn(),
+  }),
+  AlertProvider: ({ children }) => <div>{children}</div>,
+}));
+
+// ✅ Mock UIDisplayContext with hook AND provider
 vi.mock('../../context/UIDisplayContext', () => ({
   useUIDisplay: () => ({
     handMap: {
@@ -48,8 +62,13 @@ vi.mock('../../context/UIDisplayContext', () => ({
     setDiscardPile: vi.fn(),
     teamATricks: 2,
     teamBTricks: 1,
+    playedCardsByDirection: {
+      south: { suit: 'S', rank: 'A' },
+      west: { suit: 'C', rank: 'K' },
+      north: null,
+      east: null,
+    },
 
-    /* 🧠 Add ALL of these or your test will crash again */
     setDeckPosition: vi.fn(),
     setHandFor: vi.fn(),
     setShowHands: vi.fn(),
@@ -67,22 +86,19 @@ vi.mock('../../context/UIDisplayContext', () => ({
     setTeamATricks: vi.fn(),
     setTeamBTricks: vi.fn(),
   }),
+  UIDisplayProvider: ({ children }) => <div>{children}</div>,
 }));
 
-
-vi.mock('../../context/AlertContext', () => ({
-  useAlert: () => ({
-    showAlert: vi.fn(),
-  }),
-}));
-
-// ✅ THIS mock prevents CardPlayZone crash
+// ✅ Mock RefContext with hook AND provider
 vi.mock('../../context/RefContext', () => ({
   useZoneRefs: () => ({
     register: vi.fn(),
-    setDeckPosition: vi.fn(), // Must be defined
+    setDeckPosition: vi.fn(),
+    get: vi.fn(() => ({ current: null })), // <- ✅ Mock added
   }),
+  RefProvider: ({ children }) => <div>{children}</div>,
 }));
+
 
 beforeEach(() => {
   global.fetch = vi.fn(() =>
@@ -99,7 +115,11 @@ afterEach(() => {
 
 describe('GameScreen', () => {
   it('renders Submit button and sends discard request when clicked', async () => {
-    render(<GameScreen />);
+    render(
+      <AllProviders>
+        <GameScreen />
+      </AllProviders>
+    );
 
     const button = screen.getByText('Submit');
     expect(button).toBeInTheDocument();

@@ -3,6 +3,7 @@
 package com.bidwhist.utils;
 
 import com.bidwhist.bidding.BidType;
+import com.bidwhist.bidding.FinalBid;
 import com.bidwhist.model.*;
 
 import java.util.*;
@@ -41,7 +42,8 @@ public class HandUtils {
      * @return true if no higher-ranked card in the same suit remains unplayed
      */
     public static boolean allHigherCardsPlayed(
-            Card card, List<Card> playedCards, List<Card> hand, Suit targetSuit, boolean isNo) {
+            Card card, List<Card> playedCards, List<Card> hand, Suit targetSuit, BidType bidType, boolean isNo) {
+
         if (card == null || card.getSuit() == null || card.getRank() == null || targetSuit == null) {
             return false;
         }
@@ -52,16 +54,19 @@ public class HandUtils {
             return false;
         }
 
-        int candidateValue = card.getRank().getValue();
-        // Combine played cards and hand into a single pool of known cards
+        Comparator<Rank> comparator = Rank.rankComparator(bidType, isNo);
+
         List<Card> knownCards = new ArrayList<>(playedCards);
         knownCards.addAll(hand);
 
         return Rank.getOrderedRanks().stream()
-                .map(Rank::getValue)
-                .filter(v -> v > candidateValue)
-                .allMatch(v -> knownCards.stream().anyMatch(c -> suitToCheck.equals(c.getSuit()) &&
-                        c.getRank().getValue() == v));
+                .filter(r -> comparator.compare(r, card.getRank()) < 0) // means r would beat our card
+                .allMatch(r -> knownCards.stream().anyMatch(c -> {
+                    if (c.isJoker())
+                        return true;
+                    return suitToCheck.equals(c.getSuit()) && c.getRank() == r;
+                }));
+
     }
 
     /*
@@ -94,33 +99,22 @@ public class HandUtils {
         }
 
         BidType bidType = game.getBidType();
-        boolean isDowntown = bidType == BidType.DOWNTOWN;
+        boolean isNo = game.getWinningBid().isNo();
         Suit trumpSuit = game.getTrumpSuit();
         Suit leadSuit = HandUtils.getLeadSuit(game, currentTrick);
         Card winningCard = HandUtils.determineTrickWinner(game, currentTrick).getCard();
 
         boolean hasLeadSuit = HandUtils.hasSuit(myHand, leadSuit);
 
-        if (hasLeadSuit) {
-            // Must follow suit — check if any card in that suit can beat the current winner
-            return myHand.stream()
-                    .filter(c -> c.getSuit() == leadSuit)
-                    .filter(c -> CardUtils.isGreaterThan(c, winningCard, bidType))
-                    .max(Comparator.comparingInt(c -> {
-                        int val = c.getRank().getValue();
-                        return isDowntown ? (15 - val) : val;
-                    }))
-                    .orElse(null);
-        }
+        Comparator<Card> cardComparator = CardUtils.getCardComparator(game); // 💡 You may need to add this helper
 
-        // No lead suit — try to cut with lowest trump that beats winning card
         return myHand.stream()
-                .filter(c -> c.getSuit() == trumpSuit)
-                .filter(c -> CardUtils.isGreaterThan(c, winningCard, bidType))
-                .min(Comparator.comparingInt(c -> {
-                    int val = c.getRank().getValue();
-                    return isDowntown ? (15 - val) : val;
-                }))
+                .filter(card -> {
+                    if (hasLeadSuit && card.getSuit() != leadSuit)
+                        return false;
+                    return cardComparator.compare(card, winningCard) > 0;
+                })
+                .min(cardComparator) // lowest card that beats the winner
                 .orElse(null);
     }
 
@@ -222,49 +216,6 @@ public class HandUtils {
                 .anyMatch(card -> suit.equals(card.getSuit()));
     }
 
-    /**
-     * Determines which card is currently winning a trick.
-     *
-     * It checks each card in the trick. Trump cards beat non-trump cards. If
-     * both are trump or both are the lead suit, the higher rank wins.
-     */
-    public static PlayedCard getWinningCard(List<PlayedCard> trick, Suit trumpSuit) {
-        if (trick.isEmpty()) {
-            return null;
-        }
-
-        // Determine lead suit from first non-null-suit card (skip jokers or undefined)
-        Suit leadSuit = trick.stream()
-                .map(PlayedCard::getCard)
-                .map(Card::getSuit)
-                .filter(Objects::nonNull)
-                .findFirst()
-                .orElse(null);
-
-        // Start with first card as placeholder winner
-        PlayedCard winning = trick.get(0);
-
-        for (PlayedCard pc : trick) {
-            Card card = pc.getCard();
-            Suit suit = card.getSuit();
-
-            boolean isTrump = trumpSuit != null && trumpSuit.equals(suit);
-            boolean winningIsTrump = trumpSuit != null && trumpSuit.equals(winning.getCard().getSuit());
-
-            if (isTrump && !winningIsTrump) {
-                winning = pc;
-            } else if (isTrump == winningIsTrump && suit == leadSuit) {
-                int currentVal = card.getRank().getValue();
-                int winningVal = winning.getCard().getRank().getValue();
-                if (currentVal > winningVal) {
-                    winning = pc;
-                }
-            }
-        }
-
-        return winning;
-    }
-
     /*
      * Determines the winner of the current trick.
      * Applies different logic for NO_TRUMP, DOWNTOWN, and UPTOWN bids.
@@ -276,12 +227,12 @@ public class HandUtils {
         }
 
         Suit leadSuitForComparison = getLeadSuit(game, trick);
-
+        FinalBid winningBid = game.getWinningBid();
         BidType bidType = game.getBidType();
-        boolean isNoBid = game.getWinningBid() != null && game.getWinningBid().isNo();
+        boolean isNoBid = winningBid != null && winningBid.isNo();
         Suit trumpSuit = isNoBid ? null : game.getTrumpSuit();
 
-        // Store players who no longer have lead suit
+        // Track suit voids
         for (PlayedCard played : trick) {
             Card card = played.getCard();
             PlayerPos player = played.getPlayer();
@@ -296,57 +247,34 @@ public class HandUtils {
             }
         }
 
-        // Excludes jokers from being eligible to win if bidType == NO_TRUMP
+        // Set up rank comparator
+        Comparator<Rank> rankComparator = Rank.rankComparator(bidType, isNoBid);
+
+        // For No-Trump: only cards of lead suit, jokers excluded
         if (isNoBid) {
+            Comparator<Card> cardComparator = CardUtils.getCardComparator(game);
+
             return trick.stream()
-                    .filter(pc -> !pc.getCard().isJoker()) // ❌ Exclude jokers (they can’t win)
-                    .filter(pc -> pc.getCard().getSuit() == leadSuitForComparison) // ✅ Only cards that match lead suit
-                    .max(Comparator.comparingInt(pc -> {
-                        int value = pc.getCard().getRank().getValue(); // get rank number (e.g., 2 → 2, King → 13)
-                        return bidType == BidType.DOWNTOWN ? (15 - value) : value;
-                        // ⬆️ If Downtown, invert the score (low wins). If Uptown, use normal rank.
-                    }))
-                    .orElseThrow(
-                            () -> new IllegalStateException(
-                                    "BUG: determineTrickWinner - No eligible non-joker cards of lead suit found in NO_TRUMP bid. "
-                                            +
-                                            "This should never happen in a legal game. Check suit-following enforcement and card assignments."));
+                    .filter(pc -> !pc.getCard().isJoker())
+                    .filter(pc -> pc.getCard().getSuit() == leadSuitForComparison)
+                    .max(Comparator.comparing(PlayedCard::getCard, cardComparator))
+                    .orElseThrow(() -> new IllegalStateException(
+                            "BUG: No eligible cards found in NO_TRUMP bid. Check card legality."));
         }
 
-        /* DOWNTOWN: inverted rank values except ACE and JOKERs */
-        if (bidType == BidType.DOWNTOWN) {
-            return trick.stream()
-                    .max(
-                            Comparator.comparing(
-                                    pc -> {
-                                        Card c = pc.getCard();
-                                        boolean isTrump = trumpSuit != null && c.getSuit() == trumpSuit;
-                                        boolean isLead = c.getSuit() == leadSuitForComparison;
-                                        Rank rank = c.getRank();
-                                        int rankValue;
-
-                                        if (rank == Rank.JOKER_B || rank == Rank.JOKER_S || rank == Rank.ACE) {
-                                            rankValue = rank.getValue();
-                                        } else {
-                                            rankValue = 15 - rank.getValue();
-                                        }
-
-                                        return (isTrump ? 1000 : (isLead ? 100 : 0)) + rankValue;
-                                    }))
-                    .orElseThrow();
-        }
-
-        /* UPTOWN or standard: normal rank values with trump > lead > others */
+        // Otherwise: trump > lead > others, compare by rank
         return trick.stream()
-                .max(
-                        Comparator.comparing(
-                                pc -> {
-                                    Card c = pc.getCard();
-                                    boolean isTrump = trumpSuit != null && c.getSuit() == trumpSuit;
-                                    boolean isLead = c.getSuit() == leadSuitForComparison;
-                                    int rankValue = c.getRank().getValue();
-                                    return (isTrump ? 1000 : (isLead ? 100 : 0)) + rankValue;
-                                }))
+                .max(Comparator.<PlayedCard>comparingInt(pc -> {
+                    Card c = pc.getCard();
+                    if (c.isJoker())
+                        return 3000; // Jokers always win
+                    if (trumpSuit != null && c.getSuit() == trumpSuit)
+                        return 2000;
+                    if (c.getSuit() == leadSuitForComparison)
+                        return 1000;
+                    return 0;
+                })
+                        .thenComparing(pc -> pc.getCard().getRank(), rankComparator))
                 .orElseThrow();
     }
 
@@ -368,38 +296,35 @@ public class HandUtils {
      * @return The lowest legal card to play based on current trick and rules.
      */
     public static Card getLowestLegalCard(GameState game, List<PlayedCard> trick, List<Card> hand) {
-        Suit trumpSuit = game.getTrumpSuit();
+        if (hand == null || hand.isEmpty())
+            return null;
+
         Suit leadSuit = getLeadSuit(game, trick);
-        boolean isDowntown = game.getBidType() == BidType.DOWNTOWN;
+        boolean isNo = game.getWinningBid() != null && game.getWinningBid().isNo();
 
-        Optional<Card> candidate = hand.stream()
-                .filter(c -> c.getSuit() != null && c.getSuit().equals(leadSuit))
-                .min(Comparator.comparingInt(c -> {
-                    int val = c.getRank().getValue();
-                    return isDowntown ? (15 - val) : val;
-                }));
+        Comparator<Card> cardComparator = CardUtils.getCardComparator(game);
 
-        if (candidate.isPresent()) {
-            return candidate.get();
+        boolean hasLeadSuit = hand.stream().anyMatch(c -> leadSuit != null && leadSuit.equals(c.getSuit()));
+
+        if (hasLeadSuit) {
+            return hand.stream()
+                    .filter(c -> leadSuit.equals(c.getSuit()))
+                    .min(cardComparator)
+                    .orElse(null);
         }
 
-        Optional<Card> trumpCandidate = hand.stream()
-                .filter(c -> c.getSuit() == trumpSuit)
-                .min(Comparator.comparingInt(c -> {
-                    int val = c.getRank().getValue();
-                    return isDowntown ? (15 - val) : val;
-                }));
-
-        if (trumpCandidate.isPresent()) {
-            return trumpCandidate.get();
+        // In No Trump bids, avoid wasting jokers
+        if (isNo) {
+            return hand.stream()
+                    .filter(c -> !c.isJoker())
+                    .min(cardComparator)
+                    .orElseGet(() -> hand.stream().findFirst().orElse(null)); // all jokers? return any
         }
 
+        // Suited bid fallback: just lowest ranked by game-aware rules
         return hand.stream()
-                .min(Comparator.comparingInt(c -> {
-                    int val = c.getRank().getValue();
-                    return isDowntown ? (15 - val) : val;
-                }))
-                .orElse(null); // null-safe fallback
+                .min(cardComparator)
+                .orElse(null);
     }
 
     /**
@@ -415,17 +340,15 @@ public class HandUtils {
 
         Suit leadSuit = getLeadSuit(game, trick);
         Suit trumpSuit = game.getTrumpSuit();
-        boolean isDowntown = game.getBidType() == BidType.DOWNTOWN;
+        BidType bidType = game.getBidType();
+        boolean isNo = game.getWinningBid() != null && game.getWinningBid().isNo();
 
-        Comparator<Card> rankComparator = Comparator.comparingInt(c -> {
-            int val = c.getRank().getValue();
-            return isDowntown ? (15 - val) : val;
-        });
+        Comparator<Rank> rankComparator = Rank.rankComparator(bidType, isNo);
 
         // Step 1: Try to follow the lead suit but avoid trump
         Optional<Card> legalNonTrumpLeadSuit = hand.stream()
                 .filter(c -> c.getSuit() != null && c.getSuit().equals(leadSuit) && !c.getSuit().equals(trumpSuit))
-                .min(rankComparator);
+                .min(Comparator.comparing(Card::getRank, rankComparator));
 
         if (legalNonTrumpLeadSuit.isPresent()) {
             return legalNonTrumpLeadSuit.get();
@@ -434,16 +357,21 @@ public class HandUtils {
         // Step 2: Any non-trump card
         Optional<Card> anyNonTrump = hand.stream()
                 .filter(c -> c.getSuit() != null && !c.getSuit().equals(trumpSuit))
-                .min(rankComparator);
+                .min(Comparator.comparing(Card::getRank, rankComparator));
 
         if (anyNonTrump.isPresent()) {
             return anyNonTrump.get();
         }
 
-        // Step 3: Default to lowest trump card
+        // Step 3: In a No-Trump bid, return any joker (if all else fails)
+        if (isNo) {
+            return hand.stream().filter(Card::isJoker).findFirst().orElse(null);
+        }
+
+        // Step 4: Default to lowest trump card
         return hand.stream()
                 .filter(c -> c.getSuit() != null && c.getSuit().equals(trumpSuit))
-                .min(rankComparator)
+                .min(Comparator.comparing(Card::getRank, rankComparator))
                 .orElse(null);
     }
 
@@ -466,17 +394,20 @@ public class HandUtils {
      * @return The highest legal card to play
      */
     public static Card getHighestLegalCard(GameState game, List<PlayedCard> trick, List<Card> hand) {
+        if (hand == null || hand.isEmpty())
+            return null;
+
         Suit trumpSuit = game.getTrumpSuit();
         Suit leadSuit = getLeadSuit(game, trick);
-        boolean isDowntown = game.getBidType() == BidType.DOWNTOWN;
+        BidType bidType = game.getBidType();
+        boolean isNo = game.getWinningBid() != null && game.getWinningBid().isNo();
+
+        Comparator<Rank> rankComparator = Rank.rankComparator(bidType, isNo);
 
         // First: Try to follow lead suit and play highest of those
         Optional<Card> leadCandidate = hand.stream()
                 .filter(c -> c.getSuit() != null && c.getSuit().equals(leadSuit))
-                .max(Comparator.comparingInt(c -> {
-                    int val = c.getRank().getValue();
-                    return isDowntown ? (15 - val) : val;
-                }));
+                .max(Comparator.comparing(Card::getRank, rankComparator));
 
         if (leadCandidate.isPresent()) {
             return leadCandidate.get();
@@ -485,17 +416,16 @@ public class HandUtils {
         // Second: Try to cut with highest trump
         Optional<Card> trumpCandidate = hand.stream()
                 .filter(c -> c.getSuit() != null && c.getSuit().equals(trumpSuit))
-                .max(Comparator.comparingInt(c -> {
-                    int val = c.getRank().getValue();
-                    return isDowntown ? (15 - val) : val;
-                }));
+                .max(Comparator.comparing(Card::getRank, rankComparator));
 
         if (trumpCandidate.isPresent()) {
             return trumpCandidate.get();
         }
 
         // Last: No legal suit—return highest-ranked card from full hand
-        return getHighestRankedCard(game, hand);
+        return hand.stream()
+                .max(Comparator.comparing(Card::getRank, rankComparator))
+                .orElse(null);
     }
 
     /**
@@ -518,14 +448,11 @@ public class HandUtils {
             return null;
         }
 
-        boolean isDowntown = game.getBidType() == BidType.DOWNTOWN;
+        Comparator<Card> cardComparator = CardUtils.getCardComparator(game);
 
         return hand.stream()
-                .max(Comparator.comparingInt(c -> {
-                    int val = c.getRank().getValue();
-                    return isDowntown ? (15 - val) : val;
-                }))
-                .orElse(hand.get(0)); // Fallback (though shouldn't be needed if hand is non-empty)
+                .max(cardComparator)
+                .orElse(hand.get(0)); // Fallback
     }
 
     /**
@@ -541,14 +468,14 @@ public class HandUtils {
             return null;
         }
 
-        boolean isDowntown = game.getBidType() == BidType.DOWNTOWN;
+        BidType bidType = game.getBidType();
+        boolean isNo = game.getWinningBid() != null && game.getWinningBid().isNo();
+
+        Comparator<Rank> rankComparator = Rank.rankComparator(bidType, isNo);
 
         return hand.stream()
                 .filter(c -> suit.equals(c.getSuit()))
-                .max(Comparator.comparingInt(c -> {
-                    int val = c.getRank().getValue();
-                    return isDowntown ? (15 - val) : val;
-                }))
+                .max(Comparator.comparing(Card::getRank, rankComparator))
                 .orElse(null);
     }
 
@@ -566,14 +493,14 @@ public class HandUtils {
             return null;
         }
 
-        boolean isDowntown = game.getBidType() == BidType.DOWNTOWN;
+        BidType bidType = game.getBidType();
+        boolean isNo = game.getWinningBid() != null && game.getWinningBid().isNo();
+
+        Comparator<Rank> rankComparator = Rank.rankComparator(bidType, isNo);
 
         return hand.stream()
                 .filter(c -> suit.equals(c.getSuit()))
-                .min(Comparator.comparingInt(c -> {
-                    int val = c.getRank().getValue();
-                    return isDowntown ? (15 - val) : val;
-                }))
+                .min((a, b) -> rankComparator.compare(a.getRank(), b.getRank()))
                 .orElse(null);
     }
 
@@ -590,12 +517,12 @@ public class HandUtils {
             return false;
         }
 
-        // Group cards by suit (excluding trump)
+        // Count cards per non-trump suit
         Map<Suit, Long> suitCounts = hand.stream()
                 .filter(c -> c.getSuit() != null && !c.getSuit().equals(trumpSuit))
                 .collect(Collectors.groupingBy(Card::getSuit, Collectors.counting()));
 
-        // Check for any non-trump suit with ≤ 2 cards
+        // Look for any non-trump suit with 2 or fewer cards
         return suitCounts.values().stream().anyMatch(count -> count <= 2);
     }
 
@@ -616,35 +543,31 @@ public class HandUtils {
         }
 
         Suit trumpSuit = game.getTrumpSuit();
-        boolean isDowntown = game.getBidType() == BidType.DOWNTOWN;
+        BidType bidType = game.getBidType();
+        boolean isNo = game.getWinningBid() != null && game.getWinningBid().isNo();
+
+        Comparator<Rank> rankComparator = Rank.rankComparator(bidType, isNo);
 
         // Group cards by suit (excluding trump)
         Map<Suit, List<Card>> nonTrumpSuitGroups = hand.stream()
                 .filter(c -> c.getSuit() != null && !c.getSuit().equals(trumpSuit))
                 .collect(Collectors.groupingBy(Card::getSuit));
 
-        // Find a suit with 2 or fewer cards and select the lowest-ranked from that
-        // group
+        // Prefer to discard from suits with ≤ 2 cards
         for (Map.Entry<Suit, List<Card>> entry : nonTrumpSuitGroups.entrySet()) {
             List<Card> cards = entry.getValue();
             if (cards.size() <= 2) {
                 return cards.stream()
-                        .min(Comparator.comparingInt(c -> {
-                            int val = c.getRank().getValue();
-                            return isDowntown ? (15 - val) : val;
-                        }))
+                        .min(Comparator.comparing(Card::getRank, rankComparator))
                         .orElse(null);
             }
         }
 
-        // Fallback: discard lowest overall non-trump card
+        // Fallback: discard lowest-ranked non-trump card
         return hand.stream()
                 .filter(c -> c.getSuit() != null && !c.getSuit().equals(trumpSuit))
-                .min(Comparator.comparingInt(c -> {
-                    int val = c.getRank().getValue();
-                    return isDowntown ? (15 - val) : val;
-                }))
-                .orElse(hand.get(0)); // fallback to first card if no valid discard found
+                .min(Comparator.comparing(Card::getRank, rankComparator))
+                .orElse(hand.get(0)); // last fallback
     }
 
     /**
@@ -692,18 +615,23 @@ public class HandUtils {
      * @param hand        The list of cards to search (e.g., player's hand).
      * @return The next higher card in the same suit, or null if none found.
      */
-    public static Card getNextHigherCard(Card winningCard, List<Card> hand) {
-        if (winningCard == null || winningCard.getSuit() == null || winningCard.getRank() == null || hand == null) {
+    public static Card getNextHigherCard(GameState game, Card winningCard, List<Card> hand) {
+        if (game == null || winningCard == null || winningCard.getSuit() == null ||
+                winningCard.getRank() == null || hand == null) {
             return null;
         }
 
+        BidType bidType = game.getBidType();
+        boolean isNo = game.getWinningBid() != null && game.getWinningBid().isNo();
+
+        Comparator<Rank> comparator = Rank.rankComparator(bidType, isNo);
         Suit targetSuit = winningCard.getSuit();
-        int winningValue = winningCard.getRank().getValue();
+        Rank winningRank = winningCard.getRank();
 
         return hand.stream()
                 .filter(c -> c.getSuit() == targetSuit)
-                .filter(c -> c.getRank().getValue() > winningValue)
-                .min(Comparator.comparingInt(c -> c.getRank().getValue()))
+                .filter(c -> comparator.compare(c.getRank(), winningRank) > 0)
+                .min(Comparator.comparing(Card::getRank, comparator))
                 .orElse(null);
     }
 

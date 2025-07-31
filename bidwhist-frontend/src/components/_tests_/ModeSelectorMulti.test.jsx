@@ -4,13 +4,15 @@ import { render, screen, fireEvent, within } from '@testing-library/react';
 import ModeSelector from '../ModeSelector';
 import { GameStateProvider } from '../../context/GameStateContext';
 import { PositionProvider } from '../../context/PositionContext';
+import { AllProviders } from '../../test-utils/AllProviders';
 
 /* Helper to wrap with required providers */
 function renderWithProviders(ui) {
-  return render(
+  return render(<AllProviders>
     <GameStateProvider>
       <PositionProvider>{ui}</PositionProvider>
     </GameStateProvider>
+    </AllProviders>
   );
 }
 

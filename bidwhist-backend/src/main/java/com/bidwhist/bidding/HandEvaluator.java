@@ -13,6 +13,8 @@ package com.bidwhist.bidding;
 
 import com.bidwhist.model.*;
 import com.bidwhist.utils.JokerUtils;
+import com.bidwhist.utils.PlayerUtils;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -81,31 +83,32 @@ public class HandEvaluator {
 
   /**
    * Returns all valid bids the hand could support. Includes suit-based
-   * Uptown/Downtown bids and No
-   * Trump bids.
+   * Uptown/Downtown bids and No Trump bids.
    */
   public List<FinalBid> evaluateAll(PlayerPos player) {
     List<FinalBid> bidOptions = new ArrayList<>();
 
     for (SuitEvaluation eval : suitEvals) {
       for (BidType type : List.of(BidType.UPTOWN, BidType.DOWNTOWN)) {
-        FinalBid bid = AiBidOption.fromEvaluation(player, eval, type, false);
-        if (bid != null)
-          bidOptions.add(bid);
+        int score = (type == BidType.UPTOWN) ? eval.getUptownStrength() : eval.getDowntownStrength();
+        if (score >= 4) {
+          bidOptions.add(new FinalBid(player, score, false, false, type, eval.getSuit()));
+        }
       }
     }
 
+    // No-Trump logic stays mostly the same
     for (BidType type : List.of(BidType.UPTOWN, BidType.DOWNTOWN)) {
       int strength = (type == BidType.UPTOWN) ? noUptown : noDowntown;
-      if (strength >= 9 && strength <= 12) {
-        int value = strength - 5;
-        bidOptions.add(new FinalBid(player, value, true, false, type, null));
+      if (strength >= 9) {
+        int cappedValue = Math.min(strength - 5, 7);
+        bidOptions.add(new FinalBid(player, cappedValue, true, false, type, null));
       }
     }
 
-    for (FinalBid bid : bidOptions)
+    for (FinalBid bid : bidOptions) {
       System.out.println(bid.toString());
-
+    }
     return bidOptions;
   }
 
@@ -134,16 +137,18 @@ public class HandEvaluator {
       results.add(new SuitEvaluation(suit, high, low, cards.size()));
     }
 
-    for (SuitEvaluation result : results)
-      System.out.println(result.toString());
-
     return results;
   }
 
   /**
-   * Measures a suit-based run (sequence) in either uptown/downtown direction.
-   * Jokers can be used to
-   * bridge gaps.
+   * Evaluates the strength of a run in a given suit and direction,
+   * taking jokers into account to bridge gaps, and returns a recommended bid
+   * value.
+   *
+   * @param ranksInSuit List of ranks the player holds in the suit.
+   * @param jokers      Number of jokers in the hand.
+   * @param order       The ordered list of ranks (Uptown or Downtown).
+   * @return Recommended bid value (4–7). Returns 3 if hand is not bid-worthy.
    */
   public static int evaluateRun(List<Rank> ranksInSuit, int jokers, List<Rank> order) {
     List<Rank> workingList = new ArrayList<>(order);
@@ -169,26 +174,28 @@ public class HandEvaluator {
         break;
     }
 
-    if (jokers == 2) {
-      return kept.size() + jokers;
-    } else if ( jokers == 1) {
-      if (kept.size() + jokers >= 6) {
-        return 5;
-      } else {
-        return kept.size() + jokers;
-      }
-    } else {
-      if (kept.size() <= 5) {
-        return 5;
-      } else {
-        return kept.size();
-      }
-    }
+    int runScore = kept.size() + jokers;
+    int suitCount = ranksInSuit.size(); // excludes jokers by design
+
+    System.out.println(runScore + "/" + suitCount);
+
+    // Convert run + suit count + jokers into a bid
+    if (jokers == 2 && runScore >= 6 && suitCount >= 7)
+      return 7;
+    if (jokers == 1 && runScore >= 5 && suitCount >= 6)
+      return 6;
+    if (runScore >= 6 && suitCount >= 7)
+      return 6;
+    if (runScore >= 5 && suitCount >= 6)
+      return 5;
+    if (runScore >= 4 && suitCount >= 5)
+      return 4;
+    if (runScore >= 3 && suitCount >= 5)
+      return 4;
+
+    return 3; // pass tier — not bid-worthy
   }
 
-
-
-  
   /** Calculates continuous high-card run across all suits (used for No bids). */
   public static int evaluatePureRun(List<Card> cards, List<Rank> order) {
     Set<Rank> ranksInHand = cards.stream().map(Card::getRank).collect(Collectors.toSet());
@@ -224,7 +231,7 @@ public class HandEvaluator {
    * suit/direction
    * available.
    */
-  public FinalBid getForcedMinimumBid(PlayerPos player) {
+  public FinalBid getForcedMinimumBid(GameState game, PlayerPos player) {
     evaluateHand(); // Ensure hand is evaluated
 
     FinalBid bestBid = null;
@@ -241,10 +248,25 @@ public class HandEvaluator {
       }
     }
 
+    // 💡 Fallback: If no strength-based bid, use suit with highest count
     if (bestBid == null) {
-      bestBid = new FinalBid(player, 4, false, false, BidType.UPTOWN, Suit.SPADES);
+      Player thisPlayer = PlayerUtils.getPlayerByPosition(player, game.getPlayers());
+      List<Card> hand = thisPlayer.getHand().getCards();
+
+      Map<Suit, Integer> suitCounts = new EnumMap<>(Suit.class);
+      for (Card card : hand) {
+        suitCounts.put(card.getSuit(), suitCounts.getOrDefault(card.getSuit(), 0) + 1);
+      }
+
+      Suit maxSuit = suitCounts.entrySet().stream()
+          .max(Comparator.comparingInt(Map.Entry::getValue))
+          .map(Map.Entry::getKey)
+          .orElse(Suit.SPADES); // Final fallback
+
+      bestBid = new FinalBid(player, 4, false, false, BidType.UPTOWN, maxSuit);
     }
 
     return bestBid;
   }
+
 }

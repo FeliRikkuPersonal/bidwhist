@@ -25,7 +25,7 @@ export const GameStateProvider = ({ children }) => {
   const [mode, setMode] = useLocalStorage('mode', 'single');
   const [difficulty, setDifficulty] = useLocalStorage('difficulty', 'EASY');
   const [activeGame, setActiveGame] = useLocalStorage('activeGame', false);
-  const [forcedBid, setForcedBid] = useLocalStorage('foredBid', false);
+  const [forcedBid, setForcedBid] = useLocalStorage('forcedBid', false);
 
   const [players, setPlayers] = useState([]); // List<PlayerView>
   const [currentTurnIndex, setCurrentTurnIndex] = useState(0);
@@ -81,7 +81,9 @@ export const GameStateProvider = ({ children }) => {
    * @param {object} response - JSON response from backend polling
    */
   const updateFromResponse = (response) => {
-    if ('players' in response) setPlayers(response.players);
+    if ('players' in response ) {
+      setPlayers(response.players);
+    }
     if ('currentTurnIndex' in response) setCurrentTurnIndex(response.currentTurnIndex);
     if ('phase' in response) setPhase(response.phase);
     if ('trumpSuit' in response) setTrumpSuit(response.trumpSuit);

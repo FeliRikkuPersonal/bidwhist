@@ -5,7 +5,9 @@ package com.bidwhist.dto;
 import com.bidwhist.model.Book;
 import com.bidwhist.model.Card;
 import com.bidwhist.model.GamePhase;
+import com.bidwhist.model.GameState;
 import com.bidwhist.model.PlayedCard;
+import com.bidwhist.model.Player;
 import com.bidwhist.model.PlayerPos;
 import com.bidwhist.model.Suit;
 import com.bidwhist.model.Team;
@@ -50,6 +52,10 @@ public class Animation {
   private GamePhase currentPhase;
   @JsonProperty
   private int sessionKey;
+  @JsonProperty
+  private List<Player> playerList;
+  @JsonProperty
+  private String hide;
 
   public Animation() {
   }
@@ -57,7 +63,7 @@ public class Animation {
   /*
    * Constructs a PLAY animation from a PlayedCard object.
    */
-  public Animation(PlayedCard playedCard, Suit leadSuit, int currentTurnIndex, int trickSize, int sessionKey) {
+  public Animation(PlayedCard playedCard, Suit leadSuit, int currentTurnIndex, int trickSize, int sessionKey, GameState game) {
     this.type = AnimationType.PLAY;
     this.card = playedCard.getCard();
     this.player = playedCard.getPlayer();
@@ -65,6 +71,9 @@ public class Animation {
     this.currentTurnIndex = currentTurnIndex;
     this.trickSize = trickSize;
     this.sessionKey = sessionKey;
+    if (game.getCompletedTricks().size() == 11 && game.getCurrentTrick().size() == 4) {
+      this.hide = "hide";
+    }
   }
 
   /*

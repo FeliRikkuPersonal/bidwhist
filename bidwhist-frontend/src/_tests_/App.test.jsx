@@ -4,6 +4,7 @@ import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, act } from '@testing-library/react';
 import App from '../App.jsx';
+import { AllProviders } from '../test-utils/AllProviders.jsx';
 
 // ✅ Correct mock format for ESM components
 vi.mock('../components/GameScreen', () => ({
@@ -24,22 +25,6 @@ import * as GameState from '../context/GameStateContext';
 import * as PositionContext from '../context/PositionContext';
 import * as UIDisplay from '../context/UIDisplayContext';
 
-// ✅ Fake fetch response
-const mockFetchResponse = {
-  players: [
-    { name: 'Alice', position: 'P1' },
-    { name: 'Bob', position: 'P2' },
-    { name: 'Carol', position: 'P3' },
-    { name: 'Dan', position: 'P4' },
-  ],
-  playerPosition: 'P1',
-  viewerName: 'Alice',
-  currentTurnIndex: 0,
-  phase: 'BID',
-  shuffledDeck: [],
-  firstBidder: 'P2',
-  bidTurnIndex: 0,
-};
 
 describe('<App />', () => {
   beforeEach(() => {
@@ -49,8 +34,15 @@ describe('<App />', () => {
       json: () => Promise.resolve(mockFetchResponse),
     }));
 
-    // ✅ Stub context hooks
+    // ✅ Fake fetch response
     vi.spyOn(GameState, 'useGameState').mockReturnValue({
+      // 🧠 include `players`!
+      players: [
+        { name: 'Alice', position: 'P1', team: 'A' },
+        { name: 'Bob', position: 'P2', team: 'B' },
+        { name: 'Carol', position: 'P3', team: 'A' },
+        { name: 'Dan', position: 'P4', team: 'B' },
+      ],
       updateFromResponse: vi.fn(),
       gameId: '',
       setGameId: vi.fn(),
@@ -101,32 +93,7 @@ describe('<App />', () => {
   });
 
   it('renders the mocked ModeSelector by default', () => {
-    render(<App />);
+    render(<AllProviders><App /></AllProviders>);
     expect(screen.getByText('Mocked ModeSelector')).toBeInTheDocument();
-  });
-
-  // ❓ Optional: if your app has a button or trigger for startGame, this test will need adjustments
-  it.skip('calls startGame and shows GameScreen after fetch', async () => {
-    render(<App />);
-
-    const startBtn = screen.getByText('Start Game');
-    await act(async () => {
-      startBtn.click();
-      vi.runAllTimers();
-    });
-
-    expect(global.fetch).toHaveBeenCalledWith(
-      expect.stringMatching(/\/game\/start/),
-      expect.objectContaining({
-        method: 'POST',
-        body: JSON.stringify({
-          playerName: 'Alice',
-          difficulty: 'easy',
-          gameId: '123',
-        }),
-      })
-    );
-
-    expect(await screen.findByText('Game Screen')).toBeInTheDocument();
   });
 });

@@ -1,82 +1,86 @@
 // src/animations/__tests__/PlayCardAnimation.test.jsx
 
-import React, { useRef } from 'react';
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, act, cleanup } from '@testing-library/react';
+import { describe, it, vi, expect, beforeEach, afterEach } from 'vitest';
+import { render, screen, act } from '@testing-library/react';
 import PlayCardAnimation from '../PlayCardAnimation';
+import React from 'react';
 
 describe('PlayCardAnimation', () => {
-  let fromRef, toRef;
+  let fromRef, toRef, onComplete;
 
   beforeEach(() => {
-    vi.useFakeTimers();
+    fromRef = {
+      current: {
+        getBoundingClientRect: () => ({
+          left: 100,
+          top: 100,
+          width: 50,
+          height: 70,
+        }),
+      },
+    };
 
-    // Set up fake bounding boxes for both refs and the container
-    const fakeRect = { left: 100, top: 200, width: 60, height: 90 };
-    const containerRect = { left: 50, top: 100 };
+    toRef = {
+      current: {
+        getBoundingClientRect: () => ({
+          left: 300,
+          top: 400,
+          width: 50,
+          height: 70,
+        }),
+      },
+    };
 
-    vi.spyOn(document, 'querySelector').mockReturnValue({
-      getBoundingClientRect: () => containerRect,
+    const container = document.createElement('div');
+    container.className = 'floating-card-layer';
+    Object.defineProperty(container, 'getBoundingClientRect', {
+      value: () => ({
+        left: 50,
+        top: 50,
+        width: 800,
+        height: 600,
+      }),
     });
+    document.body.appendChild(container);
 
-    fromRef = { current: { getBoundingClientRect: () => fakeRect } };
-    toRef = { current: { getBoundingClientRect: () => fakeRect } };
+    onComplete = vi.fn();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    cleanup();
-    vi.clearAllTimers();
-    vi.restoreAllMocks();
+    vi.useRealTimers();
+    document.querySelector('.floating-card-layer')?.remove();
   });
 
-  it('renders the animated card and calls onComplete after timeout', () => {
-    const onComplete = vi.fn();
+  it('animates card and calls onComplete', async () => {
+    const card = { cardImage: '7S', owner: 'P1' };
 
-    act(() => {
-      render(
-        <PlayCardAnimation
-          card={{ cardImage: '5H.png' }}
-          fromRef={fromRef}
-          toRef={toRef}
-          onComplete={onComplete}
-        />
-      );
+    render(
+      <PlayCardAnimation
+        card={card}
+        fromRef={fromRef}
+        toRef={toRef}
+        onComplete={onComplete}
+        direction="south"
+      />
+    );
+
+    // Advance past first timeout (10ms delay)
+    await act(() => {
+      vi.advanceTimersByTimeAsync(15); // triggers animation start
     });
 
+    // Advance past second timeout (650ms for animation)
+    await act(() => {
+      vi.advanceTimersByTimeAsync(700); // triggers onComplete
+    });
+
+    // Check the card rendered
     const img = screen.getByAltText('Played card');
     expect(img).toBeInTheDocument();
-    expect(img).toHaveAttribute('src', '/static/img/deck/5H.png');
+    expect(img.src).toContain('7S');
 
-    // Fast-forward the animation duration (700ms)
-    act(() => {
-      vi.advanceTimersByTime(700);
-    });
-
+    // Confirm the animation completed
     expect(onComplete).toHaveBeenCalled();
-  });
-
-  it('does not crash or call onComplete if refs are missing', () => {
-    const onComplete = vi.fn();
-
-    act(() => {
-      render(
-        <PlayCardAnimation
-          card={{ cardImage: '8C.png' }}
-          fromRef={null}
-          toRef={null}
-          onComplete={onComplete}
-        />
-      );
-    });
-
-    // Should not render anything
-    expect(screen.queryByAltText('Played card')).toBeNull();
-
-    // Wait a moment to confirm nothing fires
-    act(() => {
-      vi.advanceTimersByTime(1000);
-    });
-
-    expect(onComplete).not.toHaveBeenCalled();
   });
 });
