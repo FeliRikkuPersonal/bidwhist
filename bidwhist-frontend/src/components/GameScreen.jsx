@@ -23,7 +23,6 @@ import handleQuit from '../utils/handleQuit.js';
  * @returns {JSX.Element} The full game screen layout
  */
 export default function GameScreen({ bidType }) {
-
   const { gameId, updateFromResponse, players, clearGameStateContext } = useGameState();
   const { positionToDirection, viewerPosition, clearUIContext } = usePositionContext();
 
@@ -51,7 +50,6 @@ export default function GameScreen({ bidType }) {
   const northZoneRef = useRef();
   const eastZoneRef = useRef();
   const westZoneRef = useRef();
-
 
   /**
    * Retrieves player props for a given direction (e.g., north, south).
@@ -84,23 +82,25 @@ export default function GameScreen({ bidType }) {
     };
   };
 
-  const playerProps = useMemo(() => ({
-    north: getPlayerProps('north'),
-    west: getPlayerProps('west'),
-    east: getPlayerProps('east'),
-    south: getPlayerProps('south'),
-  }), [players, positionToDirection, handMap]);
+  const playerProps = useMemo(
+    () => ({
+      north: getPlayerProps('north'),
+      west: getPlayerProps('west'),
+      east: getPlayerProps('east'),
+      south: getPlayerProps('south'),
+    }),
+    [players, positionToDirection, handMap]
+  );
 
   /**
    * Registers the zone refs for animation positioning.
    */
-useEffect(() => {
-  if (southZoneRef.current) register('zone-south', southZoneRef);
-  if (northZoneRef.current) register('zone-north', northZoneRef);
-  if (eastZoneRef.current) register('zone-east', eastZoneRef);
-  if (westZoneRef.current) register('zone-west', westZoneRef);
-}, [register]);
-
+  useEffect(() => {
+    if (southZoneRef.current) register('zone-south', southZoneRef);
+    if (northZoneRef.current) register('zone-north', northZoneRef);
+    if (eastZoneRef.current) register('zone-east', eastZoneRef);
+    if (westZoneRef.current) register('zone-west', westZoneRef);
+  }, [register]);
 
   /**
    * Submits selected cards as discards (must be 6).
@@ -176,9 +176,19 @@ useEffect(() => {
 
         <div className="grid-item top-right">
           {bidType && (
-            <button className="index-button quit-button"
+            <button
+              className="index-button quit-button"
               onClick={() =>
-                handleQuit({ viewerPosition, gameId, savedMode, API, clearUIContext, clearGameStateContext })}>
+                handleQuit({
+                  viewerPosition,
+                  gameId,
+                  savedMode,
+                  API,
+                  clearUIContext,
+                  clearGameStateContext,
+                })
+              }
+            >
               Quit
             </button>
           )}

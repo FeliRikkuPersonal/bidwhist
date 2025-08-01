@@ -11,81 +11,81 @@ import com.bidwhist.model.PlayerPos;
  * - new InitialBid(P1, 4, true) → P1 bids 4 (No)
  * - InitialBid.pass(P1) → P1 passes
  */
-public class InitialBid implements Comparable<InitialBid>{
+public class InitialBid implements Comparable<InitialBid> {
 
-    private final PlayerPos player;
-    private final int value; // Valid values: 4 to 7 (0 for pass)
-    private final boolean isNo; // Whether this is a "No" bid
-    private final boolean isPassed;
+  private final PlayerPos player;
+  private final int value; // Valid values: 4 to 7 (0 for pass)
+  private final boolean isNo; // Whether this is a "No" bid
+  private final boolean isPassed;
 
-    /* Constructs a regular or "No" bid */
-    public InitialBid(PlayerPos player, int value, boolean isNo) {
-        this.player = player;
-        this.value = value;
-        this.isNo = isNo;
-        this.isPassed = false;
+  /* Constructs a regular or "No" bid */
+  public InitialBid(PlayerPos player, int value, boolean isNo) {
+    this.player = player;
+    this.value = value;
+    this.isNo = isNo;
+    this.isPassed = false;
+  }
+
+  /* Constructs a pass bid */
+  public InitialBid(PlayerPos player) {
+    this.player = player;
+    this.value = 0;
+    this.isNo = false;
+    this.isPassed = true;
+  }
+
+  /* Static factory method for creating a pass bid */
+  public static InitialBid pass(PlayerPos player) {
+    return new InitialBid(player);
+  }
+
+  /* Returns human-readable summary of the initial bid (for display in UI) */
+  public String showInitialBid() {
+    if (isPassed) {
+      return player + " passes";
+    }
+    return player + " bids " + value + (isNo ? " (No)" : "");
+  }
+
+  @Override
+  public int compareTo(InitialBid other) {
+    int valueCompare = Integer.compare(this.value, other.value);
+    if (valueCompare != 0) {
+      return valueCompare;
     }
 
-    /* Constructs a pass bid */
-    public InitialBid(PlayerPos player) {
-        this.player = player;
-        this.value = 0;
-        this.isNo = false;
-        this.isPassed = true;
+    if (this.isNo() && !other.isNo()) {
+      return 1;
+    }
+    if (!this.isNo() && other.isNo()) {
+      return -1;
     }
 
-    /* Static factory method for creating a pass bid */
-    public static InitialBid pass(PlayerPos player) {
-        return new InitialBid(player);
+    // Same value & isNo — earlier bid (this) wins by default
+    return 0;
+  }
+
+  @Override
+  public String toString() {
+    if (isPassed) {
+      return player + " passes";
     }
+    return player + " bids " + value + (isNo ? " No" : "");
+  }
 
-    /* Returns human-readable summary of the initial bid (for display in UI) */
-    public String showInitialBid() {
-        if (isPassed) {
-            return player + " passes";
-        }
-        return player + " bids " + value + (isNo ? " (No)" : "");
-    }
+  public PlayerPos getPlayer() {
+    return player;
+  }
 
-    @Override
-    public int compareTo(InitialBid other) {
-        int valueCompare = Integer.compare(this.value, other.value);
-        if (valueCompare != 0) {
-            return valueCompare;
-        }
+  public int getValue() {
+    return value;
+  }
 
-        if (this.isNo() && !other.isNo()) {
-            return 1;
-        }
-        if (!this.isNo() && other.isNo()) {
-            return -1;
-        }
+  public boolean isNo() {
+    return isNo;
+  }
 
-        // Same value & isNo — earlier bid (this) wins by default
-        return 0;
-    }
-
-    @Override
-    public String toString() {
-        if (isPassed) {
-            return player + " passes";
-        }
-        return player + " bids " + value + (isNo ? " No" : "");
-    }
-
-    public PlayerPos getPlayer() {
-        return player;
-    }
-
-    public int getValue() {
-        return value;
-    }
-
-    public boolean isNo() {
-        return isNo;
-    }
-
-    public boolean isPassed() {
-        return isPassed;
-    }
+  public boolean isPassed() {
+    return isPassed;
+  }
 }

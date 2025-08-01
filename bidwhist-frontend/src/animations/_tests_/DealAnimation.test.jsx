@@ -61,10 +61,7 @@ describe('dealCardsClockwise', () => {
 
     // Simulate 2 cards per player (total: 8)
     playerPositions.forEach((pos, i) => {
-      cards.push(
-        { owner: pos, cardImage: `${pos}-1` },
-        { owner: pos, cardImage: `${pos}-2` }
-      );
+      cards.push({ owner: pos, cardImage: `${pos}-1` }, { owner: pos, cardImage: `${pos}-2` });
     });
 
     dealCardsClockwise(

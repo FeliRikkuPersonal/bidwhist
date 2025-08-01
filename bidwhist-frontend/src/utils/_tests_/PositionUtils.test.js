@@ -56,9 +56,7 @@ describe('getPositionMap', () => {
 
     const result = getPositionMap(players, 'P9');
     expect(result).toEqual({});
-    expect(warnSpy).toHaveBeenCalledWith(
-      'Viewer position P9 not found in backend positions'
-    );
+    expect(warnSpy).toHaveBeenCalledWith('Viewer position P9 not found in backend positions');
 
     warnSpy.mockRestore();
   });

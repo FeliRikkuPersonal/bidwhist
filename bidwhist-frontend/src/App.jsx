@@ -4,7 +4,7 @@ import React, { useEffect, useCallback } from 'react';
 import './css/index.css';
 import './css/Card.css';
 import './css/Animations.css';
-import './css/App.css'
+import './css/App.css';
 import ModeSelector from './components/ModeSelector';
 import GameScreen from './components/GameScreen';
 import Scoreboard from './components/Scoreboard';

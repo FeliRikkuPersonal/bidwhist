@@ -25,14 +25,16 @@ import * as GameState from '../context/GameStateContext';
 import * as PositionContext from '../context/PositionContext';
 import * as UIDisplay from '../context/UIDisplayContext';
 
-
 describe('<App />', () => {
   beforeEach(() => {
     // ✅ Mock global fetch
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve(mockFetchResponse),
-    }));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(mockFetchResponse),
+      })
+    );
 
     // ✅ Fake fetch response
     vi.spyOn(GameState, 'useGameState').mockReturnValue({
@@ -93,7 +95,11 @@ describe('<App />', () => {
   });
 
   it('renders the mocked ModeSelector by default', () => {
-    render(<AllProviders><App /></AllProviders>);
+    render(
+      <AllProviders>
+        <App />
+      </AllProviders>
+    );
     expect(screen.getByText('Mocked ModeSelector')).toBeInTheDocument();
   });
 });

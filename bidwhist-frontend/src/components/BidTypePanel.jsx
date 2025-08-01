@@ -29,7 +29,7 @@ export default function BidTypePanel({ closeBidTypePanel }) {
     setBidType,
     setCurrentTurnIndex,
     setWinningPlayerName,
-    clearGameStateContext
+    clearGameStateContext,
   } = useGameState();
 
   const { showFinalizeBid, setShowFinalizeBid, setAwardKitty, clearUIContext } = useUIDisplay();
@@ -135,9 +135,19 @@ export default function BidTypePanel({ closeBidTypePanel }) {
           <button className="index-button settings-button" onClick={finalizeBid}>
             Confirm
           </button>
-          <button className="index-button settings-button"
+          <button
+            className="index-button settings-button"
             onClick={() =>
-              handleQuit({ viewerPosition, gameId, savedMode, API, clearUIContext, clearGameStateContext })}>
+              handleQuit({
+                viewerPosition,
+                gameId,
+                savedMode,
+                API,
+                clearUIContext,
+                clearGameStateContext,
+              })
+            }
+          >
             Cancel
           </button>
         </div>

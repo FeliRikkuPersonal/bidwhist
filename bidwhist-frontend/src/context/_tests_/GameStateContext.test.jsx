@@ -54,7 +54,6 @@ describe('GameStateContext', () => {
     localStorage.setItem('activeGame', JSON.stringify('true'));
   });
 
-
   it('initializes and clears game state as expected', async () => {
     render(
       <GameStateProvider>

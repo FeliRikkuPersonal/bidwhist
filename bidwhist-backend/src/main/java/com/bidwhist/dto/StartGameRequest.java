@@ -7,7 +7,7 @@ import com.bidwhist.model.Difficulty;
 /**
  * DTO used to initiate a new game session.
  *
- * This object is passed from the client to the server to start a game with specified player
+ * <p>This object is passed from the client to the server to start a game with specified player
  * information, game difficulty (optional), and a game ID. It supports both multiplayer and
  * single-player initialization formats.
  */

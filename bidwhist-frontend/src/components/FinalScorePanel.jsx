@@ -4,8 +4,8 @@ import React, { useEffect } from 'react';
 import { useGameState } from '../context/GameStateContext';
 import handleQuit from '../utils/handleQuit.js';
 import { usePositionContext } from '../context/PositionContext';
-import '../css/FinalScorePanel.css'
-import '../css/index.css'
+import '../css/FinalScorePanel.css';
+import '../css/index.css';
 import { useUIDisplay } from '../context/UIDisplayContext.jsx';
 
 /**
@@ -26,27 +26,31 @@ export default function FinalScorePanel({ onNewGame }) {
   return (
     <div>
       {showFinalScore && (
-
         <div className="final-score-panel">
           <h2>Final Score</h2>
-          <div className="score-panel-text">
-            Team A: {teamAScore}
-          </div>
-          <div className="score-panel-text">
-            Team B: {teamBScore}
-          </div>
+          <div className="score-panel-text">Team A: {teamAScore}</div>
+          <div className="score-panel-text">Team B: {teamBScore}</div>
           <div className="settings-actions">
             <button className="index-button score-button" onClick={onNewGame}>
               New Game
             </button>
-            <button className="index-button score-button"
+            <button
+              className="index-button score-button"
               onClick={() =>
-                handleQuit({ viewerPosition, savedGameId, savedMode, API, clearUIContext, clearGameStateContext })}>
+                handleQuit({
+                  viewerPosition,
+                  savedGameId,
+                  savedMode,
+                  API,
+                  clearUIContext,
+                  clearGameStateContext,
+                })
+              }
+            >
               Close
             </button>
           </div>
         </div>
-
       )}
     </div>
   );

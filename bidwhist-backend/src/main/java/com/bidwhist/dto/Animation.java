@@ -24,46 +24,35 @@ public class Animation {
 
   private final String id = UUID.randomUUID().toString();
 
-  @JsonProperty
-  private AnimationType type;
-  @JsonProperty
-  private PlayerPos player;
-  @JsonProperty
-  private Card card;
-  @JsonProperty
-  private List<Card> cardList;
-  @JsonProperty
-  private Team winningTeam;
-  @JsonProperty
-  private List<PlayerView> playerViews;
-  @JsonProperty
-  private List<Card> kittyView;
-  @JsonProperty
-  private Suit leadSuit;
-  @JsonProperty
-  private String exitingPlayerName;
-  @JsonProperty
-  private String message;
-  @JsonProperty
-  private int currentTurnIndex;
-  @JsonProperty
-  private int trickSize;
-  @JsonProperty
-  private GamePhase currentPhase;
-  @JsonProperty
-  private int sessionKey;
-  @JsonProperty
-  private List<Player> playerList;
-  @JsonProperty
-  private String hide;
+  @JsonProperty private AnimationType type;
+  @JsonProperty private PlayerPos player;
+  @JsonProperty private Card card;
+  @JsonProperty private List<Card> cardList;
+  @JsonProperty private Team winningTeam;
+  @JsonProperty private List<PlayerView> playerViews;
+  @JsonProperty private List<Card> kittyView;
+  @JsonProperty private Suit leadSuit;
+  @JsonProperty private String exitingPlayerName;
+  @JsonProperty private String message;
+  @JsonProperty private int currentTurnIndex;
+  @JsonProperty private int trickSize;
+  @JsonProperty private GamePhase currentPhase;
+  @JsonProperty private int sessionKey;
+  @JsonProperty private List<Player> playerList;
+  @JsonProperty private String hide;
 
-  public Animation() {
-  }
+  public Animation() {}
 
   /*
    * Constructs a PLAY animation from a PlayedCard object.
    */
-  public Animation(PlayedCard playedCard, Suit leadSuit, int currentTurnIndex, int trickSize, int sessionKey, GameState game) {
+  public Animation(
+      PlayedCard playedCard,
+      Suit leadSuit,
+      int currentTurnIndex,
+      int trickSize,
+      int sessionKey,
+      GameState game) {
     this.type = AnimationType.PLAY;
     this.card = playedCard.getCard();
     this.player = playedCard.getPlayer();

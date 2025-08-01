@@ -18,8 +18,10 @@ public class BidRequest {
   private PlayerPos player;
   private int value;
   private BidType type;
+
   @JsonProperty("isNo")
   private boolean isNo;
+
   private Suit suit;
 
   public BidRequest() {}

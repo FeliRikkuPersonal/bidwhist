@@ -12,13 +12,13 @@ vi.mock('../../context/PositionContext', async () => {
   const actual = await vi.importActual('../../context/PositionContext');
   return {
     ...actual,
-    usePositionContext: vi.fn()
+    usePositionContext: vi.fn(),
   };
 });
 
 /* 🧪 Mock getCardImage */
 vi.mock('../../utils/CardUtils', () => ({
-  getCardImage: vi.fn()
+  getCardImage: vi.fn(),
 }));
 
 vi.useFakeTimers();

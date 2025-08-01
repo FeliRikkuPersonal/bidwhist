@@ -1,7 +1,14 @@
 // src/utils/handleQuit.js
 import { clearAllGameData } from './ClearData';
 
-const handleQuit = async ({ viewerPosition, gameId, savedMode, API, clearUIContext, clearGameStateContext }) => {
+const handleQuit = async ({
+  viewerPosition,
+  gameId,
+  savedMode,
+  API,
+  clearUIContext,
+  clearGameStateContext,
+}) => {
   if (confirm('Are you sure you want to quit? This will clear all game data.')) {
     try {
       await fetch(`${API}/game/quit`, {
@@ -13,7 +20,7 @@ const handleQuit = async ({ viewerPosition, gameId, savedMode, API, clearUIConte
       console.error('Quit API failed:', error);
     }
 
-    await clearAllGameData({clearUIContext, clearGameStateContext});
+    await clearAllGameData({ clearUIContext, clearGameStateContext });
     window.location.reload();
     window.location.href = '/';
   }

@@ -47,7 +47,10 @@ vi.mock('../../context/AlertContext', () => ({
 vi.mock('../../context/UIDisplayContext', () => ({
   useUIDisplay: () => ({
     handMap: {
-      south: [{ suit: 'H', rank: 'A' }, { suit: 'S', rank: 'K' }],
+      south: [
+        { suit: 'H', rank: 'A' },
+        { suit: 'S', rank: 'K' },
+      ],
     },
     awardKitty: true,
     setAwardKitty: vi.fn(),
@@ -98,7 +101,6 @@ vi.mock('../../context/RefContext', () => ({
   }),
   RefProvider: ({ children }) => <div>{children}</div>,
 }));
-
 
 beforeEach(() => {
   global.fetch = vi.fn(() =>

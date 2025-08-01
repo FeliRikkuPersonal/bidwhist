@@ -75,12 +75,9 @@ export function PositionProvider({ children }) {
    * Derive name from position
    */
   const getNameFromPosition = (targetPosition) => {
-    const entry = Object.values(frontendPositions).find(
-      (info) => info.position === targetPosition
-    );
+    const entry = Object.values(frontendPositions).find((info) => info.position === targetPosition);
     return entry ? entry.name : '';
   };
-
 
   /**
    * Maps player position to team (e.g., { P1: 'A', P3: 'A', P2: 'B', P4: 'B' })

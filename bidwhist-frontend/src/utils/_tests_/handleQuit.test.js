@@ -14,7 +14,10 @@ describe('handleQuit', () => {
 
   beforeEach(() => {
     // Mock global confirm
-    vi.stubGlobal('confirm', vi.fn(() => true));
+    vi.stubGlobal(
+      'confirm',
+      vi.fn(() => true)
+    );
     // Mock reload and href
     delete window.location;
     window.location = { reload: vi.fn(), href: '' };

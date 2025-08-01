@@ -9,20 +9,18 @@ import { AlertProvider, useAlert } from '../AlertContext';
 vi.mock('../../components/Alert', () => ({
   default: ({ message, type, onClose }) => (
     <div data-testid="mock-alert">
-      <p>{type}: {message}</p>
+      <p>
+        {type}: {message}
+      </p>
       <button onClick={onClose}>Dismiss</button>
     </div>
-  )
+  ),
 }));
 
 // ✅ Minimal consumer to test context behavior
 const AlertTester = () => {
   const { showAlert } = useAlert();
-  return (
-    <button onClick={() => showAlert('Test message', 'success')}>
-      Trigger Alert
-    </button>
-  );
+  return <button onClick={() => showAlert('Test message', 'success')}>Trigger Alert</button>;
 };
 
 describe('AlertContext', () => {

@@ -42,13 +42,15 @@ export function UIDisplayProvider({ children }) {
   const [animatedCards, setAnimatedCards] = useLocalStorage('animatedCards', []);
   const [showFinalScore, setShowFinalScore] = useLocalStorage('showFinalScore', false);
   const [key, setKey] = useState(0);
-  const [playedCardsByDirection, setPlayedCardsByDirection] = useLocalStorage('playedCardsByDirection', {
-    north: null,
-    south: null,
-    east: null,
-    west: null,
-  }); // Visual state of cards on table by direction
-
+  const [playedCardsByDirection, setPlayedCardsByDirection] = useLocalStorage(
+    'playedCardsByDirection',
+    {
+      north: null,
+      south: null,
+      east: null,
+      west: null,
+    }
+  ); // Visual state of cards on table by direction
 
   const [animationQueue, setAnimationQueue] = useState([]);
   const [deckPosition, setDeckPosition] = useState({ x: 0, y: 0 });
@@ -62,42 +64,41 @@ export function UIDisplayProvider({ children }) {
    * Clear context for new game
    */
   const clearUIContext = () => {
-    setHandMap({north: [], south: [], east:[], west:[]});
+    setHandMap({ north: [], south: [], east: [], west: [] });
     setShowBidding(false);
     setPlayedCardPosition(null);
     setShowAnimatedCards(true);
     setShowFinalizeBid(false);
     setDiscardPile([]);
-    setTeamATricks(0)
-    setTeamBTricks(0)
+    setTeamATricks(0);
+    setTeamBTricks(0);
     setAnimatedCards([]);
     setShowHands(false);
     setShowFinalScore(false);
-    setPlayedCardsByDirection({north: null, south: null, east: null, west: null,});
-    setPlayedCard(null)
+    setPlayedCardsByDirection({ north: null, south: null, east: null, west: null });
+    setPlayedCard(null);
     setSelectedCard([]);
     setMyTurn(false);
-  }
-
+  };
 
   /**
    * Updates the animation queue from a backend response.
    * Used during polling to prepare card animations.
    */
-const queueAnimationFromResponse = (response, sessionKey) => {
-  if ('animationQueue' in response) {
-    const taggedQueue = response.animationQueue.map(anim => ({
-      ...anim,
-      sessionKey, // tag each animation with the current UI session key
-    }));
+  const queueAnimationFromResponse = (response, sessionKey) => {
+    if ('animationQueue' in response) {
+      const taggedQueue = response.animationQueue.map((anim) => ({
+        ...anim,
+        sessionKey, // tag each animation with the current UI session key
+      }));
 
-    setAnimationQueue(taggedQueue);
-  }
+      setAnimationQueue(taggedQueue);
+    }
 
-  if ('leadSuit' in response) {
-    setLeadSuit(response.leadSuit);
-  }
-};
+    if ('leadSuit' in response) {
+      setLeadSuit(response.leadSuit);
+    }
+  };
 
   /**
    * Logs the current UI context state to the console for debugging purposes.
@@ -124,7 +125,7 @@ const queueAnimationFromResponse = (response, sessionKey) => {
       playedCard,
       teamATricks,
       teamBTricks,
-      showFinalScore
+      showFinalScore,
     });
   };
 

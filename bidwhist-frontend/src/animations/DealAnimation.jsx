@@ -31,15 +31,14 @@ export function dealCardsClockwise(
   setBidPhase,
   sessionKey,
   setPlayedCardsByDirection,
-  setShowHands,
+  setShowHands
 ) {
-
   setPlayedCardsByDirection({
-  north: null,
-  south: null,
-  east: null,
-  west: null,
-});
+    north: null,
+    south: null,
+    east: null,
+    west: null,
+  });
 
   const totalCards = cards.length;
   const delayPerCard = 120; /* milliseconds between each card */

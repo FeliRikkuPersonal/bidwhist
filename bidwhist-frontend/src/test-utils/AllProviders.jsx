@@ -11,9 +11,7 @@ export const AllProviders = ({ children }) => (
     <RefProvider>
       <GameStateProvider>
         <PositionProvider>
-          <UIDisplayProvider>
-            {children}
-          </UIDisplayProvider>
+          <UIDisplayProvider>{children}</UIDisplayProvider>
         </PositionProvider>
       </GameStateProvider>
     </RefProvider>

@@ -59,7 +59,7 @@ describe('LobbyScreen (minimal behavior)', () => {
 
   it('renders "Ready" button when all players and positions are present, and responds to click', () => {
     render(<LobbyScreen gameId="GAME456" />);
-    
+
     const readyBtn = screen.getByRole('button', { name: /ready/i });
     expect(readyBtn).toBeInTheDocument();
 

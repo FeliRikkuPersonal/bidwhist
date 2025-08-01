@@ -8,10 +8,11 @@ import { AllProviders } from '../../test-utils/AllProviders';
 
 /* Helper to wrap with required providers */
 function renderWithProviders(ui) {
-  return render(<AllProviders>
-    <GameStateProvider>
-      <PositionProvider>{ui}</PositionProvider>
-    </GameStateProvider>
+  return render(
+    <AllProviders>
+      <GameStateProvider>
+        <PositionProvider>{ui}</PositionProvider>
+      </GameStateProvider>
     </AllProviders>
   );
 }

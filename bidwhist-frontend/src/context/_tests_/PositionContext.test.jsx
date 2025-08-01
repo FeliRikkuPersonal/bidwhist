@@ -30,9 +30,7 @@ const AllProviders = ({ children }) => {
     <AlertProvider>
       <RefProvider>
         <UIDisplayProvider>
-          <PositionProvider>
-            {children}
-          </PositionProvider>
+          <PositionProvider>{children}</PositionProvider>
         </UIDisplayProvider>
       </RefProvider>
     </AlertProvider>
@@ -94,15 +92,14 @@ describe('PositionContext', () => {
     expect(screen.getByTestId('clockwiseSouth')).toHaveTextContent('south');
   });
 
-it('returns null if usePositionContext is used outside provider', () => {
-  let contextValue;
-  const BrokenConsumer = () => {
-    contextValue = usePositionContext();
-    return null;
-  };
+  it('returns null if usePositionContext is used outside provider', () => {
+    let contextValue;
+    const BrokenConsumer = () => {
+      contextValue = usePositionContext();
+      return null;
+    };
 
-  render(<BrokenConsumer />);
-  expect(contextValue).toBeNull();
-});
-
+    render(<BrokenConsumer />);
+    expect(contextValue).toBeNull();
+  });
 });

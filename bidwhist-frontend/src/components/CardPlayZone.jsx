@@ -17,23 +17,21 @@ import { getPositionMap } from '../utils/PositionUtils';
 import { delay } from '../utils/TimeUtils';
 import { startNewGame } from '../utils/gameApi'; // adjust path
 
-
 import { dealCardsClockwise } from '../animations/DealAnimation';
 
 import '../css/CardPlayZone.css';
 
 /*
-* CardPlayZone manages the central play area of the
-* Bid Whist card game. It handles:
-*   - Card play animations (deal, play, collect, clear)
-*   - Drag-and-drop logic for playing cards
-*   - Updating card positions for animation accuracy
-*   - Triggering UI components for bidding and bid type
-*   - Communicating animation progress with the backend
-*/
+ * CardPlayZone manages the central play area of the
+ * Bid Whist card game. It handles:
+ *   - Card play animations (deal, play, collect, clear)
+ *   - Drag-and-drop logic for playing cards
+ *   - Updating card positions for animation accuracy
+ *   - Triggering UI components for bidding and bid type
+ *   - Communicating animation progress with the backend
+ */
 
 export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef, onCardPlayed }) {
-
   const {
     setHandFor,
     setShowHands,
@@ -59,7 +57,6 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
     setKey,
   } = useUIDisplay();
 
-
   const {
     debugLog: positionLog,
     playerName,
@@ -67,7 +64,6 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
     backendPositions,
     positionToDirection,
   } = usePositionContext();
-
 
   const {
     gameId,
@@ -113,7 +109,6 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
     setLastAnimation(animation.id);
 
     const runAnimation = async () => {
-
       if (animation.type === 'DEAL') {
         const requiredRefs = [
           'hand-south',
@@ -155,10 +150,9 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
             setBidPhase,
             key,
             setPlayedCardsByDirection,
-            setShowHands,
+            setShowHands
           );
         }, 50);
-
       }
 
       if (animation.type === 'PLAY') {
@@ -192,7 +186,6 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
           },
         ]);
 
-
         await delay(800); // wait for animation
         setPlayedCardsByDirection((prev) => ({ ...prev, [direction]: card }));
         if (thisTurn != null && animation.currentTurnIndex === (viewerIndex + 3) % 4) {
@@ -205,8 +198,6 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
         }
       }
 
-
-
       if (animation.type === 'COLLECT') {
         const { cardList, winningTeam } = animation;
         const myTeam = viewerPosition === 'P1' || viewerPosition === 'P3' ? 'A' : 'B';
@@ -216,10 +207,16 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
           const dir = positionToDirection[card.owner];
           const from = deckPosition;
           const toRect = targetRef?.current?.getBoundingClientRect?.();
-          const parentRect = document.querySelector('.floating-card-layer')?.getBoundingClientRect();
+          const parentRect = document
+            .querySelector('.floating-card-layer')
+            ?.getBoundingClientRect();
 
           if (!from || !toRect || !parentRect) {
-            console.warn('Missing ref or bounds for trick collect animation:', { from, toRect, parentRect });
+            console.warn('Missing ref or bounds for trick collect animation:', {
+              from,
+              toRect,
+              parentRect,
+            });
             continue;
           }
 
@@ -257,7 +254,10 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
               east: null,
               west: null,
             });
-            if (animation.currentTurnIndex === viewerIndex && animationQueue.some(anim => anim.type === 'SHOW_WINNER')) {
+            if (
+              animation.currentTurnIndex === viewerIndex &&
+              animationQueue.some((anim) => anim.type === 'SHOW_WINNER')
+            ) {
               throwAlert('Your turn', 'yourTurn');
             }
           },
@@ -306,7 +306,6 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
       if (animation.type === 'SHOW_WINNER') {
         setShowFinalScore(true);
       }
-
 
       /* Player QUIT_GAME notification */
       if (animation.type === 'QUIT_GAME') {
@@ -440,7 +439,7 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
   };
 
   const handleNewGame = async () => {
-    setKey(prev => prev + 1);
+    setKey((prev) => prev + 1);
 
     const { success, gameData, isMyTurn, message } = await startNewGame({
       viewerPosition,
@@ -461,8 +460,6 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
       throwAlert(message, 'error');
     }
   };
-
-
 
   return (
     <div ref={localRef} className="card-play-zone">
@@ -491,9 +488,7 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
       <div className="floating-card-layer">
         <BiddingPanel closeBidding={() => setShowBidding(false)} />
         <BidTypePanel closeBidTypePanel={() => setShowFinalizeBid(false)} />
-        <FinalScorePanel
-          onNewGame={handleNewGame}
-        />
+        <FinalScorePanel onNewGame={handleNewGame} />
 
         {Object.entries(playedCardsByDirection).map(([dir, card]) => {
           if (!card) return null;
@@ -508,10 +503,14 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
 
           const getRotation = (dir) => {
             switch (dir) {
-              case 'north': return '180deg';
-              case 'east': return '270deg';
-              case 'west': return '90deg';
-              default: return '0deg';
+              case 'north':
+                return '180deg';
+              case 'east':
+                return '270deg';
+              case 'west':
+                return '90deg';
+              default:
+                return '0deg';
             }
           };
 
@@ -552,11 +551,9 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
           ))}
 
         {showAnimatedCards &&
-          animatedCards
-
-            .map((card, i) => (
-              <AnimatedCard key={card.id} card={card} from={card.from} to={card.to} zIndex={i} />
-            ))}
+          animatedCards.map((card, i) => (
+            <AnimatedCard key={card.id} card={card} from={card.from} to={card.to} zIndex={i} />
+          ))}
       </div>
     </div>
   );

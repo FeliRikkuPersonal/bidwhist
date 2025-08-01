@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" data-bs-theme="light">
   <head>
     <meta charset="utf-8" />
@@ -77,9 +77,7 @@
               <a href="../about/index.html" class="nav-link">About</a>
             </li>
             <li class="nav-item">
-              <a href="./index.html" class="nav-link active" aria-current="page"
-                >Game</a
-              >
+              <a href="./index.html" class="nav-link active" aria-current="page">Game</a>
             </li>
             <li class="nav-item">
               <a href="../rules/index.html" class="nav-link">Rules</a>
@@ -154,10 +152,7 @@
     <div class="container">
       <div class="row">
         <div class="col-md-3">
-          <div
-            class="navbar-expand-md bs-sidebar hidden-print affix"
-            role="complementary"
-          >
+          <div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
             <div class="navbar-header">
               <button
                 type="button"
@@ -170,26 +165,17 @@
               </button>
             </div>
 
-            <div
-              id="toc-collapse"
-              class="navbar-collapse collapse card bg-body-tertiary"
-            >
+            <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
               <ul class="nav flex-column">
                 <li class="nav-item" data-bs-level="1">
-                  <a href="#getting-started" class="nav-link"
-                    >Getting Started</a
-                  >
+                  <a href="#getting-started" class="nav-link">Getting Started</a>
                   <ul class="nav flex-column">
                     <li class="nav-item" data-bs-level="2">
-                      <a href="#environment-setup" class="nav-link"
-                        >Environment Setup</a
-                      >
+                      <a href="#environment-setup" class="nav-link">Environment Setup</a>
                       <ul class="nav flex-column"></ul>
                     </li>
                     <li class="nav-item" data-bs-level="2">
-                      <a href="#launching-the-game" class="nav-link"
-                        >Launching the Game</a
-                      >
+                      <a href="#launching-the-game" class="nav-link">Launching the Game</a>
                       <ul class="nav flex-column"></ul>
                     </li>
                     <li class="nav-item" data-bs-level="2">
@@ -211,9 +197,7 @@
                       <ul class="nav flex-column"></ul>
                     </li>
                     <li class="nav-item" data-bs-level="2">
-                      <a href="#game-board-layout" class="nav-link"
-                        >Game Board Layout</a
-                      >
+                      <a href="#game-board-layout" class="nav-link">Game Board Layout</a>
                       <ul class="nav flex-column"></ul>
                     </li>
                     <li class="nav-item" data-bs-level="2">
@@ -221,9 +205,7 @@
                       <ul class="nav flex-column"></ul>
                     </li>
                     <li class="nav-item" data-bs-level="2">
-                      <a href="#ending-the-round" class="nav-link"
-                        >Ending the round</a
-                      >
+                      <a href="#ending-the-round" class="nav-link">Ending the round</a>
                       <ul class="nav flex-column"></ul>
                     </li>
                     <li class="nav-item" data-bs-level="2">
@@ -231,9 +213,7 @@
                       <ul class="nav flex-column"></ul>
                     </li>
                     <li class="nav-item" data-bs-level="2">
-                      <a href="#ending-the-game" class="nav-link"
-                        >Ending the Game</a
-                      >
+                      <a href="#ending-the-game" class="nav-link">Ending the Game</a>
                       <ul class="nav flex-column"></ul>
                     </li>
                   </ul>
@@ -245,14 +225,11 @@
         <div class="col-md-9" role="main">
           <h1 id="getting-started">Getting Started</h1>
           <p>
-            Use the following user guide to learn how to use the application and
-            play Bid Whist!
+            Use the following user guide to learn how to use the application and play Bid Whist!
           </p>
           <h2 id="environment-setup">Environment Setup</h2>
           <ul>
-            <li>
-              Install Java (JDK 17+) <a href="https://jdk.java.net">Java JDK</a>
-            </li>
+            <li>Install Java (JDK 17+) <a href="https://jdk.java.net">Java JDK</a></li>
             <li>
               Install Maven and add <code>bin</code> to path
               <a href="https://maven.apache.org">Maven</a>
@@ -262,26 +239,21 @@
               <a href="https://nodejs.org">Node.js</a>
             </li>
             <li>Build Project (Backend) <code>mvn clean package</code></li>
+            <li>Run Application (Backend) <code>.\mvn spring-boot:run</code></li>
             <li>
-              Run Application (Backend) <code>.\mvn spring-boot:run</code>
-            </li>
-            <li>
-              Install Dependencies (Frontend) <code>cd bidwhist-frontend</code>,
-              then <code>npm i</code>
+              Install Dependencies (Frontend) <code>cd bidwhist-frontend</code>, then
+              <code>npm i</code>
             </li>
             <li>Run Server (Frontend) <code>npm run dev</code></li>
           </ul>
           <h2 id="launching-the-game">Launching the Game</h2>
           <p>
-            Once the backend and frontend services are running, open a browser
-            and navigate to http://127.0.0.1:5173 or localhost:5173
+            Once the backend and frontend services are running, open a browser and navigate to
+            http://127.0.0.1:5173 or localhost:5173
           </p>
-          <h2 id="starting-a-single-player-game">
-            Starting a Single Player Game
-          </h2>
+          <h2 id="starting-a-single-player-game">Starting a Single Player Game</h2>
           <p>
-            The application defaults to a single player game, as can be seen at
-            the game's homepage
+            The application defaults to a single player game, as can be seen at the game's homepage
           </p>
           <p>
             <a
@@ -299,28 +271,16 @@
           </div>
 
           <ul>
-            <li>
-              To start the game, enter a name in the textfield that says "Enter
-              your name"
-            </li>
-            <li>
-              Select a difficulty level [Easy, Medium, or Hard] from the
-              drop-down menu
-            </li>
+            <li>To start the game, enter a name in the textfield that says "Enter your name"</li>
+            <li>Select a difficulty level [Easy, Medium, or Hard] from the drop-down menu</li>
             <li>Click <code>Start Game</code></li>
           </ul>
           <h2 id="starting-a-multiplayer-game">Starting a Multiplayer Game</h2>
-          <h4
-            id="please-note-multiplayer-is-only-available-through-the-website"
-          >
-            <strong
-              >Please note, multiplayer is only available through the
-              website.</strong
-            >
+          <h4 id="please-note-multiplayer-is-only-available-through-the-website">
+            <strong>Please note, multiplayer is only available through the website.</strong>
           </h4>
           <p>
-            After loading the homepage for the Bid Whist App, find the slider on
-            the welcome screen.
+            After loading the homepage for the Bid Whist App, find the slider on the welcome screen.
           </p>
           <figure>
             <a
@@ -352,8 +312,7 @@
           </ul>
           <h2 id="joining-a-multiplayer-game">Joining a Multiplayer Game</h2>
           <p>
-            To join a multiplayer game, an autogenerated 6-character
-            Alphanumeric code is required.
+            To join a multiplayer game, an autogenerated 6-character Alphanumeric code is required.
           </p>
           <p>
             <a
@@ -367,9 +326,8 @@
             /></a>
           </p>
           <p>
-            This will be the same code that others will use to join the current
-            lobby. Any player will have access to the code while waiting to join
-            the game
+            This will be the same code that others will use to join the current lobby. Any player
+            will have access to the code while waiting to join the game
           </p>
           <p>
             <a
@@ -384,8 +342,8 @@
           </p>
           <h2 id="game-board-layout">Game Board Layout</h2>
           <p>
-            Whether in Single Player or Multi-Player mode, the game will load
-            and deal 12 cards to each player.
+            Whether in Single Player or Multi-Player mode, the game will load and deal 12 cards to
+            each player.
           </p>
           <p>
             <a
@@ -399,32 +357,31 @@
             /></a>
           </p>
           <p>
-            The game board contains 4 sets of cards (hands), a zone for bidding
-            and playing cards, and a scoreboard. The bottom of the game board
-            contains the user's hand. These are the cards the user can play each
-            round.
+            The game board contains 4 sets of cards (hands), a zone for bidding and playing cards,
+            and a scoreboard. The bottom of the game board contains the user's hand. These are the
+            cards the user can play each round.
           </p>
           <p>
-            When the game starts, the player must enter a bid (or how many hands
-            the player believes they can win given the current hand). Place a
-            number in the box under 'Place Your Bid' and press the
-            <code>Set Bid</code> button. Alternatively, players can press the
-            <code>Pass</code> or <code>Quit</code>.
+            When the game starts, the player must enter a bid (or how many hands the player believes
+            they can win given the current hand). Place a number in the box under 'Place Your Bid'
+            and press the
+            <code>Set Bid</code> button. Alternatively, players can press the <code>Pass</code> or
+            <code>Quit</code>.
           </p>
           <p>
-            The <code>Pass</code> Button registers a 0-bid to the game.
-            <code>Quit</code> will quit the game.
+            The <code>Pass</code> Button registers a 0-bid to the game. <code>Quit</code> will quit
+            the game.
           </p>
           <p>
-            Once all players input their bids, the round begins. The top of the
-            Game board contains the scoreboard.
+            Once all players input their bids, the round begins. The top of the Game board contains
+            the scoreboard.
           </p>
           <p>The scoreboard consists of 3 sections:</p>
           <ul>
             <li>Team A's Score</li>
             <li>
-              Game Phase/Information (Team with the winning bid, Trump Suit and
-              Direction, and Game Phase)
+              Game Phase/Information (Team with the winning bid, Trump Suit and Direction, and Game
+              Phase)
             </li>
             <li>Team B's Score</li>
           </ul>
@@ -441,9 +398,9 @@
           </p>
           <h2 id="players-turn">Player's Turn</h2>
           <p>
-            On the player's turn, drag and drop a card from the player's hand.
-            When starting to drag the card, a zone will appear on the board,
-            indicating where the card should be dropped at.
+            On the player's turn, drag and drop a card from the player's hand. When starting to drag
+            the card, a zone will appear on the board, indicating where the card should be dropped
+            at.
           </p>
           <p>
             <a
@@ -458,10 +415,9 @@
           </p>
           <h2 id="ending-the-round">Ending the round</h2>
           <p>
-            The round ends after all players have played a card, and the team
-            with the highest winning card, wins the hand (called a trick), and
-            the round begins again. Won tricks are stored in the top left and
-            bottom right of the game board.
+            The round ends after all players have played a card, and the team with the highest
+            winning card, wins the hand (called a trick), and the round begins again. Won tricks are
+            stored in the top left and bottom right of the game board.
           </p>
           <ul>
             <li>Bottom Right (1)—Team A's (Player's team) won tricks</li>
@@ -481,9 +437,9 @@
           <p>Play will continue until all cards have been played.</p>
           <h2 id="next-round">Next Round</h2>
           <p>
-            Once all cards have been played, the round starts over with a new
-            bidding phase. The scoreboard will update with team scores and
-            information as the game progresses through each round.
+            Once all cards have been played, the round starts over with a new bidding phase. The
+            scoreboard will update with team scores and information as the game progresses through
+            each round.
           </p>
           <p>
             <a
@@ -498,8 +454,7 @@
           </p>
           <h2 id="ending-the-game">Ending the Game</h2>
           <p>
-            Players will continue to play through the rounds until one team
-            reaches a score of 7.
+            Players will continue to play through the rounds until one team reaches a score of 7.
           </p>
         </div>
       </div>
@@ -507,13 +462,11 @@
 
     <footer class="col-md-12">
       <hr />
-      <p>
-        Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.
-      </p>
+      <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
     </footer>
     <script src="../js/bootstrap.bundle.min.js"></script>
     <script>
-      var base_url = "..",
+      var base_url = '..',
         shortcuts = { help: 191, next: 78, previous: 80, search: 83 };
     </script>
     <script src="../js/base.js"></script>
@@ -529,9 +482,7 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h4 class="modal-title" id="keyboardModalLabel">
-              Keyboard Shortcuts
-            </h4>
+            <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
             <button
               type="button"
               class="btn-close"
@@ -578,9 +529,9 @@
         loop: false,
         zoomable: true,
         draggable: true,
-        openEffect: "zoom",
-        closeEffect: "zoom",
-        slideEffect: "slide",
+        openEffect: 'zoom',
+        closeEffect: 'zoom',
+        slideEffect: 'slide',
       });
     </script>
   </body>

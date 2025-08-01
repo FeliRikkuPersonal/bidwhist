@@ -30,8 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/game")
 public class GameController {
 
-  @Autowired
-  private GameService gameService;
+  @Autowired private GameService gameService;
 
   /* Starts a single-player game session */
   @PostMapping("/start")

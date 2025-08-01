@@ -1,1 +1,876 @@
-{"numTotalTestSuites":52,"numPassedTestSuites":52,"numFailedTestSuites":0,"numPendingTestSuites":0,"numTotalTests":68,"numPassedTests":67,"numFailedTests":0,"numPendingTests":1,"numTodoTests":0,"snapshot":{"added":0,"failure":false,"filesAdded":0,"filesRemoved":0,"filesRemovedList":[],"filesUnmatched":0,"filesUpdated":0,"matched":0,"total":0,"unchecked":0,"uncheckedKeysByFile":[],"unmatched":0,"updated":0,"didUpdate":false},"startTime":1753327287666,"success":true,"testResults":[{"assertionResults":[{"ancestorTitles":["<App />"],"fullName":"<App /> renders the mocked ModeSelector by default","status":"passed","title":"renders the mocked ModeSelector by default","duration":48.11229999999978,"failureMessages":[],"meta":{}},{"ancestorTitles":["<App />"],"fullName":"<App /> calls startGame and shows GameScreen after fetch","status":"skipped","title":"calls startGame and shows GameScreen after fetch","failureMessages":[],"meta":{}}],"startTime":1753327292605,"endTime":1753327292653.1123,"status":"passed","message":"","name":"C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/_tests_/App.test.jsx"},{"assertionResults":[{"ancestorTitles":["dealCardsClockwise"],"fullName":"dealCardsClockwise schedules cards to animate to the correct positions in clockwise rounds","status":"passed","title":"schedules cards to animate to the correct positions in clockwise rounds","duration":9.530099999999948,"failureMessages":[],"meta":{}},{"ancestorTitles":["dealCardsClockwise"],"fullName":"dealCardsClockwise logs a warning if a player ref is missing","status":"passed","title":"logs a warning if a player ref is missing","duration":2.851599999999962,"failureMessages":[],"meta":{}}],"startTime":1753327292398,"endTime":1753327292410.8516,"status":"passed","message":"","name":"C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/animations/_tests_/DealAnimation.test.jsx"},{"assertionResults":[{"ancestorTitles":["PlayCardAnimation"],"fullName":"PlayCardAnimation renders the animated card and calls onComplete after timeout","status":"passed","title":"renders the animated card and calls onComplete after timeout","duration":40.580900000000156,"failureMessages":[],"meta":{}},{"ancestorTitles":["PlayCardAnimation"],"fullName":"PlayCardAnimation does not crash or call onComplete if refs are missing","status":"passed","title":"does not crash or call onComplete if refs are missing","duration":2.202600000000075,"failureMessages":[],"meta":{}}],"startTime":1753327292524,"endTime":1753327292567.2026,"status":"passed","message":"","name":"C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/animations/_tests_/PlayCardAnimation.test.jsx"},{"assertionResults":[{"ancestorTitles":["Alert component"],"fullName":"Alert component renders the message and type class","status":"passed","title":"renders the message and type class","duration":98.85410000000002,"failureMessages":[],"meta":{}},{"ancestorTitles":["Alert component"],"fullName":"Alert component calls onClose after 5 seconds","status":"passed","title":"calls onClose after 5 seconds","duration":6.824699999999666,"failureMessages":[],"meta":{}},{"ancestorTitles":["Alert component"],"fullName":"Alert component calls onClose when close button is clicked","status":"passed","title":"calls onClose when close button is clicked","duration":13.194100000000162,"failureMessages":[],"meta":{}},{"ancestorTitles":["Alert component"],"fullName":"Alert component resets timer when message changes","status":"passed","title":"resets timer when message changes","duration":3.923400000000129,"failureMessages":[],"meta":{}}],"startTime":1753327290385,"endTime":1753327290507.9233,"status":"passed","message":"","name":"C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/Alert.test.jsx"},{"assertionResults":[{"ancestorTitles":["AnimatedCard component"],"fullName":"AnimatedCard component renders the card at the initial position","status":"passed","title":"renders the card at the initial position","duration":86.52840000000015,"failureMessages":[],"meta":{}},{"ancestorTitles":["AnimatedCard component"],"fullName":"AnimatedCard component moves the card to the destination and calls onComplete","status":"passed","title":"moves the card to the destination and calls onComplete","duration":7.41170000000011,"failureMessages":[],"meta":{}}],"startTime":1753327290399,"endTime":1753327290493.4116,"status":"passed","message":"","name":"C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/AnimatedCard.test.jsx"},{"assertionResults":[{"ancestorTitles":["BiddingPanel component"],"fullName":"BiddingPanel component renders bidding UI when visible","status":"passed","title":"renders bidding UI when visible","duration":52.31359999999995,"failureMessages":[],"meta":{}},{"ancestorTitles":["BiddingPanel component"],"fullName":"BiddingPanel component updates bid input and checkbox","status":"passed","title":"updates bid input and checkbox","duration":73.9989999999998,"failureMessages":[],"meta":{}},{"ancestorTitles":["BiddingPanel component"],"fullName":"BiddingPanel component calls fetch when \"Pass\" is clicked","status":"passed","title":"calls fetch when \"Pass\" is clicked","duration":9.619400000000041,"failureMessages":[],"meta":{}}],"startTime":1753327290421,"endTime":1753327290556.6194,"status":"passed","message":"","name":"C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/BiddingPanel.test.jsx"},{"assertionResults":[{"ancestorTitles":["BidZone"],"fullName":"BidZone renders bid history when bidPhase is true","status":"passed","title":"renders bid history when bidPhase is true","duration":46.32400000000007,"failureMessages":[],"meta":{}}],"startTime":1753327292583,"endTime":1753327292629.324,"status":"passed","message":"","name":"C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/BidZone.test.jsx"},{"assertionResults":[{"ancestorTitles":["<CardPlayZone />"],"fullName":"<CardPlayZone /> renders without crashing","status":"passed","title":"renders without crashing","duration":47.11740000000009,"failureMessages":[],"meta":{}},{"ancestorTitles":["<CardPlayZone />"],"fullName":"<CardPlayZone /> handles card drop correctly","status":"passed","title":"handles card drop correctly","duration":35.12019999999984,"failureMessages":[],"meta":{}}],"startTime":1753327290400,"endTime":1753327290482.12,"status":"passed","message":"","name":"C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/CardPlayZone.test.jsx"},{"assertionResults":[{"ancestorTitles":["FinalScorePanel"],"fullName":"FinalScorePanel does not render when finalScore is false","status":"passed","title":"does not render when finalScore is false","duration":19.853100000000268,"failureMessages":[],"meta":{}},{"ancestorTitles":["FinalScorePanel"],"fullName":"FinalScorePanel renders scores and buttons when finalScore is true","status":"passed","title":"renders scores and buttons when finalScore is true","duration":98.02029999999968,"failureMessages":[],"meta":{}},{"ancestorTitles":["FinalScorePanel"],"fullName":"FinalScorePanel calls onNewGame when either button is clicked","status":"passed","title":"calls onNewGame when either button is clicked","duration":7.576000000000022,"failureMessages":[],"meta":{}}],"startTime":1753327290383,"endTime":1753327290508.576,"status":"passed","message":"","name":"C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/FinalScorePanel.test.jsx"},{"assertionResults":[{"ancestorTitles":["GameScreen"],"fullName":"GameScreen renders Submit button and sends discard request when clicked","status":"passed","title":"renders Submit button and sends discard request when clicked","duration":78.97839999999997,"failureMessages":[],"meta":{}}],"startTime":1753327290531,"endTime":1753327290609.9785,"status":"passed","message":"","name":"C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/GameScreen.test.jsx"},{"assertionResults":[{"ancestorTitles":["LobbyScreen"],"fullName":"LobbyScreen renders lobby code and players when fewer than 4 players","status":"passed","title":"renders lobby code and players when fewer than 4 players","duration":86.72550000000024,"failureMessages":[],"meta":{}},{"ancestorTitles":["LobbyScreen"],"fullName":"LobbyScreen renders nothing if 4 players have joined","status":"passed","title":"renders nothing if 4 players have joined","duration":9.44399999999996,"failureMessages":[],"meta":{}}],"startTime":1753327292336,"endTime":1753327292432.444,"status":"passed","message":"","name":"C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/LobbyScreen.test.jsx"},{"assertionResults":[{"ancestorTitles":["ModeSelector"],"fullName":"ModeSelector toggles to multiplayer and shows multiplayer inputs","status":"passed","title":"toggles to multiplayer and shows multiplayer inputs","duration":110.30709999999999,"failureMessages":[],"meta":{}}],"startTime":1753327290418,"endTime":1753327290528.3071,"status":"passed","message":"","name":"C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/ModeSelectorMulti.test.jsx"},{"assertionResults":[{"ancestorTitles":["ModeSelector"],"fullName":"ModeSelector renders single player inputs by default","status":"passed","title":"renders single player inputs by default","duration":112.34940000000006,"failureMessages":[],"meta":{}}],"startTime":1753327290417,"endTime":1753327290529.3494,"status":"passed","message":"","name":"C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/ModeSelectorSingle.test.jsx"},{"assertionResults":[{"ancestorTitles":["PlayerZone"],"fullName":"PlayerZone renders face-up cards when revealHand=true and showHands=true","status":"passed","title":"renders face-up cards when revealHand=true and showHands=true","duration":52.3086000000003,"failureMessages":[],"meta":{}},{"ancestorTitles":["PlayerZone"],"fullName":"PlayerZone renders card backs when revealHand=false","status":"passed","title":"renders card backs when revealHand=false","duration":8.113599999999678,"failureMessages":[],"meta":{}},{"ancestorTitles":["PlayerZone"],"fullName":"PlayerZone clicking a card when not in kitty mode selects it","status":"passed","title":"clicking a card when not in kitty mode selects it","duration":24.250800000000254,"failureMessages":[],"meta":{}},{"ancestorTitles":["PlayerZone"],"fullName":"PlayerZone clicking multiple cards in kitty mode adds/removes from discard pile","status":"passed","title":"clicking multiple cards in kitty mode adds/removes from discard pile","duration":7.691400000000158,"failureMessages":[],"meta":{}}],"startTime":1753327290403,"endTime":1753327290495.6914,"status":"passed","message":"","name":"C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/PlayerZone.test.jsx"},{"assertionResults":[{"ancestorTitles":["Scoreboard"],"fullName":"Scoreboard renders correct scores for viewer on Team A (P1)","status":"passed","title":"renders correct scores for viewer on Team A (P1)","duration":42.66390000000001,"failureMessages":[],"meta":{}},{"ancestorTitles":["Scoreboard"],"fullName":"Scoreboard renders correct scores for viewer on Team B (P2)","status":"passed","title":"renders correct scores for viewer on Team B (P2)","duration":7.181899999999587,"failureMessages":[],"meta":{}},{"ancestorTitles":["Scoreboard"],"fullName":"Scoreboard displays formatted winning bid when available","status":"passed","title":"displays formatted winning bid when available","duration":5.505000000000109,"failureMessages":[],"meta":{}},{"ancestorTitles":["Scoreboard"],"fullName":"Scoreboard displays \"-No\" in winning bid if isNo is true","status":"passed","title":"displays \"-No\" in winning bid if isNo is true","duration":4.5012000000001535,"failureMessages":[],"meta":{}},{"ancestorTitles":["Scoreboard"],"fullName":"Scoreboard does not display bid section if no winning bid","status":"passed","title":"does not display bid section if no winning bid","duration":4.116799999999785,"failureMessages":[],"meta":{}},{"ancestorTitles":["Scoreboard"],"fullName":"Scoreboard renders BidZone if bidType is provided","status":"passed","title":"renders BidZone if bidType is provided","duration":5.065500000000156,"failureMessages":[],"meta":{}},{"ancestorTitles":["Scoreboard"],"fullName":"Scoreboard handles partial winning bid safely","status":"passed","title":"handles partial winning bid safely","duration":3.9023000000001957,"failureMessages":[],"meta":{}}],"startTime":1753327290381,"endTime":1753327290453.9023,"status":"passed","message":"","name":"C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/Scoreboard.test.jsx"},{"assertionResults":[{"ancestorTitles":["SettingsPanel"],"fullName":"SettingsPanel renders heading and buttons","status":"passed","title":"renders heading and buttons","duration":105.62829999999985,"failureMessages":[],"meta":{}},{"ancestorTitles":["SettingsPanel"],"fullName":"SettingsPanel calls applySettings when Apply button is clicked","status":"passed","title":"calls applySettings when Apply button is clicked","duration":22.436099999999897,"failureMessages":[],"meta":{}},{"ancestorTitles":["SettingsPanel"],"fullName":"SettingsPanel calls closeSettings when Close button is clicked","status":"passed","title":"calls closeSettings when Close button is clicked","duration":9.798199999999724,"failureMessages":[],"meta":{}}],"startTime":1753327290362,"endTime":1753327290499.798,"status":"passed","message":"","name":"C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/SettingsPanel.test.jsx"},{"assertionResults":[{"ancestorTitles":["AlertContext"],"fullName":"AlertContext displays alert when showAlert is called","status":"passed","title":"displays alert when showAlert is called","duration":41.32369999999992,"failureMessages":[],"meta":{}},{"ancestorTitles":["AlertContext"],"fullName":"AlertContext closes alert when onClose is called","status":"passed","title":"closes alert when onClose is called","duration":8.896400000000085,"failureMessages":[],"meta":{}}],"startTime":1753327290374,"endTime":1753327290423.8965,"status":"passed","message":"","name":"C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/context/_tests_/AlertContext.test.jsx"},{"assertionResults":[{"ancestorTitles":["GameStateContext"],"fullName":"GameStateContext provides initial state and allows updates","status":"passed","title":"provides initial state and allows updates","duration":38.30030000000011,"failureMessages":[],"meta":{}},{"ancestorTitles":["GameStateContext"],"fullName":"GameStateContext throws error if useGameState is used outside provider","status":"passed","title":"throws error if useGameState is used outside provider","duration":8.530999999999949,"failureMessages":[],"meta":{}}],"startTime":1753327292580,"endTime":1753327292627.531,"status":"passed","message":"","name":"C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/context/_tests_/GameStateContext.test.jsx"},{"assertionResults":[{"ancestorTitles":["PositionContext"],"fullName":"PositionContext provides correct direction mapping and team assignment","status":"passed","title":"provides correct direction mapping and team assignment","duration":43.623299999999745,"failureMessages":[],"meta":{}},{"ancestorTitles":["PositionContext"],"fullName":"PositionContext throws if used outside provider","status":"passed","title":"throws if used outside provider","duration":2.9950999999996384,"failureMessages":[],"meta":{}}],"startTime":1753327290370,"endTime":1753327290415.995,"status":"passed","message":"","name":"C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/context/_tests_/PositionContext.test.jsx"},{"assertionResults":[{"ancestorTitles":["RefContext"],"fullName":"RefContext registers and retrieves refs correctly","status":"passed","title":"registers and retrieves refs correctly","duration":37.91679999999997,"failureMessages":[],"meta":{}},{"ancestorTitles":["RefContext"],"fullName":"RefContext throws an error if used outside RefProvider","status":"passed","title":"throws an error if used outside RefProvider","duration":8.465300000000298,"failureMessages":[],"meta":{}},{"ancestorTitles":["RefContext"],"fullName":"RefContext warns when trying to register invalid ref","status":"passed","title":"warns when trying to register invalid ref","duration":5.099499999999807,"failureMessages":[],"meta":{}}],"startTime":1753327290373,"endTime":1753327290425.0996,"status":"passed","message":"","name":"C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/context/_tests_/RefContext.test.jsx"},{"assertionResults":[{"ancestorTitles":["UIDisplayContext"],"fullName":"UIDisplayContext initializes and updates values correctly","status":"passed","title":"initializes and updates values correctly","duration":43.8728000000001,"failureMessages":[],"meta":{}},{"ancestorTitles":["UIDisplayContext"],"fullName":"UIDisplayContext returns undefined if useUIDisplay is used outside provider","status":"passed","title":"returns undefined if useUIDisplay is used outside provider","duration":3.38149999999996,"failureMessages":[],"meta":{}}],"startTime":1753327292580,"endTime":1753327292627.3816,"status":"passed","message":"","name":"C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/context/_tests_/UIDisplayContext.test.jsx"},{"assertionResults":[{"ancestorTitles":["getAnimationPath"],"fullName":"getAnimationPath returns correct center coordinates for valid refs","status":"passed","title":"returns correct center coordinates for valid refs","duration":5.591000000000122,"failureMessages":[],"meta":{}},{"ancestorTitles":["getAnimationPath"],"fullName":"getAnimationPath returns null if from ref is missing","status":"passed","title":"returns null if from ref is missing","duration":1.5858999999998105,"failureMessages":[],"meta":{}},{"ancestorTitles":["getAnimationPath"],"fullName":"getAnimationPath returns null if to ref is missing","status":"passed","title":"returns null if to ref is missing","duration":1.1208000000001448,"failureMessages":[],"meta":{}}],"startTime":1753327292524,"endTime":1753327292532.1208,"status":"passed","message":"","name":"C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/utils/_tests_/CardAnimations.test.js"},{"assertionResults":[{"ancestorTitles":["getCardPosition"],"fullName":"getCardPosition returns correct center coordinates when ref is valid","status":"passed","title":"returns correct center coordinates when ref is valid","duration":2.4522000000001754,"failureMessages":[],"meta":{}},{"ancestorTitles":["getCardPosition"],"fullName":"getCardPosition returns null if ref is missing","status":"passed","title":"returns null if ref is missing","duration":0.40039999999999054,"failureMessages":[],"meta":{}},{"ancestorTitles":["getCardPosition"],"fullName":"getCardPosition returns null if ref.current is undefined","status":"passed","title":"returns null if ref.current is undefined","duration":0.18219999999996617,"failureMessages":[],"meta":{}}],"startTime":1753327292581,"endTime":1753327292584.4004,"status":"passed","message":"","name":"C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/utils/_tests_/CardRefUtil.test.js"},{"assertionResults":[{"ancestorTitles":["getCardImage"],"fullName":"getCardImage returns the correct image path when card is visible to all","status":"passed","title":"returns the correct image path when card is visible to all","duration":1.8922999999999774,"failureMessages":[],"meta":{}},{"ancestorTitles":["getCardImage"],"fullName":"getCardImage returns the back of the card when visibility is not VISIBLE_TO_ALL","status":"passed","title":"returns the back of the card when visibility is not VISIBLE_TO_ALL","duration":0.36590000000001055,"failureMessages":[],"meta":{}},{"ancestorTitles":["getCardImage"],"fullName":"getCardImage returns the back of the card and warns if card is null","status":"passed","title":"returns the back of the card and warns if card is null","duration":3.5737000000001444,"failureMessages":[],"meta":{}},{"ancestorTitles":["getCardImage"],"fullName":"getCardImage returns the back of the card and warns if card is undefined","status":"passed","title":"returns the back of the card and warns if card is undefined","duration":0.634900000000016,"failureMessages":[],"meta":{}}],"startTime":1753327292487,"endTime":1753327292493.635,"status":"passed","message":"","name":"C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/utils/_tests_/CardUtils.test.js"},{"assertionResults":[{"ancestorTitles":["getPositionMap"],"fullName":"getPositionMap maps correctly when viewer is P1","status":"passed","title":"maps correctly when viewer is P1","duration":2.77780000000007,"failureMessages":[],"meta":{}},{"ancestorTitles":["getPositionMap"],"fullName":"getPositionMap maps correctly when viewer is P2","status":"passed","title":"maps correctly when viewer is P2","duration":0.4721999999999298,"failureMessages":[],"meta":{}},{"ancestorTitles":["getPositionMap"],"fullName":"getPositionMap maps correctly when viewer is P3","status":"passed","title":"maps correctly when viewer is P3","duration":0.26139999999986685,"failureMessages":[],"meta":{}},{"ancestorTitles":["getPositionMap"],"fullName":"getPositionMap maps correctly when viewer is P4","status":"passed","title":"maps correctly when viewer is P4","duration":0.3872000000001208,"failureMessages":[],"meta":{}},{"ancestorTitles":["getPositionMap"],"fullName":"getPositionMap returns empty object and warns if viewer position not found","status":"passed","title":"returns empty object and warns if viewer position not found","duration":3.024800000000141,"failureMessages":[],"meta":{}}],"startTime":1753327292428,"endTime":1753327292435.025,"status":"passed","message":"","name":"C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/utils/_tests_/PositionUtils.test.js"},{"assertionResults":[{"ancestorTitles":["delay"],"fullName":"delay resolves after specified milliseconds","status":"passed","title":"resolves after specified milliseconds","duration":60.60959999999977,"failureMessages":[],"meta":{}},{"ancestorTitles":["delay"],"fullName":"delay resolves immediately for 0ms","status":"passed","title":"resolves immediately for 0ms","duration":17.035300000000007,"failureMessages":[],"meta":{}}],"startTime":1753327290177,"endTime":1753327290254.0354,"status":"passed","message":"","name":"C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/utils/_tests_/TimeUtils.test.js"}]}
+{
+  "numTotalTestSuites": 52,
+  "numPassedTestSuites": 52,
+  "numFailedTestSuites": 0,
+  "numPendingTestSuites": 0,
+  "numTotalTests": 68,
+  "numPassedTests": 67,
+  "numFailedTests": 0,
+  "numPendingTests": 1,
+  "numTodoTests": 0,
+  "snapshot": {
+    "added": 0,
+    "failure": false,
+    "filesAdded": 0,
+    "filesRemoved": 0,
+    "filesRemovedList": [],
+    "filesUnmatched": 0,
+    "filesUpdated": 0,
+    "matched": 0,
+    "total": 0,
+    "unchecked": 0,
+    "uncheckedKeysByFile": [],
+    "unmatched": 0,
+    "updated": 0,
+    "didUpdate": false
+  },
+  "startTime": 1753327287666,
+  "success": true,
+  "testResults": [
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["<App />"],
+          "fullName": "<App /> renders the mocked ModeSelector by default",
+          "status": "passed",
+          "title": "renders the mocked ModeSelector by default",
+          "duration": 48.11229999999978,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["<App />"],
+          "fullName": "<App /> calls startGame and shows GameScreen after fetch",
+          "status": "skipped",
+          "title": "calls startGame and shows GameScreen after fetch",
+          "failureMessages": [],
+          "meta": {}
+        }
+      ],
+      "startTime": 1753327292605,
+      "endTime": 1753327292653.1123,
+      "status": "passed",
+      "message": "",
+      "name": "C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/_tests_/App.test.jsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["dealCardsClockwise"],
+          "fullName": "dealCardsClockwise schedules cards to animate to the correct positions in clockwise rounds",
+          "status": "passed",
+          "title": "schedules cards to animate to the correct positions in clockwise rounds",
+          "duration": 9.530099999999948,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["dealCardsClockwise"],
+          "fullName": "dealCardsClockwise logs a warning if a player ref is missing",
+          "status": "passed",
+          "title": "logs a warning if a player ref is missing",
+          "duration": 2.851599999999962,
+          "failureMessages": [],
+          "meta": {}
+        }
+      ],
+      "startTime": 1753327292398,
+      "endTime": 1753327292410.8516,
+      "status": "passed",
+      "message": "",
+      "name": "C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/animations/_tests_/DealAnimation.test.jsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["PlayCardAnimation"],
+          "fullName": "PlayCardAnimation renders the animated card and calls onComplete after timeout",
+          "status": "passed",
+          "title": "renders the animated card and calls onComplete after timeout",
+          "duration": 40.580900000000156,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["PlayCardAnimation"],
+          "fullName": "PlayCardAnimation does not crash or call onComplete if refs are missing",
+          "status": "passed",
+          "title": "does not crash or call onComplete if refs are missing",
+          "duration": 2.202600000000075,
+          "failureMessages": [],
+          "meta": {}
+        }
+      ],
+      "startTime": 1753327292524,
+      "endTime": 1753327292567.2026,
+      "status": "passed",
+      "message": "",
+      "name": "C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/animations/_tests_/PlayCardAnimation.test.jsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["Alert component"],
+          "fullName": "Alert component renders the message and type class",
+          "status": "passed",
+          "title": "renders the message and type class",
+          "duration": 98.85410000000002,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Alert component"],
+          "fullName": "Alert component calls onClose after 5 seconds",
+          "status": "passed",
+          "title": "calls onClose after 5 seconds",
+          "duration": 6.824699999999666,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Alert component"],
+          "fullName": "Alert component calls onClose when close button is clicked",
+          "status": "passed",
+          "title": "calls onClose when close button is clicked",
+          "duration": 13.194100000000162,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Alert component"],
+          "fullName": "Alert component resets timer when message changes",
+          "status": "passed",
+          "title": "resets timer when message changes",
+          "duration": 3.923400000000129,
+          "failureMessages": [],
+          "meta": {}
+        }
+      ],
+      "startTime": 1753327290385,
+      "endTime": 1753327290507.9233,
+      "status": "passed",
+      "message": "",
+      "name": "C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/Alert.test.jsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["AnimatedCard component"],
+          "fullName": "AnimatedCard component renders the card at the initial position",
+          "status": "passed",
+          "title": "renders the card at the initial position",
+          "duration": 86.52840000000015,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["AnimatedCard component"],
+          "fullName": "AnimatedCard component moves the card to the destination and calls onComplete",
+          "status": "passed",
+          "title": "moves the card to the destination and calls onComplete",
+          "duration": 7.41170000000011,
+          "failureMessages": [],
+          "meta": {}
+        }
+      ],
+      "startTime": 1753327290399,
+      "endTime": 1753327290493.4116,
+      "status": "passed",
+      "message": "",
+      "name": "C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/AnimatedCard.test.jsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["BiddingPanel component"],
+          "fullName": "BiddingPanel component renders bidding UI when visible",
+          "status": "passed",
+          "title": "renders bidding UI when visible",
+          "duration": 52.31359999999995,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["BiddingPanel component"],
+          "fullName": "BiddingPanel component updates bid input and checkbox",
+          "status": "passed",
+          "title": "updates bid input and checkbox",
+          "duration": 73.9989999999998,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["BiddingPanel component"],
+          "fullName": "BiddingPanel component calls fetch when \"Pass\" is clicked",
+          "status": "passed",
+          "title": "calls fetch when \"Pass\" is clicked",
+          "duration": 9.619400000000041,
+          "failureMessages": [],
+          "meta": {}
+        }
+      ],
+      "startTime": 1753327290421,
+      "endTime": 1753327290556.6194,
+      "status": "passed",
+      "message": "",
+      "name": "C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/BiddingPanel.test.jsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["BidZone"],
+          "fullName": "BidZone renders bid history when bidPhase is true",
+          "status": "passed",
+          "title": "renders bid history when bidPhase is true",
+          "duration": 46.32400000000007,
+          "failureMessages": [],
+          "meta": {}
+        }
+      ],
+      "startTime": 1753327292583,
+      "endTime": 1753327292629.324,
+      "status": "passed",
+      "message": "",
+      "name": "C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/BidZone.test.jsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["<CardPlayZone />"],
+          "fullName": "<CardPlayZone /> renders without crashing",
+          "status": "passed",
+          "title": "renders without crashing",
+          "duration": 47.11740000000009,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["<CardPlayZone />"],
+          "fullName": "<CardPlayZone /> handles card drop correctly",
+          "status": "passed",
+          "title": "handles card drop correctly",
+          "duration": 35.12019999999984,
+          "failureMessages": [],
+          "meta": {}
+        }
+      ],
+      "startTime": 1753327290400,
+      "endTime": 1753327290482.12,
+      "status": "passed",
+      "message": "",
+      "name": "C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/CardPlayZone.test.jsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["FinalScorePanel"],
+          "fullName": "FinalScorePanel does not render when finalScore is false",
+          "status": "passed",
+          "title": "does not render when finalScore is false",
+          "duration": 19.853100000000268,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["FinalScorePanel"],
+          "fullName": "FinalScorePanel renders scores and buttons when finalScore is true",
+          "status": "passed",
+          "title": "renders scores and buttons when finalScore is true",
+          "duration": 98.02029999999968,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["FinalScorePanel"],
+          "fullName": "FinalScorePanel calls onNewGame when either button is clicked",
+          "status": "passed",
+          "title": "calls onNewGame when either button is clicked",
+          "duration": 7.576000000000022,
+          "failureMessages": [],
+          "meta": {}
+        }
+      ],
+      "startTime": 1753327290383,
+      "endTime": 1753327290508.576,
+      "status": "passed",
+      "message": "",
+      "name": "C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/FinalScorePanel.test.jsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["GameScreen"],
+          "fullName": "GameScreen renders Submit button and sends discard request when clicked",
+          "status": "passed",
+          "title": "renders Submit button and sends discard request when clicked",
+          "duration": 78.97839999999997,
+          "failureMessages": [],
+          "meta": {}
+        }
+      ],
+      "startTime": 1753327290531,
+      "endTime": 1753327290609.9785,
+      "status": "passed",
+      "message": "",
+      "name": "C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/GameScreen.test.jsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["LobbyScreen"],
+          "fullName": "LobbyScreen renders lobby code and players when fewer than 4 players",
+          "status": "passed",
+          "title": "renders lobby code and players when fewer than 4 players",
+          "duration": 86.72550000000024,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["LobbyScreen"],
+          "fullName": "LobbyScreen renders nothing if 4 players have joined",
+          "status": "passed",
+          "title": "renders nothing if 4 players have joined",
+          "duration": 9.44399999999996,
+          "failureMessages": [],
+          "meta": {}
+        }
+      ],
+      "startTime": 1753327292336,
+      "endTime": 1753327292432.444,
+      "status": "passed",
+      "message": "",
+      "name": "C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/LobbyScreen.test.jsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["ModeSelector"],
+          "fullName": "ModeSelector toggles to multiplayer and shows multiplayer inputs",
+          "status": "passed",
+          "title": "toggles to multiplayer and shows multiplayer inputs",
+          "duration": 110.30709999999999,
+          "failureMessages": [],
+          "meta": {}
+        }
+      ],
+      "startTime": 1753327290418,
+      "endTime": 1753327290528.3071,
+      "status": "passed",
+      "message": "",
+      "name": "C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/ModeSelectorMulti.test.jsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["ModeSelector"],
+          "fullName": "ModeSelector renders single player inputs by default",
+          "status": "passed",
+          "title": "renders single player inputs by default",
+          "duration": 112.34940000000006,
+          "failureMessages": [],
+          "meta": {}
+        }
+      ],
+      "startTime": 1753327290417,
+      "endTime": 1753327290529.3494,
+      "status": "passed",
+      "message": "",
+      "name": "C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/ModeSelectorSingle.test.jsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["PlayerZone"],
+          "fullName": "PlayerZone renders face-up cards when revealHand=true and showHands=true",
+          "status": "passed",
+          "title": "renders face-up cards when revealHand=true and showHands=true",
+          "duration": 52.3086000000003,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["PlayerZone"],
+          "fullName": "PlayerZone renders card backs when revealHand=false",
+          "status": "passed",
+          "title": "renders card backs when revealHand=false",
+          "duration": 8.113599999999678,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["PlayerZone"],
+          "fullName": "PlayerZone clicking a card when not in kitty mode selects it",
+          "status": "passed",
+          "title": "clicking a card when not in kitty mode selects it",
+          "duration": 24.250800000000254,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["PlayerZone"],
+          "fullName": "PlayerZone clicking multiple cards in kitty mode adds/removes from discard pile",
+          "status": "passed",
+          "title": "clicking multiple cards in kitty mode adds/removes from discard pile",
+          "duration": 7.691400000000158,
+          "failureMessages": [],
+          "meta": {}
+        }
+      ],
+      "startTime": 1753327290403,
+      "endTime": 1753327290495.6914,
+      "status": "passed",
+      "message": "",
+      "name": "C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/PlayerZone.test.jsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["Scoreboard"],
+          "fullName": "Scoreboard renders correct scores for viewer on Team A (P1)",
+          "status": "passed",
+          "title": "renders correct scores for viewer on Team A (P1)",
+          "duration": 42.66390000000001,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Scoreboard"],
+          "fullName": "Scoreboard renders correct scores for viewer on Team B (P2)",
+          "status": "passed",
+          "title": "renders correct scores for viewer on Team B (P2)",
+          "duration": 7.181899999999587,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Scoreboard"],
+          "fullName": "Scoreboard displays formatted winning bid when available",
+          "status": "passed",
+          "title": "displays formatted winning bid when available",
+          "duration": 5.505000000000109,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Scoreboard"],
+          "fullName": "Scoreboard displays \"-No\" in winning bid if isNo is true",
+          "status": "passed",
+          "title": "displays \"-No\" in winning bid if isNo is true",
+          "duration": 4.5012000000001535,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Scoreboard"],
+          "fullName": "Scoreboard does not display bid section if no winning bid",
+          "status": "passed",
+          "title": "does not display bid section if no winning bid",
+          "duration": 4.116799999999785,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Scoreboard"],
+          "fullName": "Scoreboard renders BidZone if bidType is provided",
+          "status": "passed",
+          "title": "renders BidZone if bidType is provided",
+          "duration": 5.065500000000156,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Scoreboard"],
+          "fullName": "Scoreboard handles partial winning bid safely",
+          "status": "passed",
+          "title": "handles partial winning bid safely",
+          "duration": 3.9023000000001957,
+          "failureMessages": [],
+          "meta": {}
+        }
+      ],
+      "startTime": 1753327290381,
+      "endTime": 1753327290453.9023,
+      "status": "passed",
+      "message": "",
+      "name": "C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/Scoreboard.test.jsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["SettingsPanel"],
+          "fullName": "SettingsPanel renders heading and buttons",
+          "status": "passed",
+          "title": "renders heading and buttons",
+          "duration": 105.62829999999985,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["SettingsPanel"],
+          "fullName": "SettingsPanel calls applySettings when Apply button is clicked",
+          "status": "passed",
+          "title": "calls applySettings when Apply button is clicked",
+          "duration": 22.436099999999897,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["SettingsPanel"],
+          "fullName": "SettingsPanel calls closeSettings when Close button is clicked",
+          "status": "passed",
+          "title": "calls closeSettings when Close button is clicked",
+          "duration": 9.798199999999724,
+          "failureMessages": [],
+          "meta": {}
+        }
+      ],
+      "startTime": 1753327290362,
+      "endTime": 1753327290499.798,
+      "status": "passed",
+      "message": "",
+      "name": "C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/SettingsPanel.test.jsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["AlertContext"],
+          "fullName": "AlertContext displays alert when showAlert is called",
+          "status": "passed",
+          "title": "displays alert when showAlert is called",
+          "duration": 41.32369999999992,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["AlertContext"],
+          "fullName": "AlertContext closes alert when onClose is called",
+          "status": "passed",
+          "title": "closes alert when onClose is called",
+          "duration": 8.896400000000085,
+          "failureMessages": [],
+          "meta": {}
+        }
+      ],
+      "startTime": 1753327290374,
+      "endTime": 1753327290423.8965,
+      "status": "passed",
+      "message": "",
+      "name": "C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/context/_tests_/AlertContext.test.jsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["GameStateContext"],
+          "fullName": "GameStateContext provides initial state and allows updates",
+          "status": "passed",
+          "title": "provides initial state and allows updates",
+          "duration": 38.30030000000011,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["GameStateContext"],
+          "fullName": "GameStateContext throws error if useGameState is used outside provider",
+          "status": "passed",
+          "title": "throws error if useGameState is used outside provider",
+          "duration": 8.530999999999949,
+          "failureMessages": [],
+          "meta": {}
+        }
+      ],
+      "startTime": 1753327292580,
+      "endTime": 1753327292627.531,
+      "status": "passed",
+      "message": "",
+      "name": "C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/context/_tests_/GameStateContext.test.jsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["PositionContext"],
+          "fullName": "PositionContext provides correct direction mapping and team assignment",
+          "status": "passed",
+          "title": "provides correct direction mapping and team assignment",
+          "duration": 43.623299999999745,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["PositionContext"],
+          "fullName": "PositionContext throws if used outside provider",
+          "status": "passed",
+          "title": "throws if used outside provider",
+          "duration": 2.9950999999996384,
+          "failureMessages": [],
+          "meta": {}
+        }
+      ],
+      "startTime": 1753327290370,
+      "endTime": 1753327290415.995,
+      "status": "passed",
+      "message": "",
+      "name": "C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/context/_tests_/PositionContext.test.jsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["RefContext"],
+          "fullName": "RefContext registers and retrieves refs correctly",
+          "status": "passed",
+          "title": "registers and retrieves refs correctly",
+          "duration": 37.91679999999997,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["RefContext"],
+          "fullName": "RefContext throws an error if used outside RefProvider",
+          "status": "passed",
+          "title": "throws an error if used outside RefProvider",
+          "duration": 8.465300000000298,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["RefContext"],
+          "fullName": "RefContext warns when trying to register invalid ref",
+          "status": "passed",
+          "title": "warns when trying to register invalid ref",
+          "duration": 5.099499999999807,
+          "failureMessages": [],
+          "meta": {}
+        }
+      ],
+      "startTime": 1753327290373,
+      "endTime": 1753327290425.0996,
+      "status": "passed",
+      "message": "",
+      "name": "C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/context/_tests_/RefContext.test.jsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["UIDisplayContext"],
+          "fullName": "UIDisplayContext initializes and updates values correctly",
+          "status": "passed",
+          "title": "initializes and updates values correctly",
+          "duration": 43.8728000000001,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["UIDisplayContext"],
+          "fullName": "UIDisplayContext returns undefined if useUIDisplay is used outside provider",
+          "status": "passed",
+          "title": "returns undefined if useUIDisplay is used outside provider",
+          "duration": 3.38149999999996,
+          "failureMessages": [],
+          "meta": {}
+        }
+      ],
+      "startTime": 1753327292580,
+      "endTime": 1753327292627.3816,
+      "status": "passed",
+      "message": "",
+      "name": "C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/context/_tests_/UIDisplayContext.test.jsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["getAnimationPath"],
+          "fullName": "getAnimationPath returns correct center coordinates for valid refs",
+          "status": "passed",
+          "title": "returns correct center coordinates for valid refs",
+          "duration": 5.591000000000122,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["getAnimationPath"],
+          "fullName": "getAnimationPath returns null if from ref is missing",
+          "status": "passed",
+          "title": "returns null if from ref is missing",
+          "duration": 1.5858999999998105,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["getAnimationPath"],
+          "fullName": "getAnimationPath returns null if to ref is missing",
+          "status": "passed",
+          "title": "returns null if to ref is missing",
+          "duration": 1.1208000000001448,
+          "failureMessages": [],
+          "meta": {}
+        }
+      ],
+      "startTime": 1753327292524,
+      "endTime": 1753327292532.1208,
+      "status": "passed",
+      "message": "",
+      "name": "C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/utils/_tests_/CardAnimations.test.js"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["getCardPosition"],
+          "fullName": "getCardPosition returns correct center coordinates when ref is valid",
+          "status": "passed",
+          "title": "returns correct center coordinates when ref is valid",
+          "duration": 2.4522000000001754,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["getCardPosition"],
+          "fullName": "getCardPosition returns null if ref is missing",
+          "status": "passed",
+          "title": "returns null if ref is missing",
+          "duration": 0.40039999999999054,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["getCardPosition"],
+          "fullName": "getCardPosition returns null if ref.current is undefined",
+          "status": "passed",
+          "title": "returns null if ref.current is undefined",
+          "duration": 0.18219999999996617,
+          "failureMessages": [],
+          "meta": {}
+        }
+      ],
+      "startTime": 1753327292581,
+      "endTime": 1753327292584.4004,
+      "status": "passed",
+      "message": "",
+      "name": "C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/utils/_tests_/CardRefUtil.test.js"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["getCardImage"],
+          "fullName": "getCardImage returns the correct image path when card is visible to all",
+          "status": "passed",
+          "title": "returns the correct image path when card is visible to all",
+          "duration": 1.8922999999999774,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["getCardImage"],
+          "fullName": "getCardImage returns the back of the card when visibility is not VISIBLE_TO_ALL",
+          "status": "passed",
+          "title": "returns the back of the card when visibility is not VISIBLE_TO_ALL",
+          "duration": 0.36590000000001055,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["getCardImage"],
+          "fullName": "getCardImage returns the back of the card and warns if card is null",
+          "status": "passed",
+          "title": "returns the back of the card and warns if card is null",
+          "duration": 3.5737000000001444,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["getCardImage"],
+          "fullName": "getCardImage returns the back of the card and warns if card is undefined",
+          "status": "passed",
+          "title": "returns the back of the card and warns if card is undefined",
+          "duration": 0.634900000000016,
+          "failureMessages": [],
+          "meta": {}
+        }
+      ],
+      "startTime": 1753327292487,
+      "endTime": 1753327292493.635,
+      "status": "passed",
+      "message": "",
+      "name": "C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/utils/_tests_/CardUtils.test.js"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["getPositionMap"],
+          "fullName": "getPositionMap maps correctly when viewer is P1",
+          "status": "passed",
+          "title": "maps correctly when viewer is P1",
+          "duration": 2.77780000000007,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["getPositionMap"],
+          "fullName": "getPositionMap maps correctly when viewer is P2",
+          "status": "passed",
+          "title": "maps correctly when viewer is P2",
+          "duration": 0.4721999999999298,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["getPositionMap"],
+          "fullName": "getPositionMap maps correctly when viewer is P3",
+          "status": "passed",
+          "title": "maps correctly when viewer is P3",
+          "duration": 0.26139999999986685,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["getPositionMap"],
+          "fullName": "getPositionMap maps correctly when viewer is P4",
+          "status": "passed",
+          "title": "maps correctly when viewer is P4",
+          "duration": 0.3872000000001208,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["getPositionMap"],
+          "fullName": "getPositionMap returns empty object and warns if viewer position not found",
+          "status": "passed",
+          "title": "returns empty object and warns if viewer position not found",
+          "duration": 3.024800000000141,
+          "failureMessages": [],
+          "meta": {}
+        }
+      ],
+      "startTime": 1753327292428,
+      "endTime": 1753327292435.025,
+      "status": "passed",
+      "message": "",
+      "name": "C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/utils/_tests_/PositionUtils.test.js"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["delay"],
+          "fullName": "delay resolves after specified milliseconds",
+          "status": "passed",
+          "title": "resolves after specified milliseconds",
+          "duration": 60.60959999999977,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["delay"],
+          "fullName": "delay resolves immediately for 0ms",
+          "status": "passed",
+          "title": "resolves immediately for 0ms",
+          "duration": 17.035300000000007,
+          "failureMessages": [],
+          "meta": {}
+        }
+      ],
+      "startTime": 1753327290177,
+      "endTime": 1753327290254.0354,
+      "status": "passed",
+      "message": "",
+      "name": "C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/utils/_tests_/TimeUtils.test.js"
+    }
+  ]
+}

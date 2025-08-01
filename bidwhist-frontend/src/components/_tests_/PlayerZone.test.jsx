@@ -45,14 +45,7 @@ describe('PlayerZone (minimal behavior)', () => {
   });
 
   it('renders player zone with face-up cards and name (south)', () => {
-    render(
-      <PlayerZone
-        direction="south"
-        name="Test Player"
-        revealHand={true}
-        cards={mockCards}
-      />
-    );
+    render(<PlayerZone direction="south" name="Test Player" revealHand={true} cards={mockCards} />);
 
     expect(screen.getByText('Test Player')).toBeInTheDocument();
     const images = screen.getAllByRole('img');
@@ -62,31 +55,19 @@ describe('PlayerZone (minimal behavior)', () => {
   });
 
   it('renders card backs when revealHand is false', () => {
-    render(
-      <PlayerZone
-        direction="west"
-        name="Player West"
-        revealHand={false}
-        cards={mockCards}
-      />
-    );
+    render(<PlayerZone direction="west" name="Player West" revealHand={false} cards={mockCards} />);
 
     expect(screen.getByText('Player West')).toBeInTheDocument();
     const images = screen.getAllByRole('img');
     expect(images).toHaveLength(2);
-    images.forEach(img => {
+    images.forEach((img) => {
       expect(img).toHaveAttribute('src', '/static/img/deck/Deck_Back.png');
     });
   });
 
   it('highlights card on click when not discarding (awardKitty = false)', () => {
     render(
-      <PlayerZone
-        direction="south"
-        name="Click Tester"
-        revealHand={true}
-        cards={mockCards}
-      />
+      <PlayerZone direction="south" name="Click Tester" revealHand={true} cards={mockCards} />
     );
 
     const firstCard = screen.getAllByRole('img')[0];

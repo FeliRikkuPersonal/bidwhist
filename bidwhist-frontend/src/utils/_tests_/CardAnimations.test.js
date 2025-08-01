@@ -15,10 +15,18 @@ describe('getAnimationPath', () => {
     vi.spyOn(RefContext, 'useZoneRefs').mockReturnValue({
       get: (key) => {
         if (key === 'from') {
-          return { current: { getBoundingClientRect: () => ({ left: 10, top: 20, width: 100, height: 50 }) } };
+          return {
+            current: {
+              getBoundingClientRect: () => ({ left: 10, top: 20, width: 100, height: 50 }),
+            },
+          };
         }
         if (key === 'to') {
-          return { current: { getBoundingClientRect: () => ({ left: 210, top: 120, width: 60, height: 40 }) } };
+          return {
+            current: {
+              getBoundingClientRect: () => ({ left: 210, top: 120, width: 60, height: 40 }),
+            },
+          };
         }
         return null;
       },
@@ -36,9 +44,14 @@ describe('getAnimationPath', () => {
 
   it('returns null if from ref is missing', () => {
     RefContext.useZoneRefs.mockReturnValueOnce({
-      get: (key) => (key === 'to'
-        ? { current: { getBoundingClientRect: () => ({ left: 210, top: 120, width: 60, height: 40 }) } }
-        : null),
+      get: (key) =>
+        key === 'to'
+          ? {
+              current: {
+                getBoundingClientRect: () => ({ left: 210, top: 120, width: 60, height: 40 }),
+              },
+            }
+          : null,
     });
 
     const result = getAnimationPath('from', 'to');
@@ -47,9 +60,14 @@ describe('getAnimationPath', () => {
 
   it('returns null if to ref is missing', () => {
     RefContext.useZoneRefs.mockReturnValueOnce({
-      get: (key) => (key === 'from'
-        ? { current: { getBoundingClientRect: () => ({ left: 10, top: 20, width: 100, height: 50 }) } }
-        : null),
+      get: (key) =>
+        key === 'from'
+          ? {
+              current: {
+                getBoundingClientRect: () => ({ left: 10, top: 20, width: 100, height: 50 }),
+              },
+            }
+          : null,
     });
 
     const result = getAnimationPath('from', 'to');

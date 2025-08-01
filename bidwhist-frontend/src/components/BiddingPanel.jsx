@@ -74,7 +74,7 @@ export default function BiddingPanel({ closeBidding, onBidPlaced }) {
       setCurrentTurnIndex(bidData.currentTurnIndex);
       closeBidding();
     } else {
-      throwAlert(bidData, 'warning')
+      throwAlert(bidData, 'warning');
       console.error('Bid failed:', bidData);
     }
   };
@@ -114,26 +114,31 @@ export default function BiddingPanel({ closeBidding, onBidPlaced }) {
           className="index-input-box short-box enter-bid-input"
         />
         <label>
-          <input
-            type="checkbox"
-            checked={isNo}
-            onChange={(e) => setIsNo(e.target.checked)}
-          />
+          <input type="checkbox" checked={isNo} onChange={(e) => setIsNo(e.target.checked)} />
           No Trump
         </label>
         <div className="settings-actions">
           <button onClick={placeBid} className="index-button settings-button">
             Set Bid
           </button>
-          {!forcedBid &&
+          {!forcedBid && (
             <button onClick={passBid} className="index-button settings-button">
               Pass
             </button>
-          }
+          )}
           <button
             onClick={() =>
-              handleQuit({ viewerPosition, gameId, savedMode, API, clearUIContext, clearGameStateContext })}
-            className="index-button settings-button">
+              handleQuit({
+                viewerPosition,
+                gameId,
+                savedMode,
+                API,
+                clearUIContext,
+                clearGameStateContext,
+              })
+            }
+            className="index-button settings-button"
+          >
             Quit
           </button>
         </div>

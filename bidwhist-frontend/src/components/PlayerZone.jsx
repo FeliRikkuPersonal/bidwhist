@@ -39,7 +39,7 @@ const PlayerZone = forwardRef(({ direction, name, revealHand, cards = [] }, ref)
   const zoneRef = useRef();
   const { register } = useZoneRefs();
 
-    const throwAlert = useThrowAlert();
+  const throwAlert = useThrowAlert();
 
   /**
    * Handles clicks on cards for both discard and regular play modes.
@@ -90,7 +90,6 @@ const PlayerZone = forwardRef(({ direction, name, revealHand, cards = [] }, ref)
       register(`zone-${direction}`, ref);
     }
   }, [direction, register, ref]);
-
 
   /**
    * Exposes getPosition() to parent via ref.

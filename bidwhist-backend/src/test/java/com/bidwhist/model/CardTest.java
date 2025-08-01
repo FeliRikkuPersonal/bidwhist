@@ -6,9 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.jupiter.api.Test;
-
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import org.junit.jupiter.api.Test;
 
 @JsonPropertyOrder({"rank", "suit"})
 public class CardTest {
@@ -44,16 +43,15 @@ public class CardTest {
     Card tenOfClubs = new Card(Suit.CLUBS, Rank.TEN);
     Card twoOfHearts = new Card(Suit.HEARTS, Rank.TWO);
 
-System.out.println("twoOfClubs suit: " + twoOfClubs.getSuit());
-System.out.println("tenOfClubs suit: " + tenOfClubs.getSuit());
-System.out.println("suit compare: " + twoOfClubs.getSuit().compareTo(tenOfClubs.getSuit()));
-System.out.println("rank compare: " + twoOfClubs.getRank().compareTo(tenOfClubs.getRank()));
-System.out.println("final result: " + twoOfClubs.compareTo(tenOfClubs));
+    System.out.println("twoOfClubs suit: " + twoOfClubs.getSuit());
+    System.out.println("tenOfClubs suit: " + tenOfClubs.getSuit());
+    System.out.println("suit compare: " + twoOfClubs.getSuit().compareTo(tenOfClubs.getSuit()));
+    System.out.println("rank compare: " + twoOfClubs.getRank().compareTo(tenOfClubs.getRank()));
+    System.out.println("final result: " + twoOfClubs.compareTo(tenOfClubs));
 
     assertTrue(jokerSmall.compareTo(jokerBig) < 0);
     assertTrue(jokerSmall.compareTo(twoOfHearts) > 0);
-    assertTrue(twoOfClubs.compareTo(tenOfClubs) < 0 );
+    assertTrue(twoOfClubs.compareTo(tenOfClubs) < 0);
     assertTrue(twoOfHearts.compareTo(tenOfClubs) < 0);
   }
-
 }

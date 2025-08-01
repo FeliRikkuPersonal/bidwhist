@@ -20,7 +20,8 @@ import { useUIDisplay } from '../context/UIDisplayContext';
  * @returns {JSX.Element} Game mode selection interface
  */
 function ModeSelector({ onStartGame }) {
-  const { setGameId, mode, setMode, difficulty, setDifficulty, clearGameStateContext } = useGameState();
+  const { setGameId, mode, setMode, difficulty, setDifficulty, clearGameStateContext } =
+    useGameState();
   const { setPlayerName, setViewerPosition, setViewerTeam } = usePositionContext();
   const { showAlert } = useAlert();
   const throwAlert = useThrowAlert();
@@ -33,23 +34,22 @@ function ModeSelector({ onStartGame }) {
   /**
    * Starts a single-player game using a generated lobby code.
    */
-const handleStart = async () => {
-  const trimmedName = newPlayerName.trim();
-  if (!trimmedName) {
-    showAlert('Cannot start game with empty name.');
-    return;
-  }
+  const handleStart = async () => {
+    const trimmedName = newPlayerName.trim();
+    if (!trimmedName) {
+      showAlert('Cannot start game with empty name.');
+      return;
+    }
 
-  const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+    const code = Math.random().toString(36).substring(2, 8).toUpperCase();
 
-  await clearAllGameData({clearUIContext, clearGameStateContext}); // wait for the cleanup to finish
+    await clearAllGameData({ clearUIContext, clearGameStateContext }); // wait for the cleanup to finish
 
-  setPlayerName(trimmedName);
-  setMode('single');  
-  setGameId(code);
-  onStartGame(trimmedName, difficulty, code);
-};
-
+    setPlayerName(trimmedName);
+    setMode('single');
+    setGameId(code);
+    onStartGame(trimmedName, difficulty, code);
+  };
 
   /**
    * Joins an existing multiplayer game via POST request to /game/join.
@@ -81,7 +81,6 @@ const handleStart = async () => {
         setPlayers(data.players);
         const positionNameMap = Object.fromEntries(data.players.map((p) => [p.position, p.name]));
         setBackendPositions(positionNameMap);
-
       } else {
         throwAlert(data, 'error');
         console.error('Failed to join game:', data);

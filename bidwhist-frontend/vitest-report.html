@@ -1,541 +1,532 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Vitest Report</title>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    font-size: 11px;
-    line-height: 1;
-    padding: 1.2rem;
-    background: #f9f9f9;
-    color: #333;
-  }
+  <head>
+    <meta charset="UTF-8" />
+    <title>Vitest Report</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        font-size: 11px;
+        line-height: 1;
+        padding: 1.2rem;
+        background: #f9f9f9;
+        color: #333;
+      }
 
-  h1 {
-    font-size: 16px;
-    margin-bottom: 0.5rem;
-    color: #222;
-  }
+      h1 {
+        font-size: 16px;
+        margin-bottom: 0.5rem;
+        color: #222;
+      }
 
-  h2 {
-    font-size: 13px;
-    margin-top: 1.5rem;
-    margin-bottom: 0.5rem;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 0.25rem;
-  }
+      h2 {
+        font-size: 13px;
+        margin-top: 1.5rem;
+        margin-bottom: 0.5rem;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 0.25rem;
+      }
 
-  .test-file {
-    margin-bottom: 1rem;
-  }
+      .test-file {
+        margin-bottom: 1rem;
+      }
 
-  .test {
-    border-left: 4px solid #ccc;
-    padding: 0.5rem;
-    margin: 0.5rem 0;
-    background: #fff;
-    font-size: 12px;
-  }
+      .test {
+        border-left: 4px solid #ccc;
+        padding: 0.5rem;
+        margin: 0.5rem 0;
+        background: #fff;
+        font-size: 12px;
+      }
 
-  .passed {
-    border-color: green;
-  }
+      .passed {
+        border-color: green;
+      }
 
-  .failed {
-    border-color: red;
-    background: #fff1f1;
-  }
+      .failed {
+        border-color: red;
+        background: #fff1f1;
+      }
 
-  .test-title {
-    font-weight: bold;
-    margin-bottom: 0.25rem;
-  }
+      .test-title {
+        font-weight: bold;
+        margin-bottom: 0.25rem;
+      }
 
-  .error {
-    color: #c00;
-    white-space: pre-wrap;
-    font-size: 12px;
-    margin-top: 0.25rem;
-  }
-</style>
+      .error {
+        color: #c00;
+        white-space: pre-wrap;
+        font-size: 12px;
+        margin-top: 0.25rem;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Vitest Test Report</h1>
+    <p><strong>Total:</strong> 68 | ✅ Passed: 67 | ❌ Failed: 0</p>
 
-</head>
-<body>
-  <h1>Vitest Test Report</h1>
-  <p><strong>Total:</strong> 68 | ✅ Passed: 67 | ❌ Failed: 0</p>
-  
     <div class="test-file">
       <h2>C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/_tests_/App.test.jsx</h2>
-      
-        <div class="test passed">
-          <div class="test-title"><App /> renders the mocked ModeSelector by default</div>
-          
-        </div>
-      
-        <div class="test skipped">
-          <div class="test-title"><App /> calls startGame and shows GameScreen after fetch</div>
-          
-        </div>
-      
+
+      <div class="test passed">
+        <div class="test-title"><App /> renders the mocked ModeSelector by default</div>
+      </div>
+
+      <div class="test skipped">
+        <div class="test-title"><App /> calls startGame and shows GameScreen after fetch</div>
+      </div>
     </div>
-  
+
     <div class="test-file">
-      <h2>C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/animations/_tests_/DealAnimation.test.jsx</h2>
-      
-        <div class="test passed">
-          <div class="test-title">dealCardsClockwise schedules cards to animate to the correct positions in clockwise rounds</div>
-          
+      <h2>
+        C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/animations/_tests_/DealAnimation.test.jsx
+      </h2>
+
+      <div class="test passed">
+        <div class="test-title">
+          dealCardsClockwise schedules cards to animate to the correct positions in clockwise rounds
         </div>
-      
-        <div class="test passed">
-          <div class="test-title">dealCardsClockwise logs a warning if a player ref is missing</div>
-          
-        </div>
-      
+      </div>
+
+      <div class="test passed">
+        <div class="test-title">dealCardsClockwise logs a warning if a player ref is missing</div>
+      </div>
     </div>
-  
+
     <div class="test-file">
-      <h2>C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/animations/_tests_/PlayCardAnimation.test.jsx</h2>
-      
-        <div class="test passed">
-          <div class="test-title">PlayCardAnimation renders the animated card and calls onComplete after timeout</div>
-          
+      <h2>
+        C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/animations/_tests_/PlayCardAnimation.test.jsx
+      </h2>
+
+      <div class="test passed">
+        <div class="test-title">
+          PlayCardAnimation renders the animated card and calls onComplete after timeout
         </div>
-      
-        <div class="test passed">
-          <div class="test-title">PlayCardAnimation does not crash or call onComplete if refs are missing</div>
-          
+      </div>
+
+      <div class="test passed">
+        <div class="test-title">
+          PlayCardAnimation does not crash or call onComplete if refs are missing
         </div>
-      
+      </div>
     </div>
-  
+
     <div class="test-file">
-      <h2>C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/Alert.test.jsx</h2>
-      
-        <div class="test passed">
-          <div class="test-title">Alert component renders the message and type class</div>
-          
-        </div>
-      
-        <div class="test passed">
-          <div class="test-title">Alert component calls onClose after 5 seconds</div>
-          
-        </div>
-      
-        <div class="test passed">
-          <div class="test-title">Alert component calls onClose when close button is clicked</div>
-          
-        </div>
-      
-        <div class="test passed">
-          <div class="test-title">Alert component resets timer when message changes</div>
-          
-        </div>
-      
+      <h2>
+        C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/Alert.test.jsx
+      </h2>
+
+      <div class="test passed">
+        <div class="test-title">Alert component renders the message and type class</div>
+      </div>
+
+      <div class="test passed">
+        <div class="test-title">Alert component calls onClose after 5 seconds</div>
+      </div>
+
+      <div class="test passed">
+        <div class="test-title">Alert component calls onClose when close button is clicked</div>
+      </div>
+
+      <div class="test passed">
+        <div class="test-title">Alert component resets timer when message changes</div>
+      </div>
     </div>
-  
+
     <div class="test-file">
-      <h2>C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/AnimatedCard.test.jsx</h2>
-      
-        <div class="test passed">
-          <div class="test-title">AnimatedCard component renders the card at the initial position</div>
-          
+      <h2>
+        C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/AnimatedCard.test.jsx
+      </h2>
+
+      <div class="test passed">
+        <div class="test-title">
+          AnimatedCard component renders the card at the initial position
         </div>
-      
-        <div class="test passed">
-          <div class="test-title">AnimatedCard component moves the card to the destination and calls onComplete</div>
-          
+      </div>
+
+      <div class="test passed">
+        <div class="test-title">
+          AnimatedCard component moves the card to the destination and calls onComplete
         </div>
-      
+      </div>
     </div>
-  
+
     <div class="test-file">
-      <h2>C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/BiddingPanel.test.jsx</h2>
-      
-        <div class="test passed">
-          <div class="test-title">BiddingPanel component renders bidding UI when visible</div>
-          
-        </div>
-      
-        <div class="test passed">
-          <div class="test-title">BiddingPanel component updates bid input and checkbox</div>
-          
-        </div>
-      
-        <div class="test passed">
-          <div class="test-title">BiddingPanel component calls fetch when "Pass" is clicked</div>
-          
-        </div>
-      
+      <h2>
+        C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/BiddingPanel.test.jsx
+      </h2>
+
+      <div class="test passed">
+        <div class="test-title">BiddingPanel component renders bidding UI when visible</div>
+      </div>
+
+      <div class="test passed">
+        <div class="test-title">BiddingPanel component updates bid input and checkbox</div>
+      </div>
+
+      <div class="test passed">
+        <div class="test-title">BiddingPanel component calls fetch when "Pass" is clicked</div>
+      </div>
     </div>
-  
+
     <div class="test-file">
-      <h2>C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/BidZone.test.jsx</h2>
-      
-        <div class="test passed">
-          <div class="test-title">BidZone renders bid history when bidPhase is true</div>
-          
-        </div>
-      
+      <h2>
+        C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/BidZone.test.jsx
+      </h2>
+
+      <div class="test passed">
+        <div class="test-title">BidZone renders bid history when bidPhase is true</div>
+      </div>
     </div>
-  
+
     <div class="test-file">
-      <h2>C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/CardPlayZone.test.jsx</h2>
-      
-        <div class="test passed">
-          <div class="test-title"><CardPlayZone /> renders without crashing</div>
-          
-        </div>
-      
-        <div class="test passed">
-          <div class="test-title"><CardPlayZone /> handles card drop correctly</div>
-          
-        </div>
-      
+      <h2>
+        C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/CardPlayZone.test.jsx
+      </h2>
+
+      <div class="test passed">
+        <div class="test-title"><CardPlayZone /> renders without crashing</div>
+      </div>
+
+      <div class="test passed">
+        <div class="test-title"><CardPlayZone /> handles card drop correctly</div>
+      </div>
     </div>
-  
+
     <div class="test-file">
-      <h2>C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/FinalScorePanel.test.jsx</h2>
-      
-        <div class="test passed">
-          <div class="test-title">FinalScorePanel does not render when finalScore is false</div>
-          
+      <h2>
+        C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/FinalScorePanel.test.jsx
+      </h2>
+
+      <div class="test passed">
+        <div class="test-title">FinalScorePanel does not render when finalScore is false</div>
+      </div>
+
+      <div class="test passed">
+        <div class="test-title">
+          FinalScorePanel renders scores and buttons when finalScore is true
         </div>
-      
-        <div class="test passed">
-          <div class="test-title">FinalScorePanel renders scores and buttons when finalScore is true</div>
-          
-        </div>
-      
-        <div class="test passed">
-          <div class="test-title">FinalScorePanel calls onNewGame when either button is clicked</div>
-          
-        </div>
-      
+      </div>
+
+      <div class="test passed">
+        <div class="test-title">FinalScorePanel calls onNewGame when either button is clicked</div>
+      </div>
     </div>
-  
+
     <div class="test-file">
-      <h2>C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/GameScreen.test.jsx</h2>
-      
-        <div class="test passed">
-          <div class="test-title">GameScreen renders Submit button and sends discard request when clicked</div>
-          
+      <h2>
+        C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/GameScreen.test.jsx
+      </h2>
+
+      <div class="test passed">
+        <div class="test-title">
+          GameScreen renders Submit button and sends discard request when clicked
         </div>
-      
+      </div>
     </div>
-  
+
     <div class="test-file">
-      <h2>C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/LobbyScreen.test.jsx</h2>
-      
-        <div class="test passed">
-          <div class="test-title">LobbyScreen renders lobby code and players when fewer than 4 players</div>
-          
+      <h2>
+        C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/LobbyScreen.test.jsx
+      </h2>
+
+      <div class="test passed">
+        <div class="test-title">
+          LobbyScreen renders lobby code and players when fewer than 4 players
         </div>
-      
-        <div class="test passed">
-          <div class="test-title">LobbyScreen renders nothing if 4 players have joined</div>
-          
-        </div>
-      
+      </div>
+
+      <div class="test passed">
+        <div class="test-title">LobbyScreen renders nothing if 4 players have joined</div>
+      </div>
     </div>
-  
+
     <div class="test-file">
-      <h2>C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/ModeSelectorMulti.test.jsx</h2>
-      
-        <div class="test passed">
-          <div class="test-title">ModeSelector toggles to multiplayer and shows multiplayer inputs</div>
-          
+      <h2>
+        C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/ModeSelectorMulti.test.jsx
+      </h2>
+
+      <div class="test passed">
+        <div class="test-title">
+          ModeSelector toggles to multiplayer and shows multiplayer inputs
         </div>
-      
+      </div>
     </div>
-  
+
     <div class="test-file">
-      <h2>C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/ModeSelectorSingle.test.jsx</h2>
-      
-        <div class="test passed">
-          <div class="test-title">ModeSelector renders single player inputs by default</div>
-          
-        </div>
-      
+      <h2>
+        C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/ModeSelectorSingle.test.jsx
+      </h2>
+
+      <div class="test passed">
+        <div class="test-title">ModeSelector renders single player inputs by default</div>
+      </div>
     </div>
-  
+
     <div class="test-file">
-      <h2>C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/PlayerZone.test.jsx</h2>
-      
-        <div class="test passed">
-          <div class="test-title">PlayerZone renders face-up cards when revealHand=true and showHands=true</div>
-          
+      <h2>
+        C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/PlayerZone.test.jsx
+      </h2>
+
+      <div class="test passed">
+        <div class="test-title">
+          PlayerZone renders face-up cards when revealHand=true and showHands=true
         </div>
-      
-        <div class="test passed">
-          <div class="test-title">PlayerZone renders card backs when revealHand=false</div>
-          
+      </div>
+
+      <div class="test passed">
+        <div class="test-title">PlayerZone renders card backs when revealHand=false</div>
+      </div>
+
+      <div class="test passed">
+        <div class="test-title">PlayerZone clicking a card when not in kitty mode selects it</div>
+      </div>
+
+      <div class="test passed">
+        <div class="test-title">
+          PlayerZone clicking multiple cards in kitty mode adds/removes from discard pile
         </div>
-      
-        <div class="test passed">
-          <div class="test-title">PlayerZone clicking a card when not in kitty mode selects it</div>
-          
-        </div>
-      
-        <div class="test passed">
-          <div class="test-title">PlayerZone clicking multiple cards in kitty mode adds/removes from discard pile</div>
-          
-        </div>
-      
+      </div>
     </div>
-  
+
     <div class="test-file">
-      <h2>C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/Scoreboard.test.jsx</h2>
-      
-        <div class="test passed">
-          <div class="test-title">Scoreboard renders correct scores for viewer on Team A (P1)</div>
-          
-        </div>
-      
-        <div class="test passed">
-          <div class="test-title">Scoreboard renders correct scores for viewer on Team B (P2)</div>
-          
-        </div>
-      
-        <div class="test passed">
-          <div class="test-title">Scoreboard displays formatted winning bid when available</div>
-          
-        </div>
-      
-        <div class="test passed">
-          <div class="test-title">Scoreboard displays "-No" in winning bid if isNo is true</div>
-          
-        </div>
-      
-        <div class="test passed">
-          <div class="test-title">Scoreboard does not display bid section if no winning bid</div>
-          
-        </div>
-      
-        <div class="test passed">
-          <div class="test-title">Scoreboard renders BidZone if bidType is provided</div>
-          
-        </div>
-      
-        <div class="test passed">
-          <div class="test-title">Scoreboard handles partial winning bid safely</div>
-          
-        </div>
-      
+      <h2>
+        C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/Scoreboard.test.jsx
+      </h2>
+
+      <div class="test passed">
+        <div class="test-title">Scoreboard renders correct scores for viewer on Team A (P1)</div>
+      </div>
+
+      <div class="test passed">
+        <div class="test-title">Scoreboard renders correct scores for viewer on Team B (P2)</div>
+      </div>
+
+      <div class="test passed">
+        <div class="test-title">Scoreboard displays formatted winning bid when available</div>
+      </div>
+
+      <div class="test passed">
+        <div class="test-title">Scoreboard displays "-No" in winning bid if isNo is true</div>
+      </div>
+
+      <div class="test passed">
+        <div class="test-title">Scoreboard does not display bid section if no winning bid</div>
+      </div>
+
+      <div class="test passed">
+        <div class="test-title">Scoreboard renders BidZone if bidType is provided</div>
+      </div>
+
+      <div class="test passed">
+        <div class="test-title">Scoreboard handles partial winning bid safely</div>
+      </div>
     </div>
-  
+
     <div class="test-file">
-      <h2>C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/SettingsPanel.test.jsx</h2>
-      
-        <div class="test passed">
-          <div class="test-title">SettingsPanel renders heading and buttons</div>
-          
-        </div>
-      
-        <div class="test passed">
-          <div class="test-title">SettingsPanel calls applySettings when Apply button is clicked</div>
-          
-        </div>
-      
-        <div class="test passed">
-          <div class="test-title">SettingsPanel calls closeSettings when Close button is clicked</div>
-          
-        </div>
-      
+      <h2>
+        C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/components/_tests_/SettingsPanel.test.jsx
+      </h2>
+
+      <div class="test passed">
+        <div class="test-title">SettingsPanel renders heading and buttons</div>
+      </div>
+
+      <div class="test passed">
+        <div class="test-title">SettingsPanel calls applySettings when Apply button is clicked</div>
+      </div>
+
+      <div class="test passed">
+        <div class="test-title">SettingsPanel calls closeSettings when Close button is clicked</div>
+      </div>
     </div>
-  
+
     <div class="test-file">
-      <h2>C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/context/_tests_/AlertContext.test.jsx</h2>
-      
-        <div class="test passed">
-          <div class="test-title">AlertContext displays alert when showAlert is called</div>
-          
-        </div>
-      
-        <div class="test passed">
-          <div class="test-title">AlertContext closes alert when onClose is called</div>
-          
-        </div>
-      
+      <h2>
+        C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/context/_tests_/AlertContext.test.jsx
+      </h2>
+
+      <div class="test passed">
+        <div class="test-title">AlertContext displays alert when showAlert is called</div>
+      </div>
+
+      <div class="test passed">
+        <div class="test-title">AlertContext closes alert when onClose is called</div>
+      </div>
     </div>
-  
+
     <div class="test-file">
-      <h2>C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/context/_tests_/GameStateContext.test.jsx</h2>
-      
-        <div class="test passed">
-          <div class="test-title">GameStateContext provides initial state and allows updates</div>
-          
+      <h2>
+        C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/context/_tests_/GameStateContext.test.jsx
+      </h2>
+
+      <div class="test passed">
+        <div class="test-title">GameStateContext provides initial state and allows updates</div>
+      </div>
+
+      <div class="test passed">
+        <div class="test-title">
+          GameStateContext throws error if useGameState is used outside provider
         </div>
-      
-        <div class="test passed">
-          <div class="test-title">GameStateContext throws error if useGameState is used outside provider</div>
-          
-        </div>
-      
+      </div>
     </div>
-  
+
     <div class="test-file">
-      <h2>C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/context/_tests_/PositionContext.test.jsx</h2>
-      
-        <div class="test passed">
-          <div class="test-title">PositionContext provides correct direction mapping and team assignment</div>
-          
+      <h2>
+        C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/context/_tests_/PositionContext.test.jsx
+      </h2>
+
+      <div class="test passed">
+        <div class="test-title">
+          PositionContext provides correct direction mapping and team assignment
         </div>
-      
-        <div class="test passed">
-          <div class="test-title">PositionContext throws if used outside provider</div>
-          
-        </div>
-      
+      </div>
+
+      <div class="test passed">
+        <div class="test-title">PositionContext throws if used outside provider</div>
+      </div>
     </div>
-  
+
     <div class="test-file">
-      <h2>C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/context/_tests_/RefContext.test.jsx</h2>
-      
-        <div class="test passed">
-          <div class="test-title">RefContext registers and retrieves refs correctly</div>
-          
-        </div>
-      
-        <div class="test passed">
-          <div class="test-title">RefContext throws an error if used outside RefProvider</div>
-          
-        </div>
-      
-        <div class="test passed">
-          <div class="test-title">RefContext warns when trying to register invalid ref</div>
-          
-        </div>
-      
+      <h2>
+        C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/context/_tests_/RefContext.test.jsx
+      </h2>
+
+      <div class="test passed">
+        <div class="test-title">RefContext registers and retrieves refs correctly</div>
+      </div>
+
+      <div class="test passed">
+        <div class="test-title">RefContext throws an error if used outside RefProvider</div>
+      </div>
+
+      <div class="test passed">
+        <div class="test-title">RefContext warns when trying to register invalid ref</div>
+      </div>
     </div>
-  
+
     <div class="test-file">
-      <h2>C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/context/_tests_/UIDisplayContext.test.jsx</h2>
-      
-        <div class="test passed">
-          <div class="test-title">UIDisplayContext initializes and updates values correctly</div>
-          
+      <h2>
+        C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/context/_tests_/UIDisplayContext.test.jsx
+      </h2>
+
+      <div class="test passed">
+        <div class="test-title">UIDisplayContext initializes and updates values correctly</div>
+      </div>
+
+      <div class="test passed">
+        <div class="test-title">
+          UIDisplayContext returns undefined if useUIDisplay is used outside provider
         </div>
-      
-        <div class="test passed">
-          <div class="test-title">UIDisplayContext returns undefined if useUIDisplay is used outside provider</div>
-          
-        </div>
-      
+      </div>
     </div>
-  
+
     <div class="test-file">
-      <h2>C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/utils/_tests_/CardAnimations.test.js</h2>
-      
-        <div class="test passed">
-          <div class="test-title">getAnimationPath returns correct center coordinates for valid refs</div>
-          
+      <h2>
+        C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/utils/_tests_/CardAnimations.test.js
+      </h2>
+
+      <div class="test passed">
+        <div class="test-title">
+          getAnimationPath returns correct center coordinates for valid refs
         </div>
-      
-        <div class="test passed">
-          <div class="test-title">getAnimationPath returns null if from ref is missing</div>
-          
-        </div>
-      
-        <div class="test passed">
-          <div class="test-title">getAnimationPath returns null if to ref is missing</div>
-          
-        </div>
-      
+      </div>
+
+      <div class="test passed">
+        <div class="test-title">getAnimationPath returns null if from ref is missing</div>
+      </div>
+
+      <div class="test passed">
+        <div class="test-title">getAnimationPath returns null if to ref is missing</div>
+      </div>
     </div>
-  
+
     <div class="test-file">
-      <h2>C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/utils/_tests_/CardRefUtil.test.js</h2>
-      
-        <div class="test passed">
-          <div class="test-title">getCardPosition returns correct center coordinates when ref is valid</div>
-          
+      <h2>
+        C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/utils/_tests_/CardRefUtil.test.js
+      </h2>
+
+      <div class="test passed">
+        <div class="test-title">
+          getCardPosition returns correct center coordinates when ref is valid
         </div>
-      
-        <div class="test passed">
-          <div class="test-title">getCardPosition returns null if ref is missing</div>
-          
-        </div>
-      
-        <div class="test passed">
-          <div class="test-title">getCardPosition returns null if ref.current is undefined</div>
-          
-        </div>
-      
+      </div>
+
+      <div class="test passed">
+        <div class="test-title">getCardPosition returns null if ref is missing</div>
+      </div>
+
+      <div class="test passed">
+        <div class="test-title">getCardPosition returns null if ref.current is undefined</div>
+      </div>
     </div>
-  
+
     <div class="test-file">
       <h2>C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/utils/_tests_/CardUtils.test.js</h2>
-      
-        <div class="test passed">
-          <div class="test-title">getCardImage returns the correct image path when card is visible to all</div>
-          
+
+      <div class="test passed">
+        <div class="test-title">
+          getCardImage returns the correct image path when card is visible to all
         </div>
-      
-        <div class="test passed">
-          <div class="test-title">getCardImage returns the back of the card when visibility is not VISIBLE_TO_ALL</div>
-          
+      </div>
+
+      <div class="test passed">
+        <div class="test-title">
+          getCardImage returns the back of the card when visibility is not VISIBLE_TO_ALL
         </div>
-      
-        <div class="test passed">
-          <div class="test-title">getCardImage returns the back of the card and warns if card is null</div>
-          
+      </div>
+
+      <div class="test passed">
+        <div class="test-title">
+          getCardImage returns the back of the card and warns if card is null
         </div>
-      
-        <div class="test passed">
-          <div class="test-title">getCardImage returns the back of the card and warns if card is undefined</div>
-          
+      </div>
+
+      <div class="test passed">
+        <div class="test-title">
+          getCardImage returns the back of the card and warns if card is undefined
         </div>
-      
+      </div>
     </div>
-  
+
     <div class="test-file">
-      <h2>C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/utils/_tests_/PositionUtils.test.js</h2>
-      
-        <div class="test passed">
-          <div class="test-title">getPositionMap maps correctly when viewer is P1</div>
-          
+      <h2>
+        C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/utils/_tests_/PositionUtils.test.js
+      </h2>
+
+      <div class="test passed">
+        <div class="test-title">getPositionMap maps correctly when viewer is P1</div>
+      </div>
+
+      <div class="test passed">
+        <div class="test-title">getPositionMap maps correctly when viewer is P2</div>
+      </div>
+
+      <div class="test passed">
+        <div class="test-title">getPositionMap maps correctly when viewer is P3</div>
+      </div>
+
+      <div class="test passed">
+        <div class="test-title">getPositionMap maps correctly when viewer is P4</div>
+      </div>
+
+      <div class="test passed">
+        <div class="test-title">
+          getPositionMap returns empty object and warns if viewer position not found
         </div>
-      
-        <div class="test passed">
-          <div class="test-title">getPositionMap maps correctly when viewer is P2</div>
-          
-        </div>
-      
-        <div class="test passed">
-          <div class="test-title">getPositionMap maps correctly when viewer is P3</div>
-          
-        </div>
-      
-        <div class="test passed">
-          <div class="test-title">getPositionMap maps correctly when viewer is P4</div>
-          
-        </div>
-      
-        <div class="test passed">
-          <div class="test-title">getPositionMap returns empty object and warns if viewer position not found</div>
-          
-        </div>
-      
+      </div>
     </div>
-  
+
     <div class="test-file">
       <h2>C:/Users/Leh-D/VSCode/bidwhist/bidwhist-frontend/src/utils/_tests_/TimeUtils.test.js</h2>
-      
-        <div class="test passed">
-          <div class="test-title">delay resolves after specified milliseconds</div>
-          
-        </div>
-      
-        <div class="test passed">
-          <div class="test-title">delay resolves immediately for 0ms</div>
-          
-        </div>
-      
+
+      <div class="test passed">
+        <div class="test-title">delay resolves after specified milliseconds</div>
+      </div>
+
+      <div class="test passed">
+        <div class="test-title">delay resolves immediately for 0ms</div>
+      </div>
     </div>
-  
-</body>
+  </body>
 </html>

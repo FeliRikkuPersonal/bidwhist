@@ -8,17 +8,22 @@ import { AllProviders } from '../../test-utils/AllProviders';
 
 /* Helper to wrap ModeSelector with required context */
 function renderWithProviders(ui) {
-  return render(<AllProviders>
-    <GameStateProvider>
-      <PositionProvider>{ui}</PositionProvider>
-    </GameStateProvider>
+  return render(
+    <AllProviders>
+      <GameStateProvider>
+        <PositionProvider>{ui}</PositionProvider>
+      </GameStateProvider>
     </AllProviders>
   );
 }
 
 describe('ModeSelector', () => {
   test('renders single player inputs by default', () => {
-    const { container } = renderWithProviders(<AllProviders><ModeSelector /></AllProviders>);
+    const { container } = renderWithProviders(
+      <AllProviders>
+        <ModeSelector />
+      </AllProviders>
+    );
 
     // Scope to the visible single-player form
     const singleForm = container.querySelector('.mode-form.single');

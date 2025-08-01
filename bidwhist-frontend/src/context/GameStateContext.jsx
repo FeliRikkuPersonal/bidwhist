@@ -64,15 +64,14 @@ export const GameStateProvider = ({ children }) => {
     setBidWinnerPos(null);
     setWinningBid(null);
     setCurrentTrick([]);
-    setLeadSuit(null)
+    setLeadSuit(null);
     setCompletedTricks([]);
     setTeamAScore(0);
     setTeamBScore(0);
     setTeamATricksWon(0);
     setTeamBTricksWon(0);
     setForcedBid(false);
-  }
-
+  };
 
   /**
    * Updates game state from a backend response object.
@@ -81,7 +80,7 @@ export const GameStateProvider = ({ children }) => {
    * @param {object} response - JSON response from backend polling
    */
   const updateFromResponse = (response) => {
-    if ('players' in response ) {
+    if ('players' in response) {
       setPlayers(response.players);
     }
     if ('currentTurnIndex' in response) setCurrentTurnIndex(response.currentTurnIndex);

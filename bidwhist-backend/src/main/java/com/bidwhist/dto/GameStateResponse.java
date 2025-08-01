@@ -253,5 +253,4 @@ public class GameStateResponse {
   public void setGameId(String id) {
     this.gameId = id;
   }
-
 }

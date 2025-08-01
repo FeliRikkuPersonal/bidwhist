@@ -36,12 +36,15 @@ beforeEach(() => {
       P4: 'Dan',
     })
   );
-  localStorage.setItem('playedCardsByDirection', JSON.stringify({
-  north: { suit: 'H', rank: 'K' },
-  south: null,
-  east: null,
-  west: null,
-}));
+  localStorage.setItem(
+    'playedCardsByDirection',
+    JSON.stringify({
+      north: { suit: 'H', rank: 'K' },
+      south: null,
+      east: null,
+      west: null,
+    })
+  );
 
   localStorage.setItem(
     'handMap',

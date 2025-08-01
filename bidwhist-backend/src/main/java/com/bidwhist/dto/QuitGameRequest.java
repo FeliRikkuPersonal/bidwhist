@@ -4,9 +4,7 @@ package com.bidwhist.dto;
 
 import com.bidwhist.model.PlayerPos;
 
-/**
- * DTO for quiting the current game state.
- */
+/** DTO for quiting the current game state. */
 public class QuitGameRequest {
   private PlayerPos player;
   private String gameId;

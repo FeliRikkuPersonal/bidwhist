@@ -1,10 +1,7 @@
 import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import {
-  UIDisplayProvider,
-  useUIDisplay,
-} from '../UIDisplayContext';
+import { UIDisplayProvider, useUIDisplay } from '../UIDisplayContext';
 import { AllProviders } from '../../test-utils/AllProviders';
 
 function FullTestConsumer() {
@@ -29,10 +26,7 @@ function FullTestConsumer() {
       setShowGameScreen(true);
       setHandFor('north', ['JH']);
       queueAnimationFromResponse({
-        animationQueue: [
-          { type: 'FADE' },
-          { type: 'FLIP' },
-        ]
+        animationQueue: [{ type: 'FADE' }, { type: 'FLIP' }],
       });
       setDiscardPile(['4D']);
       setTeamATricks(3);
@@ -44,36 +38,35 @@ function FullTestConsumer() {
     <div>
       <div data-testid="screen">{showGameScreen ? 'Game' : 'Lobby'}</div>
       <div data-testid="northHand">{handMap.north.join(',')}</div>
-      <div data-testid="queue">
-        {animationQueue.map(a => a.type).join('|')}
-      </div>
+      <div data-testid="queue">{animationQueue.map((a) => a.type).join('|')}</div>
       <div data-testid="discard">{discardPile.join(',')}</div>
       <div data-testid="tricks">{teamATricks}</div>
       <div data-testid="myTurn">{myTurn.toString()}</div>
-      <button onClick={() => act(() => clearUIContext())} data-testid="clear">Reset</button>
+      <button onClick={() => act(() => clearUIContext())} data-testid="clear">
+        Reset
+      </button>
     </div>
   );
 }
 
 describe('UIDisplayContext (Full Suite)', () => {
-it('correctly sets and updates context values', async () => {
-  render(
-    <AllProviders>
-      <FullTestConsumer />
-    </AllProviders>
-  );
+  it('correctly sets and updates context values', async () => {
+    render(
+      <AllProviders>
+        <FullTestConsumer />
+      </AllProviders>
+    );
 
-  // Wait for the state to settle
-  const screenText = await screen.findByTestId('screen');
-  expect(screenText.textContent).toBe('Game');
+    // Wait for the state to settle
+    const screenText = await screen.findByTestId('screen');
+    expect(screenText.textContent).toBe('Game');
 
-  expect(screen.getByTestId('northHand').textContent).toBe('JH');
-  expect(screen.getByTestId('queue').textContent).toBe('FADE|FLIP');
-  expect(screen.getByTestId('discard').textContent).toBe('4D');
-  expect(screen.getByTestId('tricks').textContent).toBe('3');
-  expect(screen.getByTestId('myTurn').textContent).toBe('true');
-});
-
+    expect(screen.getByTestId('northHand').textContent).toBe('JH');
+    expect(screen.getByTestId('queue').textContent).toBe('FADE|FLIP');
+    expect(screen.getByTestId('discard').textContent).toBe('4D');
+    expect(screen.getByTestId('tricks').textContent).toBe('3');
+    expect(screen.getByTestId('myTurn').textContent).toBe('true');
+  });
 
   it('resets values via clearUIContext()', () => {
     render(
