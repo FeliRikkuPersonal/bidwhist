@@ -137,6 +137,8 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
           setShowAnimatedCards(true);
           setShowHands(false);
           setBidWinnerPos(null);
+          setTeamATricks(0);
+          setTeamBTricks(0);
           dealCardsClockwise(
             playerPositions,
             cards,
@@ -458,7 +460,7 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
       setShowBidding(false);
       setTeamATricks(0);
       setTeamBTricks(0);
-      set
+      setAnimatedCards([]);
     } else {
       throwAlert(message, 'error');
     }

@@ -18,6 +18,7 @@ const HamburgerMenu = () => {
     key, setKey, 
     clearUIContext, 
     setAnimationQueue, 
+    setAnimatedCard,
     setBidPhase,
     setShowBidding,
     setShowFinalScore,
@@ -56,6 +57,7 @@ const HamburgerMenu = () => {
       setMyTurn(isMyTurn);
       setTeamATricks(0);
       setTeamBTricks(0);
+      setAnimatedCard([]);
       reloadComponent();
     } else {
       throwAlert(message, 'error');
