@@ -72,6 +72,9 @@ const PlayerZone = forwardRef(({ direction, name, revealHand, cards = [] }, ref)
       register(`hand-${direction}`, handRef);
 
       const attemptRegisterOrigin = () => {
+        // Prevent crashing if unmounted
+        if (!handRef.current) return;
+
         const firstCard = handRef.current.querySelector('.card-img');
         if (firstCard) {
           register(`card-origin-${direction}`, { current: firstCard });
@@ -90,6 +93,7 @@ const PlayerZone = forwardRef(({ direction, name, revealHand, cards = [] }, ref)
       register(`zone-${direction}`, ref);
     }
   }, [direction, register, ref]);
+
 
   /**
    * Exposes getPosition() to parent via ref.
@@ -115,49 +119,49 @@ const PlayerZone = forwardRef(({ direction, name, revealHand, cards = [] }, ref)
         {showHands &&
           (revealHand
             ? cards
-                .filter((c) => !(playedCard?.cardImage === c.cardImage && direction === 'south'))
-                .map((card, i) => (
-                  <img
-                    key={i}
-                    src={`/static/img/deck/${card.cardImage}`}
-                    alt="card"
-                    className="card-img draggable"
-                    style={{
-                      transform:
-                        playedCard?.cardImage === card.cardImage
-                          ? `translate(${playedCardPosition.x}px, ${playedCardPosition.y}px)`
-                          : selectedIndices.includes(i)
-                            ? 'translateY(-30px)'
-                            : 'translateY(0)',
-                      border: selectedIndices.includes(i) ? '2px solid gold' : 'none',
-                      opacity: playedCard?.cardImage === card.cardImage ? 0.9 : 1,
-                      transition: 'transform 0.2s, border 0.2s, opacity 0.2s',
-                      position: playedCard?.cardImage === card.cardImage ? 'absolute' : 'relative',
-                      left:
-                        playedCard?.cardImage === card.cardImage ? playedCardPosition.x : undefined,
-                      top:
-                        playedCard?.cardImage === card.cardImage ? playedCardPosition.y : undefined,
-                    }}
-                    onClick={() => handleCardClick(i, card)}
-                    draggable={myTurn && direction === 'south'}
-                    onDragStart={(e) => {
-                      e.dataTransfer.setData('application/json', JSON.stringify(card));
-                      setDraggingCardIndex(i);
-                    }}
-                    onDragEnd={() => setDraggingCardIndex(null)}
-                  />
-                ))
-            : cards.map((_, i) => (
+              .filter((c) => !(playedCard?.cardImage === c.cardImage && direction === 'south'))
+              .map((card, i) => (
                 <img
                   key={i}
-                  src="/static/img/deck/Deck_Back.png"
-                  alt="Card Back"
-                  className="card-img"
+                  src={`/static/img/deck/${card.cardImage}`}
+                  alt="card"
+                  className="card-img draggable"
                   style={{
-                    visibility: draggingCardIndex === i ? 'hidden' : 'visible',
+                    transform:
+                      playedCard?.cardImage === card.cardImage
+                        ? `translate(${playedCardPosition.x}px, ${playedCardPosition.y}px)`
+                        : selectedIndices.includes(i)
+                          ? 'translateY(-30px)'
+                          : 'translateY(0)',
+                    border: selectedIndices.includes(i) ? '2px solid gold' : 'none',
+                    opacity: playedCard?.cardImage === card.cardImage ? 0.9 : 1,
+                    transition: 'transform 0.2s, border 0.2s, opacity 0.2s',
+                    position: playedCard?.cardImage === card.cardImage ? 'absolute' : 'relative',
+                    left:
+                      playedCard?.cardImage === card.cardImage ? playedCardPosition.x : undefined,
+                    top:
+                      playedCard?.cardImage === card.cardImage ? playedCardPosition.y : undefined,
                   }}
+                  onClick={() => handleCardClick(i, card)}
+                  draggable={myTurn && direction === 'south'}
+                  onDragStart={(e) => {
+                    e.dataTransfer.setData('application/json', JSON.stringify(card));
+                    setDraggingCardIndex(i);
+                  }}
+                  onDragEnd={() => setDraggingCardIndex(null)}
                 />
-              )))}
+              ))
+            : cards.map((_, i) => (
+              <img
+                key={i}
+                src="/static/img/deck/Deck_Back.png"
+                alt="Card Back"
+                className="card-img"
+                style={{
+                  visibility: draggingCardIndex === i ? 'hidden' : 'visible',
+                }}
+              />
+            )))}
       </div>
 
       {['north', 'south'].includes(direction) && <div className="player-name">{name}</div>}

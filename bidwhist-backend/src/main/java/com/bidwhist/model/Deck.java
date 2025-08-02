@@ -59,6 +59,23 @@ public class Deck {
     for (int i = 48; i < 54; i++) {
       kitty.addCard(cards.get(i));
     }
+
+    for (Player player : players) {
+      for (Card c : player.getHand().getCards()) {
+        if (JokerUtils.isJokerRank(c.getRank())) {
+          System.out.println("[Deal] Dealt joker to " + player.getName()
+              + " | card=" + c
+              + " | id=" + System.identityHashCode(c));
+        }
+      }
+    }
+
+    for (Card c : cards) {
+      if (JokerUtils.isJokerRank(c.getRank())) {
+        System.out.println("[Deck] Joker in deck: " + c + " | id=" + System.identityHashCode(c));
+      }
+    }
+
   }
 
   /*
@@ -76,6 +93,11 @@ public class Deck {
   public void assignTrumpSuitToJokers(Suit trump) {
     for (Card card : cards) {
       card.assignSuit(trump);
+
+      if (JokerUtils.isJokerRank(card.getRank())) {
+        System.out.println("[AssignTrump] Joker=" + card + " | id=" + System.identityHashCode(card));
+      }
+
     }
   }
 

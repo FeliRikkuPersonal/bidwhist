@@ -12,8 +12,18 @@ import '../css/HamburgerMenu.css'; // Optional styling
 
 const HamburgerMenu = () => {
   const [open, setOpen] = useState(false);
-  const { setMyTurn, queueAnimationFromResponse, key, setKey, clearUIContext, setAnimationQueue } =
-    useUIDisplay();
+  const { 
+    setMyTurn, 
+    queueAnimationFromResponse, 
+    key, setKey, 
+    clearUIContext, 
+    setAnimationQueue, 
+    setBidPhase,
+    setShowBidding,
+    setShowFinalScore,
+    setTeamATricks,
+    setTeamBTricks,
+  } = useUIDisplay();
   const { viewerPosition } = usePositionContext();
   const { gameId, updateFromResponse, clearGameStateContext } = useGameState();
   const savedMode = JSON.parse(localStorage.getItem('mode'));
@@ -39,8 +49,13 @@ const HamburgerMenu = () => {
       setAnimationQueue([]);
       await clearCurrentGameData({ clearUIContext, clearGameStateContext });
       updateFromResponse(gameData);
+      setShowFinalScore(false);
       queueAnimationFromResponse(gameData, key);
+      setBidPhase(false);
+      setShowBidding(false);
       setMyTurn(isMyTurn);
+      setTeamATricks(0);
+      setTeamBTricks(0);
       reloadComponent();
     } else {
       throwAlert(message, 'error');

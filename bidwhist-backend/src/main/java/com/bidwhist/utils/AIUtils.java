@@ -33,17 +33,15 @@ public class AIUtils {
     List<FinalBid> bidOptions = evaluator.evaluateAll(ai.getPosition());
     InitialBid currentHigh = game.getHighestBid();
 
-    List<FinalBid> strongerBids =
-        bidOptions.stream()
-            .filter(bid -> currentHigh == null || bid.getInitialBid().compareTo(currentHigh) > 0)
-            .toList();
+    List<FinalBid> strongerBids = bidOptions.stream()
+        .filter(bid -> currentHigh == null || bid.getInitialBid().compareTo(currentHigh) > 0)
+        .toList();
 
     if (strongerBids.isEmpty()) {
       return InitialBid.pass(ai.getPosition());
     }
 
-    FinalBid bestBid =
-        strongerBids.stream().max(Comparator.comparingInt(FinalBid::getValue)).orElse(null);
+    FinalBid bestBid = strongerBids.stream().max(Comparator.comparingInt(FinalBid::getValue)).orElse(null);
 
     game.getFinalBidCache().put(ai.getPosition(), bestBid);
 
@@ -108,6 +106,14 @@ public class AIUtils {
       }
 
       Card chosenCard = chooseCardForAI(game, current, game.getCurrentTrick());
+
+      if (JokerUtils.isJokerRank(chosenCard.getRank())) {
+        String suitStr = (chosenCard.getSuit() == null) ? "null" : chosenCard.getSuit().name();
+        System.out.println("[Play] Attempting to play joker: " + chosenCard
+            + " | suit=" + suitStr
+            + " | id=" + System.identityHashCode(chosenCard));
+      }
+
       System.out.println(
           "DEBUG: "
               + current.getName()
@@ -136,8 +142,7 @@ public class AIUtils {
         System.out.println("DEBUG: Trick complete. Evaluating winner...");
         PlayedCard winner = HandUtils.determineTrickWinner(game, game.getCurrentTrick());
 
-        Player winnerPlayer =
-            PlayerUtils.getPlayerByPosition(winner.getPlayer(), game.getPlayers());
+        Player winnerPlayer = PlayerUtils.getPlayerByPosition(winner.getPlayer(), game.getPlayers());
         Team winnerTeam = winnerPlayer.getTeam();
         System.out.println(
             "DEBUG: Trick won by " + winnerPlayer.getName() + " (Team " + winnerTeam + ")");
@@ -183,13 +188,20 @@ public class AIUtils {
   /**
    * Selects the best card for the AI to play based on difficulty level.
    *
-   * <p>- EASY: Plays the lowest legal card to keep logic simple. - MEDIUM: Leads with the highest
-   * non-trump card or follows suit with the lowest. - HARD: Evaluates trump, lead suit, partner
-   * position, and past tricks to choose: - A safe high card if leading - A defensive low card if
-   * partner is winning - The weakest card that can beat the current winner - A fallback lowest card
+   * <p>
+   * - EASY: Plays the lowest legal card to keep logic simple. - MEDIUM: Leads
+   * with the highest
+   * non-trump card or follows suit with the lowest. - HARD: Evaluates trump, lead
+   * suit, partner
+   * position, and past tricks to choose: - A safe high card if leading - A
+   * defensive low card if
+   * partner is winning - The weakest card that can beat the current winner - A
+   * fallback lowest card
    * when no better play is found
    *
-   * <p>Decision logic adjusts dynamically based on trick position, trump usage, and potential to
+   * <p>
+   * Decision logic adjusts dynamically based on trick position, trump usage, and
+   * potential to
    * preserve strong cards for later rounds.
    */
   public static Card chooseCardForAI(
@@ -197,6 +209,8 @@ public class AIUtils {
     List<Card> hand = aiPlayer.getHand().getCards();
     Difficulty difficulty = game.getDifficulty();
     PlayerPos aiPlayerPosition = aiPlayer.getPosition();
+
+    System.out.println("Getting card for " + aiPlayer.getName());
 
     if (difficulty == Difficulty.EASY) {
       Card easyCard = getEasyAIMove(game, hand, currentTrick);
@@ -214,7 +228,8 @@ public class AIUtils {
   }
 
   /**
-   * Returns a "dumb" AI move for Easy difficulty. - If leading: play the highest card (no strategy)
+   * Returns a "dumb" AI move for Easy difficulty. - If leading: play the highest
+   * card (no strategy)
    * - If following: play the lowest legal card (follow suit if possible)
    */
   public static Card getEasyAIMove(GameState game, List<Card> hand, List<PlayedCard> trick) {
@@ -224,6 +239,15 @@ public class AIUtils {
     }
 
     List<Card> playableHand = HandUtils.getPlayableHand(game, trick, hand);
+
+    System.out.println("Full hand:");
+    for (Card card : hand) {
+      System.out.println(card.toString());
+    }
+    System.out.println("Playable hand:");
+    for (Card card : playableHand) {
+      System.out.println(card.toString());
+    }
 
     if (HandUtils.canWinTrick(game, trick, playableHand)) {
       return HandUtils.canBeat(game, trick, playableHand);
@@ -235,11 +259,15 @@ public class AIUtils {
   /**
    * Determines the Medium AI's move based on the current game state.
    *
-   * <p>- If leading: plays the highest-ranked card in hand. - If following: - Plays the lowest
-   * legal non-trump card if partner is winning or cannot win the trick. - Otherwise, attempts to
+   * <p>
+   * - If leading: plays the highest-ranked card in hand. - If following: - Plays
+   * the lowest
+   * legal non-trump card if partner is winning or cannot win the trick. -
+   * Otherwise, attempts to
    * win with the highest legal card.
    *
-   * <p>Prioritizes safe play and avoids wasting strong cards when unnecessary.
+   * <p>
+   * Prioritizes safe play and avoids wasting strong cards when unnecessary.
    */
   public static Card getMediumAIMove(
       GameState game, PlayerPos player, List<Card> hand, List<PlayedCard> trick) {
@@ -248,8 +276,16 @@ public class AIUtils {
     }
 
     List<Card> playableHand = HandUtils.getPlayableHand(game, trick, hand);
-    Suit trumpSuit = game.getTrumpSuit();
     PlayedCard winningCard = HandUtils.determineTrickWinner(game, trick);
+
+    System.out.println("Full hand:");
+    for (Card card : hand) {
+      System.out.println(card.toString());
+    }
+    System.out.println("Playable hand:");
+    for (Card card : playableHand) {
+      System.out.println(card.toString());
+    }
 
     if (HandUtils.partnerIsWinning(player, winningCard)
         || !HandUtils.canWinTrick(game, trick, playableHand)) {
@@ -265,6 +301,7 @@ public class AIUtils {
    * @return
    */
   public static Card getHardAIMove(
+
       GameState game, PlayerPos player, List<Card> hand, List<PlayedCard> trick) {
     Suit trumpSuit = game.getTrumpSuit();
     boolean isNoTrump = game.getWinningBid().isNo();
@@ -272,12 +309,15 @@ public class AIUtils {
 
     // Leading
     if (trick.isEmpty()) {
-      Card highestTrump = HandUtils.getHighestOfSuit(game, hand, trumpSuit);
-      if (highestTrump != null
-          && HandUtils.allHigherCardsPlayed(
-              highestTrump, playedCardList, hand, trumpSuit, game.getBidType(), isNoTrump)
-          && !HandUtils.areOpponentsSuitVoid(game, player, trumpSuit)) {
-        return highestTrump; // Drain opponent's trump cards
+      if (HandUtils.hasSuit(hand, trumpSuit)) {
+        Card highestTrump = HandUtils.getHighestOfSuit(game, hand, trumpSuit);
+
+        if (highestTrump != null
+            && HandUtils.allHigherCardsPlayed(
+                highestTrump, playedCardList, hand, trumpSuit, game.getBidType(), isNoTrump)
+            && !HandUtils.areOpponentsSuitVoid(game, player, trumpSuit)) {
+          return highestTrump; // Drain opponent's trump cards
+        }
       } else {
         return HandUtils.getHighestRankedCard(game, hand);
       }
@@ -291,6 +331,15 @@ public class AIUtils {
       boolean wasCut = !winningCard.getCard().getSuit().equals(leadSuit);
       Card canBeatCard = null;
       boolean trickIsWinnable = HandUtils.canWinTrick(game, trick, playableHand);
+
+      System.out.println("Full hand:");
+      for (Card card : hand) {
+        System.out.println(card.toString());
+      }
+      System.out.println("Playable hand:");
+      for (Card card : playableHand) {
+        System.out.println(card.toString());
+      }
 
       if (trickIsWinnable) {
         canBeatCard = HandUtils.canBeat(game, trick, playableHand);
@@ -394,7 +443,7 @@ public class AIUtils {
                 if (!HandUtils.areOpponentsSuitVoid(game, player, leadSuit)
                     && HandUtils.isPartnerSuitVoid(game, player, leadSuit)
                     && !HandUtils.isPartnerSuitVoid(game, player, trumpSuit)) {
-                  if (HandUtils.hasDiscardSuit(hand, trumpSuit)) {
+                  if (HandUtils.hasDiscardSuit(playableHand, trumpSuit)) {
                     return HandUtils.getDiscardCard(game, playableHand);
                   } else {
                     return HandUtils.getLowestOfSuit(game, playableHand, trumpSuit);

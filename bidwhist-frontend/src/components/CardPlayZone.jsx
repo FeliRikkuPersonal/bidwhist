@@ -74,8 +74,10 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
     winningPlayerName,
     setWinningBid,
     bidWinnerPos,
+    setBidWinnerPos,
     forcedBid,
     setForcedBid,
+    updateFromResponse,
   } = useGameState();
 
   const [isOver, setIsOver] = useState(false); // Tracks if drag is over drop zone
@@ -94,10 +96,6 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
     if (!animationQueue || animationQueue.length === 0) return;
 
     const animation = animationQueue[0];
-    if ('sessionKey' in animation && animation.sessionKey !== key) {
-      console.log('[SKIP] Animation from old session:', animation.sessionKey, 'Expected:', key);
-      return;
-    }
 
     const thisTurn = animation?.currentTurnIndex !== undefined ? animation.currentTurnIndex : null;
 
@@ -138,6 +136,7 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
         setTimeout(() => {
           setShowAnimatedCards(true);
           setShowHands(false);
+          setBidWinnerPos(null);
           dealCardsClockwise(
             playerPositions,
             cards,
@@ -273,6 +272,7 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
 
       if (animation.type == 'HIDE_HANDS') {
         setShowHands(false);
+        setShowFinalScore(false);
       }
 
       if (animation.type === 'UPDATE_CARDS') {
@@ -454,8 +454,11 @@ export default function CardPlayZone({ dropZoneRef, yourTrickRef, theirTrickRef,
       setShowFinalScore(false);
       queueAnimationFromResponse(gameData, key);
       setMyTurn(isMyTurn);
+      setBidPhase(false);
+      setShowBidding(false);
       setTeamATricks(0);
       setTeamBTricks(0);
+      set
     } else {
       throwAlert(message, 'error');
     }

@@ -34,6 +34,7 @@ import com.bidwhist.utils.AIUtils;
 import com.bidwhist.utils.CardUtils;
 import com.bidwhist.utils.GameplayUtils;
 import com.bidwhist.utils.HandUtils;
+import com.bidwhist.utils.JokerUtils;
 import com.bidwhist.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +48,8 @@ public class GameService {
   private final Map<String, GameState> games = new ConcurrentHashMap<>();
 
   /* Constructor for GameService (DeckService currently unused) */
-  public GameService(DeckService deckService) {}
+  public GameService(DeckService deckService) {
+  }
 
   /*
    * Starts a solo game with one human player and three AIs.
@@ -193,17 +195,16 @@ public class GameService {
     Team myTeam = game.getTeamByPlayerPos(players, playerPosition);
     List<Card> shuffledDeck = getMyShuffledDeck(game, playerPosition);
 
-    GameStateResponse response =
-        new GameStateResponse(
-            game.getAnimationList().getOrDefault(playerPosition, new ArrayList<>()),
-            playerViews,
-            myKittyView,
-            game.getCurrentTurnIndex(),
-            game.getPhase(),
-            shuffledDeck,
-            playerPosition,
-            game.getFirstBidder(),
-            game.getBidTurnIndex());
+    GameStateResponse response = new GameStateResponse(
+        game.getAnimationList().getOrDefault(playerPosition, new ArrayList<>()),
+        playerViews,
+        myKittyView,
+        game.getCurrentTurnIndex(),
+        game.getPhase(),
+        shuffledDeck,
+        playerPosition,
+        game.getFirstBidder(),
+        game.getBidTurnIndex());
 
     response.setWinningPlayerName(game.getWinningPlayerName());
     response.setHighestBid(game.getHighestBid());
@@ -232,11 +233,10 @@ public class GameService {
       throw new IllegalStateException("Game has not been started. Call /start first.");
     }
 
-    Player bidder =
-        game.getPlayers().stream()
-            .filter(p -> p.getPosition().equals(request.getPlayer()))
-            .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException("Player not found"));
+    Player bidder = game.getPlayers().stream()
+        .filter(p -> p.getPosition().equals(request.getPlayer()))
+        .findFirst()
+        .orElseThrow(() -> new IllegalArgumentException("Player not found"));
 
     InitialBid bid = BidRequest.fromRequest(request, bidder);
     game.addBid(bid);
@@ -266,11 +266,10 @@ public class GameService {
 
     if (game.getBids().size() >= 4) {
       PlayerPos winnerPos = game.getHighestBid().getPlayer();
-      Player winner =
-          game.getPlayers().stream()
-              .filter(p -> p.getPosition().equals(winnerPos))
-              .findFirst()
-              .orElseThrow(() -> new IllegalStateException("Winner not found"));
+      Player winner = game.getPlayers().stream()
+          .filter(p -> p.getPosition().equals(winnerPos))
+          .findFirst()
+          .orElseThrow(() -> new IllegalStateException("Winner not found"));
 
       game.setBidWinnerPos(winnerPos);
 
@@ -279,12 +278,11 @@ public class GameService {
         game.setBidType(BidType.NO_TRUMP);
         game.setTrumpSuit(null);
 
-        FinalBid finalBid =
-            new FinalBid(
-                game.getHighestBid().getPlayer(),
-                game.getHighestBid().getValue(),
-                BidType.NO_TRUMP,
-                null);
+        FinalBid finalBid = new FinalBid(
+            game.getHighestBid().getPlayer(),
+            game.getHighestBid().getValue(),
+            BidType.NO_TRUMP,
+            null);
         game.setWinningBidStats(finalBid);
 
         if (winner.isAI()) {
@@ -333,11 +331,10 @@ public class GameService {
     GameState game = getGameById(request.getGameId());
 
     PlayerPos winnerPos = request.getPlayer();
-    Player winner =
-        game.getPlayers().stream()
-            .filter(p -> p.getPosition().equals(winnerPos))
-            .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException("Player not found: " + winnerPos));
+    Player winner = game.getPlayers().stream()
+        .filter(p -> p.getPosition().equals(winnerPos))
+        .findFirst()
+        .orElseThrow(() -> new IllegalArgumentException("Player not found: " + winnerPos));
 
     if (winner.isAI()) {
       throw new IllegalStateException("AI players do not need to finalize a bid.");
@@ -376,15 +373,13 @@ public class GameService {
       throw new IllegalArgumentException("Only the winning player may apply the kitty.");
     }
 
-    Player winner =
-        game.getPlayers().stream()
-            .filter(
-                p ->
-                    p.getName()
-                        .equals(
-                            PlayerUtils.getNameByPosition(request.getPlayer(), game.getPlayers())))
-            .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException("Winning player not found."));
+    Player winner = game.getPlayers().stream()
+        .filter(
+            p -> p.getName()
+                .equals(
+                    PlayerUtils.getNameByPosition(request.getPlayer(), game.getPlayers())))
+        .findFirst()
+        .orElseThrow(() -> new IllegalArgumentException("Winning player not found."));
 
     if (request.getDiscards().size() != 6) {
       throw new IllegalArgumentException("You must discard exactly 6 cards.");
@@ -453,6 +448,14 @@ public class GameService {
     }
 
     Card cardToPlay = request.getCard();
+
+    if (JokerUtils.isJokerRank(cardToPlay.getRank())) {
+      String suitStr = (cardToPlay.getSuit() == null) ? "null" : cardToPlay.getSuit().name();
+      System.out.println("[Play] Attempting to play joker: " + cardToPlay
+          + " | suit=" + suitStr
+          + " | id=" + System.identityHashCode(cardToPlay));
+    }
+
     game.addPlayedCard(cardToPlay);
     if (!currentPlayer.getHand().getCards().contains(cardToPlay)) {
       throw new IllegalArgumentException(
@@ -466,8 +469,7 @@ public class GameService {
     if (!currentTrick.isEmpty()) {
       Suit leadSuit = currentTrick.get(0).getCard().getSuit();
       game.setLeadSuit(leadSuit);
-      boolean hasLeadSuit =
-          currentPlayer.getHand().getCards().stream().anyMatch(c -> c.getSuit() == leadSuit);
+      boolean hasLeadSuit = currentPlayer.getHand().getCards().stream().anyMatch(c -> c.getSuit() == leadSuit);
       if (hasLeadSuit && cardToPlay.getSuit() != leadSuit) {
         throw new IllegalArgumentException("Must follow suit if possible");
       }
@@ -525,7 +527,7 @@ public class GameService {
     }
 
     if (PlayerUtils.getPlayerByPosition(
-            PlayerPos.values()[game.getCurrentTurnIndex()], game.getPlayers())
+        PlayerPos.values()[game.getCurrentTurnIndex()], game.getPlayers())
         .isAI()) {
       AIUtils.autoPlayAITurns(game);
     }
