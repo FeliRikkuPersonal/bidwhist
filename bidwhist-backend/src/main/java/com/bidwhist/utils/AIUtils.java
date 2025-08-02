@@ -1,5 +1,9 @@
 package com.bidwhist.utils;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
 import com.bidwhist.bidding.FinalBid;
 import com.bidwhist.bidding.HandEvaluator;
 import com.bidwhist.bidding.InitialBid;
@@ -15,9 +19,6 @@ import com.bidwhist.model.Player;
 import com.bidwhist.model.PlayerPos;
 import com.bidwhist.model.Suit;
 import com.bidwhist.model.Team;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
 
 public class AIUtils {
 
@@ -198,19 +199,46 @@ public class AIUtils {
     Difficulty difficulty = game.getDifficulty();
     PlayerPos aiPlayerPosition = aiPlayer.getPosition();
 
-    if (difficulty == Difficulty.EASY) {
-      Card easyCard = getEasyAIMove(game, hand, currentTrick);
-      game.addPlayedCard(easyCard);
-      return easyCard;
-    } else if (difficulty == Difficulty.MEDIUM) {
-      Card mediumCard = getMediumAIMove(game, aiPlayerPosition, hand, currentTrick);
-      game.addPlayedCard(mediumCard);
-      return mediumCard;
-    } else {
-      Card hardCard = getHardAIMove(game, aiPlayer.getPosition(), hand, currentTrick);
-      game.addPlayedCard(hardCard);
-      return hardCard;
+
+        // Safety check: ensure AI has cards to play
+    if (hand == null || hand.isEmpty()) {
+      System.err.println("ERROR: AI " + aiPlayer.getName() + " has no cards in hand!");
+      return null;
     }
+
+    Card chosenCard = null;
+
+
+    if (difficulty == Difficulty.EASY) {
+      chosenCard = getEasyAIMove(game, hand, currentTrick);
+    } else if (difficulty == Difficulty.MEDIUM) {
+      chosenCard = getMediumAIMove(game, aiPlayerPosition, hand, currentTrick);
+    } else {
+     chosenCard = getHardAIMove(game, aiPlayer.getPosition(), hand, currentTrick);
+    }
+  
+    // Null check with fallback logic
+    if (chosenCard == null) {
+      System.err.println("WARNING: AI " + aiPlayer.getName() + " difficulty method returned null. Using fallback.");
+      
+      // Try to get a legal card based on the current trick
+      if (currentTrick != null && !currentTrick.isEmpty()) {
+        chosenCard = HandUtils.getLowestLegalCard(game, currentTrick, hand);
+      }
+      
+      // Final fallback: just pick the first card
+      if (chosenCard == null && !hand.isEmpty()) {
+        chosenCard = hand.get(0);
+        System.err.println("FALLBACK: AI " + aiPlayer.getName() + " choosing first available card: " + chosenCard);
+      }
+    }
+
+    // Only add to played cards if we have a valid card
+    if (chosenCard != null) {
+      game.addPlayedCard(chosenCard);
+    }
+
+    return chosenCard;
   }
 
   /**
@@ -218,6 +246,10 @@ public class AIUtils {
    * - If following: play the lowest legal card (follow suit if possible)
    */
   public static Card getEasyAIMove(GameState game, List<Card> hand, List<PlayedCard> trick) {
+        if (hand == null || hand.isEmpty()) {
+      return null;
+    }
+
     if (trick == null || trick.isEmpty()) {
       // AI is leading — play highest card
       return HandUtils.getHighestRankedCard(game, hand);
@@ -243,6 +275,10 @@ public class AIUtils {
    */
   public static Card getMediumAIMove(
       GameState game, PlayerPos player, List<Card> hand, List<PlayedCard> trick) {
+    if (hand == null || hand.isEmpty()) {
+      return null;
+    }
+
     if (trick.isEmpty()) {
       return HandUtils.getHighestRankedCard(game, hand);
     }
@@ -266,6 +302,10 @@ public class AIUtils {
    */
   public static Card getHardAIMove(
       GameState game, PlayerPos player, List<Card> hand, List<PlayedCard> trick) {
+    if (hand == null || hand.isEmpty()) {
+      return null;
+    }
+
     Suit trumpSuit = game.getTrumpSuit();
     boolean isNoTrump = game.getWinningBid().isNo();
     List<Card> playedCardList = game.getPlayedCards();
